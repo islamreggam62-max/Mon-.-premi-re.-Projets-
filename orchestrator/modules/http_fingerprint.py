@@ -17,7 +17,7 @@ _TITLE_RE = re.compile(rb"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 
 class HttpFingerprint(Module):
     name = "http_fingerprint"
-    description = "Fetch HTTP(S) headers and page title with a single GET request."
+    description = "جلب ترويسات HTTP(S) وعنوان الصفحة عبر طلب GET واحد."
 
     def run(self, target: str) -> ModuleResult:
         schemes = self.options.get("schemes") or ["https", "http"]

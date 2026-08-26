@@ -23,7 +23,7 @@ COMMON_PORTS: dict[int, str] = {
 
 class PortScan(Module):
     name = "port_scan"
-    description = "TCP connect scan of common ports (non-intrusive handshake only)."
+    description = "فحص TCP connect للمنافذ الشائعة (مصافحة عادية غير تدخّلية فقط)."
 
     def run(self, target: str) -> ModuleResult:
         ports = self.options.get("ports") or sorted(COMMON_PORTS)

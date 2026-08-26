@@ -79,18 +79,18 @@ class Engine:
                 tr.authorized = True
             except AuthorizationError as exc:
                 tr.skipped_reason = str(exc)
-                log.warning("SKIP %s: %s", target, exc)
+                log.warning("تخطّي %s: %s", target, exc)
                 report.targets.append(tr)
                 continue
 
-            log.info("Scanning authorized target: %s", target)
+            log.info("فحص هدف مُصرَّح به: %s", target)
             for name in self.module_names:
                 module = REGISTRY[name](**module_options.get(name, {}))
                 try:
                     result = module.run(target)
                 except Exception as exc:  # defensive: a module bug must not abort the run
                     result = ModuleResult(module=name, target=target, ok=False, error=repr(exc))
-                    log.error("Module %s crashed on %s: %s", name, target, exc)
+                    log.error("تعطّلت الوحدة %s على %s: %s", name, target, exc)
                 tr.results.append(result)
             report.targets.append(tr)
 

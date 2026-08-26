@@ -9,7 +9,7 @@ from .base import Module, ModuleResult
 
 class DnsRecon(Module):
     name = "dns_recon"
-    description = "Resolve forward and reverse DNS records for the target."
+    description = "تحليل سجلّات DNS المباشرة والعكسية للهدف."
 
     def run(self, target: str) -> ModuleResult:
         try:

@@ -1,20 +1,18 @@
-"""Authorization guardrail.
+"""بوابة الأذونات (Authorization guardrail).
 
-This module is the safety gate of the orchestrator. No scanning module is
-allowed to run against a target until that target has been confirmed to be
-inside an explicitly declared, attested authorization scope.
+هذه الوحدة هي صمّام الأمان في المنسّق. لا يُسمح لأي وحدة فحص بالعمل ضد أي
+هدف قبل التأكّد من أنه داخل نطاق أذونات مُعلَن ومُوثَّق صراحةً.
 
-Design principles
------------------
-* **Default deny.** With no authorization file, nothing runs.
-* **Explicit attestation.** The operator must set ``i_am_authorized: true`` and
-  name themselves. This is a deliberate friction point: it forces the human to
-  affirm they have permission before the tool does anything.
-* **Scope is a whitelist.** Only hosts/CIDRs listed in ``scope`` are testable.
-  Everything else is rejected, including by accident.
-* **Local-only default.** When ``allow_nonlocal`` is not explicitly enabled, the
-  scope may only contain loopback / private (RFC 1918) / link-local addresses,
-  so an out-of-the-box run can never reach the public internet.
+مبادئ التصميم
+-------------
+* **المنع افتراضيًا.** بدون ملف أذونات، لا شيء يعمل.
+* **إقرار صريح.** على المشغّل ضبط ``i_am_authorized: true`` وذكر اسمه. هذه
+  عقبة متعمَّدة تُلزم الإنسان بالإقرار بأنه يملك التصريح قبل أن يفعل الأداة أي شيء.
+* **النطاق قائمة سماح.** فقط المضيفون/نطاقات CIDR المذكورون في ``scope`` قابلون
+  للفحص. وكل ما عداهم يُرفَض، حتى عن طريق الخطأ.
+* **محلي فقط افتراضيًا.** ما لم يُفعَّل ``allow_nonlocal`` صراحةً، لا يقبل النطاق
+  إلا عناوين الحلقة المحلية / الخاصة (RFC 1918) / المحلية للوصلة، بحيث لا يمكن
+  لأي تشغيل جاهز أن يصل إلى الإنترنت العام.
 """
 
 from __future__ import annotations
@@ -29,12 +27,12 @@ try:
     import yaml
 except ImportError as exc:  # pragma: no cover - dependency hint
     raise SystemExit(
-        "PyYAML is required. Install dependencies with: pip install -r requirements.txt"
+        "‏PyYAML مطلوبة. ثبّت الاعتماديات عبر: pip install -r requirements.txt"
     ) from exc
 
 
 class AuthorizationError(Exception):
-    """Raised whenever a target or configuration is not authorized."""
+    """يُطلَق كلما كان هدف أو إعداد غير مُصرَّح به."""
 
 
 @dataclass
@@ -52,19 +50,19 @@ class Authorization:
         path = Path(path)
         if not path.exists():
             raise AuthorizationError(
-                f"No authorization file at '{path}'. Copy authorization.example.yaml, "
-                "fill in your scope, and confirm you are authorized before running."
+                f"‏لا يوجد ملف أذونات في '{path}'. انسخ authorization.example.yaml، "
+                "واملأ نطاقك، وأقرّ بأنك مُصرَّح لك قبل التشغيل."
             )
         data = yaml.safe_load(path.read_text()) or {}
 
         missing = [k for k in ("operator", "engagement", "scope") if not data.get(k)]
         if missing:
-            raise AuthorizationError(f"Authorization file missing fields: {', '.join(missing)}")
+            raise AuthorizationError(f"‏ملف الأذونات تنقصه حقول: {', '.join(missing)}")
 
         if data.get("i_am_authorized") is not True:
             raise AuthorizationError(
-                "Refusing to run: set 'i_am_authorized: true' in the authorization file "
-                "only if you have written permission to test every host in scope."
+                "‏رفض التشغيل: اضبط 'i_am_authorized: true' في ملف الأذونات فقط إن كان "
+                "لديك تصريح كتابي لاختبار كل مضيف في النطاق."
             )
 
         expires = data.get("expires")
@@ -72,7 +70,7 @@ class Authorization:
             expires = date.fromisoformat(expires)
         if isinstance(expires, date) and expires < date.today():
             raise AuthorizationError(
-                f"Authorization expired on {expires.isoformat()}. Renew it before scanning."
+                f"‏انتهت صلاحية الأذونات بتاريخ {expires.isoformat()}. جدّدها قبل الفحص."
             )
 
         auth = cls(
@@ -92,18 +90,18 @@ class Authorization:
             for net in self._resolve_entry(entry):
                 if not self.allow_nonlocal and not self._is_local(net):
                     raise AuthorizationError(
-                        f"Scope entry '{entry}' ({net}) is a public address. "
-                        "Refusing by default. If you truly have authorization for a "
-                        "non-local target, set 'allow_nonlocal: true' explicitly."
+                        f"‏عنصر النطاق '{entry}' ({net}) عنوان عام. "
+                        "مرفوض افتراضيًا. إن كان لديك فعلاً تصريح لهدف غير محلي، "
+                        "فاضبط 'allow_nonlocal: true' صراحةً."
                     )
                 networks.append(net)
         if not networks:
-            raise AuthorizationError("Authorization scope resolved to zero targets.")
+            raise AuthorizationError("‏نطاق الأذونات لم يُحدِّد أي هدف.")
         self._networks = networks
 
     @staticmethod
     def _resolve_entry(entry: str) -> list[ipaddress._BaseNetwork]:
-        # A CIDR or bare IP resolves directly; a hostname is resolved via DNS.
+        # نطاق CIDR أو عنوان IP مجرّد يُحلّ مباشرةً؛ اسم المضيف يُحلّ عبر DNS.
         try:
             return [ipaddress.ip_network(entry, strict=False)]
         except ValueError:
@@ -111,7 +109,7 @@ class Authorization:
         try:
             infos = socket.getaddrinfo(entry, None)
         except socket.gaierror as exc:
-            raise AuthorizationError(f"Could not resolve scope host '{entry}': {exc}") from exc
+            raise AuthorizationError(f"‏تعذّر تحليل مضيف النطاق '{entry}': {exc}") from exc
         nets = []
         for info in infos:
             ip = info[4][0]
@@ -123,7 +121,7 @@ class Authorization:
         return net.is_private or net.is_loopback or net.is_link_local
 
     def check(self, target: str) -> None:
-        """Raise AuthorizationError unless *target* falls inside the scope."""
+        """يُطلق AuthorizationError ما لم يكن *target* داخل النطاق."""
         try:
             addr = ipaddress.ip_address(target)
             candidates = [addr]
@@ -131,14 +129,14 @@ class Authorization:
             try:
                 infos = socket.getaddrinfo(target, None)
             except socket.gaierror as exc:
-                raise AuthorizationError(f"Could not resolve target '{target}': {exc}") from exc
+                raise AuthorizationError(f"‏تعذّر تحليل الهدف '{target}': {exc}") from exc
             candidates = [ipaddress.ip_address(i[4][0]) for i in infos]
 
         for addr in candidates:
             if any(addr in net for net in self._networks):
                 return
         raise AuthorizationError(
-            f"Target '{target}' is not inside the authorized scope. Refusing to touch it."
+            f"‏الهدف '{target}' خارج النطاق المُصرَّح به. رفض المساس به."
         )
 
     def is_authorized(self, target: str) -> bool:

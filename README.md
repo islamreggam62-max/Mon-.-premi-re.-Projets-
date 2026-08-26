@@ -1,91 +1,108 @@
-# cyber-orchestrator
+# cyber-orchestrator — منسّق استطلاع
 
-An **educational, authorization-gated reconnaissance orchestrator**.
+<div dir="rtl">
 
-It demonstrates the real structure of a security-assessment pipeline —
-*recon → scan → report* — while making it **impossible to run against a target
-you have not explicitly declared you are authorized to test**. It performs only
-non-destructive observation (DNS lookups, TCP-connect port checks, a single HTTP
-request). There is no exploitation, brute-forcing, denial-of-service, or
-evasion code here, by design.
+**منسّق استطلاع (Reconnaissance) تعليمي محكوم بالأذونات.**
 
-> ⚠️ **Use only on systems you own or are explicitly authorized to test.**
-> Unauthorized scanning of computers you do not own is illegal in most
-> jurisdictions. This project is meant for home labs, CTFs, and authorized
-> engagements.
+يُظهر البنية الحقيقية لخطّ تقييم أمني — *استطلاع ← فحص ← تقرير* — مع جعله
+**من المستحيل تشغيله ضد هدف لم تُعلن صراحةً أنك مُصرَّح لك باختباره**. لا يقوم
+إلا بمراقبة غير تدخّلية (استعلامات DNS، فحص منافذ TCP-connect، طلب HTTP واحد).
+لا يوجد هنا أي استغلال للثغرات، ولا تخمين لكلمات المرور، ولا حجب خدمة (DoS)،
+ولا تهرّب من الكشف — وذلك بحكم التصميم.
 
-## How the safety gate works
+> ⚠️ **استخدمه فقط على الأنظمة التي تملكها أو صُرّح لك صراحةً باختبارها.**
+> الفحص غير المصرَّح به لأجهزة لا تملكها غير قانوني في معظم الدول. هذا المشروع
+> موجّه للمختبرات المنزلية، ومسابقات CTF، والمهام المُصرَّح بها.
 
-Nothing runs until you provide an `authorization.yaml` that:
+## كيف تعمل بوابة الأمان
 
-1. names the operator and engagement,
-2. sets `i_am_authorized: true` (an explicit attestation), and
-3. lists a **scope** whitelist of hosts/CIDRs.
+لا شيء يعمل حتى تُوفّر ملف `authorization.yaml` الذي:
 
-Every target is checked against that scope before any module touches it.
-By default only loopback / private / link-local addresses are permitted, so a
-first run can never reach the public internet. Out-of-scope targets are skipped
-and recorded, never scanned.
+1. يذكر المشغّل والمهمّة،
+2. يضبط `i_am_authorized: true` (إقرار صريح)، و
+3. يُدرج **نطاقًا (scope)** كقائمة سماح بالمضيفين/نطاقات CIDR.
 
-## Quick start
+يُفحَص كل هدف مقابل هذا النطاق قبل أن تمسّه أي وحدة. افتراضيًا تُقبل عناوين
+الحلقة المحلية / الخاصة / المحلية للوصلة فقط، بحيث لا يمكن لأول تشغيل أن يصل
+إلى الإنترنت العام. الأهداف خارج النطاق تُتخطّى وتُسجَّل، ولا تُفحَص أبدًا.
+
+## البداية السريعة
+
+</div>
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 cp authorization.example.yaml authorization.yaml
-# edit authorization.yaml: set i_am_authorized: true and your scope
+# عدّل authorization.yaml: اضبط i_am_authorized: true ونطاقك
 
-# scan a target that is inside your declared scope
+# افحص هدفًا داخل نطاقك المُعلَن
 python -m orchestrator 127.0.0.1 -v
 ```
 
-## Usage
+<div dir="rtl">
+
+## الاستخدام
+
+</div>
 
 ```bash
 python -m orchestrator [targets...] [options]
 
-  -a, --auth PATH        authorization file (default: authorization.yaml)
-  -m, --modules LIST     comma-separated modules to run
+  -a, --auth PATH        ملف الأذونات (الافتراضي: authorization.yaml)
+  -m, --modules LIST     وحدات للتشغيل مفصولة بفواصل
   -f, --format {text,json}
-  -o, --output PATH      write the report to a file
-      --list-modules     list available modules
+  -o, --output PATH      كتابة التقرير إلى ملف
+      --list-modules     عرض الوحدات المتاحة
   -v, --verbose
 ```
 
-## Built-in modules
+<div dir="rtl">
 
-| module             | what it does (non-destructive)                         |
-|--------------------|--------------------------------------------------------|
-| `dns_recon`        | forward + reverse DNS resolution                       |
-| `port_scan`        | TCP-connect scan of common ports (ordinary handshakes) |
-| `http_fingerprint` | single GET request; records status, headers, title     |
+## الوحدات المضمّنة
 
-Add your own by subclassing `orchestrator.modules.base.Module` and registering
-it in `orchestrator/modules/__init__.py`.
+| الوحدة             | ما تفعله (غير تدخّلية)                                 |
+|--------------------|-------------------------------------------------------|
+| `dns_recon`        | تحليل DNS مباشر وعكسي                                  |
+| `port_scan`        | فحص TCP-connect للمنافذ الشائعة (مصافحات عادية)        |
+| `http_fingerprint` | طلب GET واحد؛ يسجّل الحالة والترويسات والعنوان          |
 
-## Architecture
+أضِف وحداتك الخاصة بوراثة `orchestrator.modules.base.Module` وتسجيلها في
+`orchestrator/modules/__init__.py`.
+
+## البنية المعمارية
+
+</div>
 
 ```
 orchestrator/
-  authorization.py   # the safety gate (default-deny, scope whitelist)
-  engine.py          # runs modules per authorized target -> RunReport
-  reporting.py       # RunReport -> text / JSON
-  cli.py             # command-line interface
+  authorization.py   # بوابة الأمان (منع افتراضي، قائمة سماح للنطاق)
+  engine.py          # يشغّل الوحدات لكل هدف مُصرَّح ← RunReport
+  reporting.py       # RunReport ← نص / JSON
+  cli.py             # واجهة سطر الأوامر
   modules/
-    base.py          # Module base class + ModuleResult
+    base.py          # صنف Module الأساس + ModuleResult
     recon_dns.py
     port_scan.py
     http_fingerprint.py
 ```
 
-## Tests
+<div dir="rtl">
+
+## الاختبارات
+
+</div>
 
 ```bash
 pip install pytest
 python -m pytest -q
 ```
 
-## License
+<div dir="rtl">
+
+## الرخصة
 
 MIT
+
+</div>

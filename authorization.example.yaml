@@ -1,26 +1,26 @@
 # ---------------------------------------------------------------------------
-# Authorization file  --  copy to authorization.yaml and fill it in.
+# ملف الأذونات  --  انسخه إلى authorization.yaml ثم املأه.
 #
-# The orchestrator will NOT run against any target that is not covered here.
-# Only list hosts you own or have written permission to test.
+# لن يعمل المنسّق ضد أي هدف غير مذكور هنا.
+# اذكر فقط المضيفين الذين تملكهم أو لديك تصريح كتابي باختبارهم.
 # ---------------------------------------------------------------------------
 
-operator: "Your Name"
-engagement: "Home lab practice"      # a label for this run / engagement
+operator: "اسمك"
+engagement: "تدريب في المختبر المنزلي"   # وصف لهذه المهمّة / الجولة
 
-# Set to true ONLY if you have permission to test every host in 'scope'.
-# This is an attestation. Leaving it false (or absent) refuses every run.
+# اضبطه على true فقط إن كان لديك تصريح باختبار كل مضيف في 'scope'.
+# هذا إقرار. تركه false (أو غيابه) يرفض كل تشغيل.
 i_am_authorized: false
 
-# Optional expiry (ISO date). After this date, runs are refused.
+# انتهاء صلاحية اختياري (تاريخ ISO). بعد هذا التاريخ تُرفَض عمليات التشغيل.
 # expires: "2026-12-31"
 
-# By default only loopback / private / link-local targets are allowed, so an
-# out-of-the-box run can never reach the public internet. Flip this to true
-# only for a genuinely authorized non-local engagement.
+# افتراضيًا تُقبل الأهداف المحلية / الخاصة / المحلية للوصلة فقط، بحيث لا يمكن
+# لأي تشغيل جاهز أن يصل إلى الإنترنت العام. اجعله true فقط لمهمّة غير محلية
+# مُصرَّح بها فعلاً.
 allow_nonlocal: false
 
-# Whitelist of testable targets: bare IPs, CIDR ranges, or hostnames.
+# قائمة سماح للأهداف القابلة للفحص: عناوين IP مجرّدة، أو نطاقات CIDR، أو أسماء مضيفين.
 scope:
   - 127.0.0.1
-  - 192.168.56.0/24     # e.g. a private VirtualBox host-only lab network
+  - 192.168.56.0/24     # مثال: شبكة مختبر خاصة معزولة (host-only)
