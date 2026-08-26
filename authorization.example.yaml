@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------------------
+# Authorization file  --  copy to authorization.yaml and fill it in.
+#
+# The orchestrator will NOT run against any target that is not covered here.
+# Only list hosts you own or have written permission to test.
+# ---------------------------------------------------------------------------
+
+operator: "Your Name"
+engagement: "Home lab practice"      # a label for this run / engagement
+
+# Set to true ONLY if you have permission to test every host in 'scope'.
+# This is an attestation. Leaving it false (or absent) refuses every run.
+i_am_authorized: false
+
+# Optional expiry (ISO date). After this date, runs are refused.
+# expires: "2026-12-31"
+
+# By default only loopback / private / link-local targets are allowed, so an
+# out-of-the-box run can never reach the public internet. Flip this to true
+# only for a genuinely authorized non-local engagement.
+allow_nonlocal: false
+
+# Whitelist of testable targets: bare IPs, CIDR ranges, or hostnames.
+scope:
+  - 127.0.0.1
+  - 192.168.56.0/24     # e.g. a private VirtualBox host-only lab network
