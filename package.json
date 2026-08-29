@@ -1,0 +1,14 @@
+{
+  "name": "haqqi-dz",
+  "version": "0.1.0",
+  "private": true,
+  "description": "حقّي — منصة قانونية بالدارجة الجزائرية لحقوق المرأة",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "node build.js && node --run serve:only",
+    "serve:only": "python3 -m http.server 8080 --directory public",
+    "check": "node build.js --check"
+  },
+  "license": "UNLICENSED"
+}
