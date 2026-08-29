@@ -163,13 +163,14 @@ form.addEventListener('submit', (event) => {
 
   const data = new FormData(form);
   const guests = Number(data.get('guests'));
-  const people = guests === 1 ? 'شخص واحد' : guests === 2 ? 'شخصان' : `${guests} أشخاص`;
+  // حرف الجر داخل العبارة: «لشخصين» تُوصل، بينما «لـ 4 أشخاص» تُفصل عن الرقم
+  const people = guests === 1 ? 'لشخص واحد' : guests === 2 ? 'لشخصين' : `لـ ${guests} أشخاص`;
   const dateLabel = new Date(data.get('date')).toLocaleDateString('ar-MA', {
     weekday: 'long', day: 'numeric', month: 'long'
   });
 
   $('#booking-summary').textContent =
-    `شكرًا ${data.get('name')}. طاولة لـ ${people} يوم ${dateLabel} على الساعة ${data.get('time')}. ` +
+    `شكرًا ${data.get('name')}. طاولة ${people} يوم ${dateLabel} على الساعة ${data.get('time')}. ` +
     `سنؤكّد الحجز برسالة على ${data.get('phone')}.`;
 
   form.hidden = true;
