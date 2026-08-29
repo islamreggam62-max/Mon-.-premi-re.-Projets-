@@ -1,0 +1,126 @@
+/* =========================================================
+   دليل قاعات الحفلات — صفحة مرجعية تُمسح بالعين لا تُقرأ سطرًا سطرًا
+   عالم بصري واحد فاتح، كل لون مُصرَّح به.
+   ========================================================= */
+
+:root {
+  --pg:   #f6f5f3;
+  --cd:   #ffffff;
+  --ink:  #17181a;
+  --ink2: #64676d;   /* رمادي بميل بارد خفيف */
+  --ln:   #e2e0dc;
+  --key:  #1b3a6b;   /* كحلي هادئ: لون مرفق عمومي لا علامة تجارية */
+  --key2: #12294d;
+  --tint: #e8edf5;
+
+  --dis: "Readex Pro", "Segoe UI", Tahoma, sans-serif;
+  --bod: "Almarai", "Segoe UI", "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body { margin: 0; font-family: var(--bod); background: var(--pg); color: var(--ink); line-height: 1.8; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3 { font-family: var(--dis); font-weight: 700; line-height: 1.35; margin: 0 0 .35em; }
+p { margin: 0 0 .8em; }
+:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; border-radius: 6px; }
+
+.wr { width: min(100% - 2rem, 1120px); margin-inline: auto; }
+.dot { opacity: .45; margin-inline: .35rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; inset-inline-start: 1rem; top: -100px; z-index: 90; background: var(--key); color: #fff; padding: .6rem 1rem; transition: top .2s; }
+.skip:focus { top: 0; }
+
+/* ---------- الرأس ---------- */
+.hd { background: var(--key); color: #fff; }
+.hd__in { padding-block: 2.2rem 1.8rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; justify-content: space-between; }
+.hd h1 { font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.2rem); margin: 0; }
+.hd__sub { margin: .3em 0 0; color: #c3d0e4; max-width: 52ch; }
+.hd__meta { margin: 0; font-size: .85rem; color: #c3d0e4; font-variant-numeric: tabular-nums; }
+
+/* ---------- أدوات البحث ---------- */
+.tools { background: var(--cd); border-bottom: 1px solid var(--ln); position: sticky; top: 0; z-index: 20; }
+.tools .wr { padding-block: 1rem; }
+.srch input {
+  font: inherit; width: 100%; color: var(--ink); background: var(--pg);
+  border: 1px solid var(--ln); border-radius: 12px; padding: .7rem 1rem;
+}
+.srch input:focus { border-color: var(--key); }
+
+.rows { display: grid; gap: .5rem; margin-top: .8rem; }
+.row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.row__l { font-size: .78rem; font-weight: 700; color: var(--ink2); min-width: 3rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  font: inherit; font-size: .85rem; padding: .3rem .85rem; cursor: pointer;
+  background: var(--pg); color: var(--ink); border: 1px solid var(--ln); border-radius: 999px;
+  transition: background-color .14s, color .14s, border-color .14s;
+}
+.chip:hover { border-color: var(--key); }
+.chip.on { background: var(--key); border-color: var(--key); color: #fff; }
+
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .9rem; }
+.bar__n { margin: 0; font-size: .85rem; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.sort select { font: inherit; font-size: .88rem; color: var(--ink); background: var(--pg); border: 1px solid var(--ln); border-radius: 10px; padding: .4rem .7rem; }
+
+/* ---------- البطاقات ---------- */
+#list { padding-block: 1.6rem 3rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+
+.c {
+  background: var(--cd); border: 1px solid var(--ln); border-radius: 14px;
+  overflow: hidden; display: flex; flex-direction: column;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.c:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(23,24,26,.05), 0 14px 30px rgba(23,24,26,.09); }
+/* الصورة النائبة تشتقّ لونها من درجة اللون في البيانات، فتتمايز البطاقات بلا صور */
+.c__art {
+  height: 92px;
+  background:
+    radial-gradient(120% 150% at 70% 0%, hsl(var(--h) 55% 72%), hsl(var(--h) 45% 42%));
+}
+.c__b { padding: 1rem 1.1rem 1.1rem; display: flex; flex-direction: column; flex: 1; }
+.c h3 { font-size: 1.08rem; margin-bottom: .1em; }
+.c__meta { margin: 0; font-size: .85rem; color: var(--ink2); }
+.c__note { margin: .5em 0 0; font-size: .88rem; color: var(--ink2); }
+.c__price { margin: .7em 0 0; font-size: .9rem; color: var(--ink2); }
+.c__price strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.c__acts { margin-top: auto; padding-top: .9rem; display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+.c__no { font-size: .8rem; color: var(--ink2); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; font-weight: 700; background: var(--key); color: #fff;
+  padding: .75rem 1.6rem; border-radius: 999px; border: 0; cursor: pointer;
+  transition: background-color .15s;
+  direction: ltr;
+}
+.btn:hover { background: var(--key2); color: #fff; }
+.btn--sm { padding: .4rem 1rem; font-size: .88rem; }
+.lnk { font-weight: 700; color: var(--key); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; font: inherit; cursor: pointer; }
+
+.empty { text-align: center; padding: 2.5rem 0; color: var(--ink2); }
+
+/* ---------- الإضافة ---------- */
+.join { background: var(--tint); border-block: 1px solid var(--ln); }
+.join__in { padding-block: 2.2rem; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
+.join h2 { font-size: 1.25rem; }
+.join p { margin: 0 0 .5em; max-width: 58ch; color: var(--ink2); }
+.join__fine { font-size: .84rem; }
+
+/* ---------- التذييل ---------- */
+.ft { background: var(--cd); }
+.ft__in { padding-block: 1.3rem; font-size: .85rem; color: var(--ink2); }
+
+/* ---------- الاستجابة ---------- */
+@media (max-width: 600px) {
+  .hd__in { flex-direction: column; align-items: start; }
+  .row { align-items: start; flex-direction: column; gap: .35rem; }
+  .bar { flex-direction: column; align-items: start; gap: .5rem; }
+  .join__in { flex-direction: column; align-items: stretch; }
+  .join .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}

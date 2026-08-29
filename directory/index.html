@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل قاعات الحفلات — الجزائر العاصمة</title>
+<meta name="description" content="دليل مجاني لقاعات الحفلات بالجزائر العاصمة: السعة، الصيغ، الأحياء، وأرقام الهاتف في صفحة واحدة.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=Almarai:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/dir.css">
+</head>
+<body>
+<a class="skip" href="#list">تخطَّ إلى القائمة</a>
+
+<header class="hd">
+  <div class="wr hd__in">
+    <div>
+      <h1 id="t-title">دليل قاعات الحفلات</h1>
+      <p class="hd__sub" id="t-tag">…</p>
+    </div>
+    <p class="hd__meta">
+      <span id="t-count">—</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span id="t-city">—</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span>آخر تحديث <time id="t-upd">—</time></span>
+    </p>
+  </div>
+</header>
+
+<main>
+  <section class="tools" aria-label="البحث والتصفية">
+    <div class="wr">
+      <label class="srch">
+        <span class="sr-only">ابحث باسم القاعة أو الحيّ</span>
+        <input id="q" type="search" placeholder="ابحث باسم القاعة أو الحيّ…" autocomplete="off">
+      </label>
+      <div class="rows">
+        <div class="row"><span class="row__l">الحيّ</span><div class="chips" id="f-area" role="group" aria-label="تصفية حسب الحيّ"></div></div>
+        <div class="row"><span class="row__l">السعة</span><div class="chips" id="f-cap" role="group" aria-label="تصفية حسب السعة"></div></div>
+      </div>
+      <div class="bar">
+        <p class="bar__n" id="t-res" aria-live="polite"></p>
+        <label class="sort">
+          <span class="sr-only">ترتيب</span>
+          <select id="sort">
+            <option value="name">ترتيب: الاسم</option>
+            <option value="price-asc">السعر: من الأقلّ</option>
+            <option value="price-desc">السعر: من الأعلى</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section id="list" class="wr">
+    <div class="cards" id="cards"></div>
+    <p class="empty" id="empty" hidden>لا توجد نتيجة مطابقة. <button class="lnk" id="reset">أعد ضبط التصفية</button></p>
+  </section>
+
+  <section class="join">
+    <div class="wr join__in">
+      <div>
+        <h2>قاعتك ليست هنا؟ أضفها مجانًا</h2>
+        <p>
+          الدليل مجاني بالكامل ولا يُدفع مقابل الإدراج. أرسل اسم القاعة والحيّ
+          والسعة ورقم الهاتف، وتُضاف خلال 48 ساعة.
+        </p>
+        <p class="join__fine">
+          نعرض معلومات معلنة فقط (اسم، حيّ، هاتف، صيغ). لحذف قاعتك أو تصحيح
+          بياناتها، راسلنا وتُنفَّذ في اليوم نفسه.
+        </p>
+      </div>
+      <a class="btn" id="join-btn" href="#">أضف قاعتك على واتساب</a>
+    </div>
+  </section>
+</main>
+
+<footer class="ft">
+  <div class="wr ft__in">
+    <span>دليل مجاني يحرّره <strong id="t-owner">—</strong></span>
+    <span class="dot" aria-hidden="true">·</span>
+    <span>© <span data-year>2026</span></span>
+  </div>
+</footer>
+
+<script src="js/dir.js"></script>
+</body>
+</html>
