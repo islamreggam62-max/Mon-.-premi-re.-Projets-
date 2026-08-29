@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الاستوديو</title>
+<meta name="description" content="اكتب اسم المؤسسة ومجالها ولونها، فيظهر موقعها جاهزًا في ثوانٍ — ورابط ترسله فورًا.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700&family=Almarai:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/studio.css">
+</head>
+<body>
+
+<!-- وضع العرض: يظهر الموقع وحده بملء الشاشة حين يحمل الرابط v=1 -->
+<div class="full" id="full" hidden></div>
+
+<!-- وضع التحرير -->
+<div class="app" id="app">
+  <header class="bar">
+    <div class="bar__in">
+      <span class="bar__logo"><span aria-hidden="true">◈</span> الاستوديو</span>
+      <span class="bar__note">اكتب، فيُبنى الموقع أمامك — ثم أرسل الرابط</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="pane" aria-label="بيانات المؤسسة">
+      <label class="fld">
+        <span>اسم المؤسسة</span>
+        <input id="i-name" type="text" value="دار الياسمين" maxlength="40" autocomplete="off">
+        <em class="err" id="e-name"></em>
+      </label>
+
+      <label class="fld">
+        <span>المجال</span>
+        <select id="i-sector"></select>
+      </label>
+
+      <div class="fld">
+        <span>لون العلامة</span>
+        <div class="swatches" id="i-swatches" role="group" aria-label="ألوان جاهزة"></div>
+        <label class="pickrow">
+          <input id="i-color" type="color" value="#b4531f">
+          <span class="pickrow__t">أو اختر لونًا آخر</span>
+        </label>
+      </div>
+
+      <label class="fld">
+        <span>الهاتف</span>
+        <input id="i-phone" type="tel" value="0550 00 00 00" maxlength="20" autocomplete="off">
+      </label>
+
+      <label class="fld">
+        <span>العنوان</span>
+        <input id="i-addr" type="text" value="حيدرة، الجزائر العاصمة" maxlength="60" autocomplete="off">
+      </label>
+
+      <label class="fld">
+        <span>جملة تعريفية (اختياري)</span>
+        <textarea id="i-lead" rows="3" maxlength="180" placeholder="اتركها فارغة لاستعمال النص الجاهز"></textarea>
+      </label>
+
+      <div class="acts">
+        <button class="b b--fill" id="b-copy" type="button">انسخ الرابط</button>
+        <button class="b b--edge" id="b-open" type="button">افتح بملء الشاشة</button>
+      </div>
+      <p class="tip" id="tip">
+        الرابط يحمل البيانات بداخله — لا خادم ولا حساب. أرسله في واتساب وسيفتح
+        عند صاحب المؤسسة كما تراه الآن.
+      </p>
+    </section>
+
+    <section class="stage" aria-label="معاينة الموقع">
+      <div class="phone">
+        <div class="phone__bar"><span></span></div>
+        <div class="phone__screen" id="preview"></div>
+      </div>
+      <p class="stage__hint">هكذا سيراه صاحب المؤسسة على هاتفه</p>
+    </section>
+  </main>
+</div>
+
+<script src="js/sectors.js"></script>
+<script src="js/studio.js"></script>
+</body>
+</html>
