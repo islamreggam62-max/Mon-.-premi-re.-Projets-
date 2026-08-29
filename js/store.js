@@ -1,7 +1,7 @@
 /* منطق مشترك بين كل الصفحات: السلة، التنسيق، رأس الصفحة، التنبيهات. */
 
 const CART_KEY = 'nour-store-cart-v1';
-const CURRENCY = 'د.م';
+const CURRENCY = 'دج';
 
 /* ---------- أدوات عامة ---------- */
 
@@ -9,7 +9,8 @@ const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 function formatPrice(value) {
-  return `${Number(value).toLocaleString('ar-MA', { maximumFractionDigits: 2 })} ${CURRENCY}`;
+  // تجميع الآلاف بمسافة لا بنقطة: «9 100 دج» بدل «9.100 دج» التي تُقرأ خطأً كعدد عشري
+  return `${Number(value).toLocaleString('fr-DZ', { maximumFractionDigits: 2 })} ${CURRENCY}`;
 }
 
 /* صيغة الجمع في العربية: 1 مفرد، 2 مثنّى، 3–10 جمع، 11+ تمييز مفرد منصوب */
