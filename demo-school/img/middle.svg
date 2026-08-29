@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="middle">
+  <defs>
+    <radialGradient id="g-middle" cx="45%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#b98ac4" stop-opacity="0.85"/>
+      <stop offset="55%" stop-color="#b98ac4" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#4a2352" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="n-middle"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="45"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer></filter>
+  </defs>
+  <rect width="1200" height="900" fill="#4a2352"/>
+  <rect width="1200" height="900" fill="url(#g-middle)"/>
+  <g opacity="0.13" fill="none" stroke="#b98ac4" stroke-width="3">
+    <circle cx="250" cy="640" r="130"/><circle cx="620" cy="700" r="90"/>
+    <rect x="820" y="560" width="240" height="240" rx="28"/>
+  </g>
+  <rect width="1200" height="900" filter="url(#n-middle)" opacity="0.5"/>
+</svg>
