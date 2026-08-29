@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>متجر نور — إلكترونيات ومستلزمات المنزل والمكتب</title>
+<meta name="description" content="متجر نور: منتجات مختارة للمنزل والمكتب والإلكترونيات، بأسعار واضحة وشحن سريع.">
+<link rel="icon" href="assets/img/lamp.svg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true">ن</span>
+      <span class="logo__text">متجر نور</span>
+    </a>
+
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">القائمة</span>
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="التنقّل الرئيسي">
+      <a href="index.html" aria-current="page">الرئيسية</a>
+      <a href="#products">المنتجات</a>
+      <a href="#offers">العروض</a>
+      <a class="site-nav__cart" href="cart.html">
+        السلة
+        <span class="cart-badge" data-cart-count hidden>0</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <p class="eyebrow">توصيل خلال 48 ساعة</p>
+        <h1>أشياء مختارة بعناية<br>لمنزلك ومكتبك</h1>
+        <p class="lead">
+          مجموعة صغيرة ومنتقاة من الإلكترونيات ومستلزمات المنزل والمكتب.
+          أسعار واضحة، وإرجاع مجاني خلال 14 يومًا.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#products">تسوّق الآن</a>
+          <a class="btn btn--ghost" href="#offers">شاهد العروض</a>
+        </div>
+        <dl class="hero__stats">
+          <div><dt>منتج</dt><dd data-stat="products">—</dd></div>
+          <div><dt>تقييم متوسط</dt><dd>4.5 ★</dd></div>
+          <div><dt>شحن مجاني من</dt><dd>500 د.م</dd></div>
+        </dl>
+      </div>
+      <div class="hero__art" aria-hidden="true">
+        <img src="assets/img/headphones.svg" alt="" class="hero__img hero__img--1">
+        <img src="assets/img/plant.svg" alt="" class="hero__img hero__img--2">
+        <img src="assets/img/watch.svg" alt="" class="hero__img hero__img--3">
+      </div>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="container strip__inner">
+      <div class="strip__item"><span aria-hidden="true">🚚</span> شحن مجاني فوق 500 د.م</div>
+      <div class="strip__item"><span aria-hidden="true">↩️</span> إرجاع خلال 14 يومًا</div>
+      <div class="strip__item"><span aria-hidden="true">🔒</span> دفع آمن</div>
+      <div class="strip__item"><span aria-hidden="true">💬</span> دعم كل أيام الأسبوع</div>
+    </div>
+  </section>
+
+  <section class="section" id="offers">
+    <div class="container">
+      <div class="section__head">
+        <h2>عروض هذا الأسبوع</h2>
+        <p class="muted">منتجات عليها تخفيض مباشر — الكميات محدودة.</p>
+      </div>
+      <div class="grid" id="offers-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="products">
+    <div class="container">
+      <div class="section__head">
+        <h2>كل المنتجات</h2>
+        <p class="muted">استخدم البحث والتصنيفات للوصول إلى ما تريد.</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="chips" id="category-chips" role="group" aria-label="تصفية حسب التصنيف"></div>
+        <div class="toolbar__controls">
+          <label class="field field--search">
+            <span class="sr-only">ابحث عن منتج</span>
+            <input type="search" id="search" placeholder="ابحث عن منتج…" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="sr-only">ترتيب</span>
+            <select id="sort">
+              <option value="featured">الترتيب: مميّز</option>
+              <option value="price-asc">السعر: من الأقل</option>
+              <option value="price-desc">السعر: من الأعلى</option>
+              <option value="rating">الأعلى تقييمًا</option>
+              <option value="name">الاسم (أ–ي)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <p class="results-count muted" id="results-count" aria-live="polite"></p>
+      <div class="grid" id="products-grid"></div>
+      <p class="empty" id="empty-state" hidden>
+        لا توجد منتجات مطابقة. جرّب كلمة أخرى أو <button class="link-btn" id="reset-filters">أعد ضبط التصفية</button>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section newsletter">
+    <div class="container newsletter__inner">
+      <div>
+        <h2>وصلنا جديد؟ نخبرك أولًا</h2>
+        <p class="muted">رسالة واحدة في الشهر، بدون إزعاج.</p>
+      </div>
+      <form class="newsletter__form" id="newsletter-form" novalidate>
+        <label class="sr-only" for="news-email">بريدك الإلكتروني</label>
+        <input type="email" id="news-email" name="email" placeholder="بريدك الإلكتروني" required>
+        <button class="btn btn--primary" type="submit">اشترك</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <a class="logo" href="index.html">
+        <span class="logo__mark" aria-hidden="true">ن</span>
+        <span class="logo__text">متجر نور</span>
+      </a>
+      <p class="muted">متجر تجريبي — كل البيانات والطلبات وهمية وتُحفظ في متصفحك فقط.</p>
+    </div>
+    <nav aria-label="روابط التذييل">
+      <h3>روابط</h3>
+      <a href="index.html">الرئيسية</a>
+      <a href="#products">المنتجات</a>
+      <a href="cart.html">السلة</a>
+    </nav>
+    <div>
+      <h3>أكواد خصم للتجربة</h3>
+      <p class="muted"><code>WELCOME10</code> · <code>FREESHIP</code> · <code>SAVE50</code></p>
+    </div>
+  </div>
+  <div class="container site-footer__bottom">
+    <p class="muted">© <span data-year>2026</span> متجر نور. جميع الحقوق محفوظة.</p>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سلة المشتريات — متجر نور</title>
+<meta name="description" content="راجع سلة مشترياتك وأتمّ الطلب في متجر نور.">
+<link rel="icon" href="assets/img/lamp.svg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true">ن</span>
+      <span class="logo__text">متجر نور</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">القائمة</span>
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="التنقّل الرئيسي">
+      <a href="index.html">الرئيسية</a>
+      <a href="index.html#products">المنتجات</a>
+      <a href="index.html#offers">العروض</a>
+      <a class="site-nav__cart" href="cart.html" aria-current="page">
+        السلة
+        <span class="cart-badge" data-cart-count hidden>0</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container page">
+  <h1>سلة المشتريات</h1>
+
+  <div id="cart-empty" class="notice" hidden>
+    <p class="notice__icon" aria-hidden="true">🛒</p>
+    <h2>سلتك فارغة</h2>
+    <p class="muted">أضف بعض المنتجات ثم عد إلى هنا لإتمام الطلب.</p>
+    <a class="btn btn--primary" href="index.html#products">تصفّح المنتجات</a>
+  </div>
+
+  <div id="cart-layout" class="cart" hidden>
+    <section class="cart__items" aria-label="عناصر السلة">
+      <div id="cart-lines"></div>
+      <div class="cart__actions">
+        <a class="link-btn" href="index.html#products">‹ متابعة التسوّق</a>
+        <button class="link-btn link-btn--danger" id="clear-cart">إفراغ السلة</button>
+      </div>
+    </section>
+
+    <aside class="summary" aria-label="ملخّص الطلب">
+      <h2>ملخّص الطلب</h2>
+
+      <form class="promo" id="promo-form" novalidate>
+        <label class="sr-only" for="promo">كود الخصم</label>
+        <input type="text" id="promo" placeholder="كود الخصم" autocomplete="off">
+        <button class="btn btn--ghost btn--sm" type="submit">تطبيق</button>
+      </form>
+      <p class="promo__status muted" id="promo-status" aria-live="polite"></p>
+
+      <dl class="summary__lines">
+        <div><dt>المجموع الفرعي</dt><dd id="sum-subtotal">—</dd></div>
+        <div id="row-discount" class="summary__discount" hidden><dt>الخصم المطبَّق</dt><dd id="sum-discount">—</dd></div>
+        <div><dt>الشحن</dt><dd id="sum-shipping">—</dd></div>
+        <div class="summary__total"><dt>الإجمالي</dt><dd id="sum-total">—</dd></div>
+      </dl>
+
+      <p class="muted" id="free-shipping-hint"></p>
+
+      <button class="btn btn--primary btn--lg btn--block" id="checkout-open">إتمام الطلب</button>
+      <p class="muted small">متجر تجريبي — لن تتم أي عملية دفع حقيقية.</p>
+    </aside>
+  </div>
+
+  <!-- نموذج إتمام الطلب -->
+  <section class="checkout" id="checkout" hidden>
+    <h2>بيانات التوصيل</h2>
+    <form id="checkout-form" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span>الاسم الكامل</span>
+          <input type="text" name="name" required minlength="3" autocomplete="name">
+          <em class="error" data-error-for="name"></em>
+        </label>
+        <label class="field">
+          <span>البريد الإلكتروني</span>
+          <input type="email" name="email" required autocomplete="email">
+          <em class="error" data-error-for="email"></em>
+        </label>
+        <label class="field">
+          <span>رقم الهاتف</span>
+          <input type="tel" name="phone" required inputmode="tel" pattern="[0-9+\s\-]{8,}" autocomplete="tel">
+          <em class="error" data-error-for="phone"></em>
+        </label>
+        <label class="field">
+          <span>المدينة</span>
+          <input type="text" name="city" required autocomplete="address-level2">
+          <em class="error" data-error-for="city"></em>
+        </label>
+        <label class="field field--wide">
+          <span>العنوان</span>
+          <input type="text" name="address" required minlength="5" autocomplete="street-address">
+          <em class="error" data-error-for="address"></em>
+        </label>
+        <label class="field field--wide">
+          <span>ملاحظات (اختياري)</span>
+          <textarea name="notes" rows="3"></textarea>
+        </label>
+      </div>
+
+      <fieldset class="payment">
+        <legend>طريقة الدفع</legend>
+        <label class="radio"><input type="radio" name="payment" value="cod" checked> الدفع عند الاستلام</label>
+        <label class="radio"><input type="radio" name="payment" value="card"> بطاقة بنكية</label>
+      </fieldset>
+
+      <div class="checkout__actions">
+        <button class="btn btn--primary btn--lg" type="submit">تأكيد الطلب</button>
+        <button class="btn btn--ghost btn--lg" type="button" id="checkout-cancel">رجوع</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- تأكيد الطلب -->
+  <section class="notice notice--success" id="confirmation" hidden>
+    <p class="notice__icon" aria-hidden="true">✅</p>
+    <h2>تم استلام طلبك</h2>
+    <p>رقم الطلب: <strong id="order-id">—</strong></p>
+    <p class="muted" id="order-summary"></p>
+    <a class="btn btn--primary" href="index.html">العودة إلى المتجر</a>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__bottom">
+    <p class="muted">© <span data-year>2026</span> متجر نور — متجر تجريبي، الطلبات وهمية.</p>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/cart.js"></script>
+</body>
+</html>

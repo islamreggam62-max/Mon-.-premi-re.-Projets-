@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تفاصيل المنتج — متجر نور</title>
+<meta name="description" content="تفاصيل المنتج ومواصفاته في متجر نور.">
+<link rel="icon" href="assets/img/lamp.svg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true">ن</span>
+      <span class="logo__text">متجر نور</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">القائمة</span>
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="التنقّل الرئيسي">
+      <a href="index.html">الرئيسية</a>
+      <a href="index.html#products">المنتجات</a>
+      <a href="index.html#offers">العروض</a>
+      <a class="site-nav__cart" href="cart.html">
+        السلة
+        <span class="cart-badge" data-cart-count hidden>0</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container page">
+  <nav class="breadcrumb" aria-label="مسار التصفح">
+    <a href="index.html">الرئيسية</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html#products">المنتجات</a>
+    <span aria-hidden="true">/</span>
+    <span id="crumb-current">…</span>
+  </nav>
+
+  <div id="product-root"></div>
+
+  <section class="section" id="related-section" hidden>
+    <div class="section__head">
+      <h2>قد يعجبك أيضًا</h2>
+    </div>
+    <div class="grid" id="related-grid"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__bottom">
+    <p class="muted">© <span data-year>2026</span> متجر نور — متجر تجريبي، الطلبات وهمية.</p>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>
