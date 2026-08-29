@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دار الياسمين — مطبخ مغربي معاصر | نموذج تجريبي</title>
+<meta name="description" content="دار الياسمين: مطعم فاخر بمطبخ مغربي معاصر — القائمة، المعرض، وحجز الطاولات. نموذج تجريبي.">
+<link rel="icon" href="img/hero.svg">
+<link rel="stylesheet" href="css/restaurant.css">
+</head>
+<body>
+<a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+<p class="demo-flag">نموذج تجريبي — مطعم غير حقيقي، والحجوزات لا تُرسل إلى أي جهة.</p>
+
+<header class="rheader" id="rheader">
+  <div class="wrap rheader__inner">
+    <a class="brand" href="#top">
+      <span class="brand__mark" aria-hidden="true">ي</span>
+      <span class="brand__name">دار الياسمين<small>مطبخ مغربي معاصر</small></span>
+    </a>
+
+    <button class="burger" aria-expanded="false" aria-controls="rnav">
+      <span class="sr-only">القائمة</span><span class="burger__bars" aria-hidden="true"></span>
+    </button>
+
+    <nav class="rnav" id="rnav" aria-label="التنقّل الرئيسي">
+      <a href="#about">عن المطعم</a>
+      <a href="#menu">القائمة</a>
+      <a href="#gallery">المعرض</a>
+      <a href="#reviews">آراء الضيوف</a>
+      <a href="#contact">التواصل</a>
+      <a class="cta" href="#booking">احجز طاولة</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" id="top">
+    <div class="hero__bg" aria-hidden="true"><img src="img/hero.svg" alt=""></div>
+    <div class="wrap hero__inner">
+      <p class="kicker">منذ 1998 · قلب المدينة القديمة</p>
+      <h1>حين يصير<br>العشاء ذكرى</h1>
+      <p class="hero__lead">
+        أطباق مغربية بروح معاصرة، تُحضَّر يوميًا من موسم السوق،
+        وتُقدَّم في فناء أندلسي على ضوء الشموع.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--gold" href="#booking">احجز طاولتك</a>
+        <a class="btn btn--outline" href="#menu">تصفّح القائمة</a>
+      </div>
+    </div>
+    <a class="scroll-hint" href="#facts" aria-label="انزل للأسفل"><span aria-hidden="true">↓</span></a>
+  </section>
+
+  <section class="facts" id="facts">
+    <div class="wrap facts__inner">
+      <div><strong>مساءً 19:00 – 00:30</strong><span>مفتوح كل يوم عدا الاثنين</span></div>
+      <div><strong>0522 00 11 22</strong><span>للحجز الهاتفي</span></div>
+      <div><strong>12 زنقة الياسمين</strong><span>الدار البيضاء</span></div>
+      <div><strong>موقف خاص</strong><span>خدمة صفّ السيارات</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap about">
+      <div class="about__text">
+        <p class="kicker">عن المطعم</p>
+        <h2>مطبخ يحترم أصله<br>ولا يخاف من الجديد</h2>
+        <p>
+          بدأت الحكاية بدار عائلية في المدينة القديمة، وبوصفات جدّة ظلّت تُنقل شفهيًا لثلاثة أجيال.
+          اليوم نطبخها بالتقنية نفسها التي تعلّمناها، وبمكوّنات نختارها بأنفسنا من سوق الفلاحين كل صباح.
+        </p>
+        <p>
+          القائمة تتغيّر أربع مرات في السنة تبعًا للموسم، والخبز يُخبز في فرن الطين أمام الضيوف،
+          والزيت من ضيعتنا في الحوز.
+        </p>
+        <ul class="ticks">
+          <li>قائمة موسمية تتجدّد كل ثلاثة أشهر</li>
+          <li>خيارات نباتية وخالية من الغلوتين</li>
+          <li>قاعة خاصة تتّسع لـ 30 ضيفًا للمناسبات</li>
+        </ul>
+      </div>
+      <div class="about__media">
+        <img src="img/about.svg" alt="الفناء الداخلي للمطعم" loading="lazy">
+        <div class="about__badge"><strong>27</strong><span>سنة من الطبخ</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark" id="menu">
+    <div class="wrap">
+      <div class="shead">
+        <p class="kicker">القائمة</p>
+        <h2>ما نقدّمه هذا الموسم</h2>
+        <p class="lede">الأسعار بالدرهم وتشمل الخدمة. أخبرنا بأي حساسية غذائية قبل الطلب.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="أقسام القائمة">
+        <button role="tab" class="tab is-active" aria-selected="true"  data-tab="starters">المقبلات</button>
+        <button role="tab" class="tab"           aria-selected="false" data-tab="mains">الأطباق الرئيسية</button>
+        <button role="tab" class="tab"           aria-selected="false" data-tab="desserts">الحلويات</button>
+        <button role="tab" class="tab"           aria-selected="false" data-tab="drinks">المشروبات</button>
+      </div>
+
+      <div class="menu-grid" id="menu-grid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="gallery">
+    <div class="wrap">
+      <div class="shead">
+        <p class="kicker">المعرض</p>
+        <h2>لمحة من الدار</h2>
+      </div>
+      <div class="gallery">
+        <img src="img/gallery-1.svg" alt="الفناء على ضوء الشموع" loading="lazy">
+        <img src="img/gallery-2.svg" alt="ركن الشواء المفتوح" loading="lazy">
+        <img src="img/gallery-3.svg" alt="قاعة المناسبات الخاصة" loading="lazy">
+        <img src="img/gallery-4.svg" alt="البار وركن المشروبات" loading="lazy">
+        <img src="img/gallery-5.svg" alt="طاولة مهيّأة للعشاء" loading="lazy">
+        <img src="img/gallery-6.svg" alt="مدخل الدار" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark" id="reviews">
+    <div class="wrap">
+      <div class="shead">
+        <p class="kicker">آراء الضيوف</p>
+        <h2>ما يقوله من زارونا</h2>
+      </div>
+      <div class="reviews">
+        <blockquote>
+          <p>«الطنجية هنا ليست طبقًا، بل درس في الصبر. حجزنا مرتين في أسبوع واحد.»</p>
+          <footer><strong>سارة ب.</strong><span>عشاء عائلي</span></footer>
+        </blockquote>
+        <blockquote>
+          <p>«نظّمنا عشاء عمل لـ 22 شخصًا في القاعة الخاصة. الخدمة كانت دقيقة إلى حدّ الدهشة.»</p>
+          <footer><strong>ياسين م.</strong><span>مناسبة خاصة</span></footer>
+        </blockquote>
+        <blockquote>
+          <p>«المكان الوحيد الذي أخذت فيه ضيوفًا من الخارج ولم أضطر للاعتذار عن شيء.»</p>
+          <footer><strong>ليلى ر.</strong><span>زبونة دائمة</span></footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="section booking" id="booking">
+    <div class="wrap booking__inner">
+      <div class="booking__intro">
+        <p class="kicker">الحجز</p>
+        <h2>احجز طاولتك</h2>
+        <p>
+          نستقبل الحجوزات حتى 30 يومًا مقدّمًا. للمجموعات فوق 8 أشخاص أو المناسبات الخاصة،
+          اتصل بنا مباشرة على <strong>0522 00 11 22</strong>.
+        </p>
+        <ul class="ticks">
+          <li>تأكيد الحجز خلال ساعتين برسالة قصيرة</li>
+          <li>إلغاء مجاني حتى 4 ساعات قبل الموعد</li>
+          <li>نحتفظ بالطاولة 15 دقيقة بعد الموعد</li>
+        </ul>
+      </div>
+
+      <form class="bform" id="booking-form" novalidate>
+        <div class="bform__grid">
+          <label class="fld">
+            <span>الاسم الكامل</span>
+            <input type="text" name="name" required minlength="3" autocomplete="name">
+            <em class="err" data-err="name"></em>
+          </label>
+          <label class="fld">
+            <span>رقم الهاتف</span>
+            <input type="tel" name="phone" required pattern="[0-9+\s\-]{8,}" inputmode="tel" autocomplete="tel">
+            <em class="err" data-err="phone"></em>
+          </label>
+          <label class="fld">
+            <span>التاريخ</span>
+            <input type="date" name="date" required>
+            <em class="err" data-err="date"></em>
+          </label>
+          <label class="fld">
+            <span>الوقت</span>
+            <select name="time" required>
+              <option value="">اختر وقتًا</option>
+              <option>19:00</option><option>19:30</option><option>20:00</option>
+              <option>20:30</option><option>21:00</option><option>21:30</option>
+              <option>22:00</option>
+            </select>
+            <em class="err" data-err="time"></em>
+          </label>
+          <label class="fld">
+            <span>عدد الأشخاص</span>
+            <select name="guests" required>
+              <option value="">اختر العدد</option>
+              <option>1</option><option selected>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option><option>8</option>
+            </select>
+            <em class="err" data-err="guests"></em>
+          </label>
+          <label class="fld">
+            <span>مناسبة (اختياري)</span>
+            <select name="occasion">
+              <option value="">بدون</option>
+              <option>عيد ميلاد</option><option>ذكرى زواج</option>
+              <option>عشاء عمل</option><option>أخرى</option>
+            </select>
+          </label>
+          <label class="fld fld--wide">
+            <span>ملاحظات (اختياري)</span>
+            <textarea name="notes" rows="3" placeholder="حساسية غذائية، طاولة قرب النافذة…"></textarea>
+          </label>
+        </div>
+        <button class="btn btn--gold btn--block" type="submit">أرسل طلب الحجز</button>
+        <p class="fineprint">نموذج تجريبي — لن يُرسل الطلب إلى أي جهة.</p>
+      </form>
+
+      <div class="booking__done" id="booking-done" hidden>
+        <p class="booking__icon" aria-hidden="true">✓</p>
+        <h3>وصلنا طلبك</h3>
+        <p id="booking-summary"></p>
+        <button class="btn btn--outline" type="button" id="booking-again">حجز آخر</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark" id="contact">
+    <div class="wrap contact">
+      <div>
+        <p class="kicker">التواصل</p>
+        <h2>تجدنا هنا</h2>
+        <dl class="contact__list">
+          <div><dt>العنوان</dt><dd>12 زنقة الياسمين، المدينة القديمة، الدار البيضاء</dd></div>
+          <div><dt>الهاتف</dt><dd><a href="tel:+212522001122">0522 00 11 22</a></dd></div>
+          <div><dt>البريد</dt><dd><a href="mailto:contact@example.com">contact@example.com</a></dd></div>
+          <div><dt>ساعات العمل</dt><dd>الثلاثاء – الأحد، 19:00 – 00:30<br>الاثنين مغلق</dd></div>
+        </dl>
+      </div>
+      <div class="map" aria-label="موقع المطعم على الخريطة">
+        <div class="map__grid" aria-hidden="true"></div>
+        <div class="map__pin" aria-hidden="true">📍</div>
+        <p class="map__note">تُستبدل هذه المساحة بخريطة تفاعلية في النسخة النهائية.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rfooter">
+  <div class="wrap rfooter__inner">
+    <a class="brand" href="#top">
+      <span class="brand__mark" aria-hidden="true">ي</span>
+      <span class="brand__name">دار الياسمين</span>
+    </a>
+    <nav aria-label="روابط سريعة">
+      <a href="#menu">القائمة</a>
+      <a href="#booking">الحجز</a>
+      <a href="#contact">التواصل</a>
+    </nav>
+    <p class="muted">© <span data-year>2026</span> دار الياسمين — نموذج تجريبي لعرض تصميم مواقع المطاعم.</p>
+  </div>
+</footer>
+
+<script src="js/restaurant.js"></script>
+</body>
+</html>
