@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بطاقة العرض</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="card.css">
+</head>
+<body>
+<div class="stage">
+
+  <aside class="panel" id="panel">
+    <h1>بطاقة العرض</h1>
+    <p class="panel__intro">
+      املأ الحقول، اطبع، واترك البطاقة بعد كل زيارة.
+      من يخرج بلا أن يترك شيئًا يُنسى خلال ساعة.
+    </p>
+
+    <div class="warn">
+      <strong>قبل أن تطبع:</strong> تأكّد أن الرابط يفتح لدى شخص غريب.
+      روابط المعاينة الخاصة لا تعمل إلا لك — انشر النموذج على
+      GitHub&nbsp;Pages واستعمل رابطه، أو شارك الصفحة للعموم أولًا.
+      كود QR يقود إلى صفحة مقفلة يُفقدك العميل بدل أن يكسبه.
+    </div>
+
+    <label class="f">
+      <span>القطاع</span>
+      <select id="sector">
+        <option value="school">مدرسة خاصة</option>
+        <option value="kg">روضة أطفال</option>
+        <option value="resto">مطعم</option>
+        <option value="market">سوبرماركت</option>
+        <option value="clinic">عيادة خاصة</option>
+        <option value="hall">قاعة حفلات</option>
+        <option value="gym">قاعة رياضة</option>
+        <option value="driving">مدرسة سياقة</option>
+      </select>
+    </label>
+
+    <label class="f"><span>اسمك</span><input id="name" type="text" value="إسلام رقام" maxlength="28"></label>
+    <label class="f"><span>رقم الهاتف</span><input id="phone" type="tel" value="0550 00 00 00" maxlength="20"></label>
+    <label class="f">
+      <span>رابط النموذج</span>
+      <input id="link" type="url" value="https://islamreggam62-max.github.io/Mon-.-premi-re.-Projets-/demo-school/">
+    </label>
+    <label class="f"><span>السعر الظاهر على البطاقة</span><input id="price" type="text" value="من 10 000 دج شهريًا" maxlength="30"></label>
+
+    <button class="print" id="print" type="button">اطبع البطاقة</button>
+    <p class="hint">
+      الحجم A5 — ورقتان في كل صفحة A4 عند الطباعة على الوجهين.
+      اطبع 50 نسخة، فهي تكفي شهرًا كاملًا من الزيارات.
+    </p>
+  </aside>
+
+  <div class="sheet">
+    <article class="card" id="card">
+      <header class="card__top">
+        <p class="card__who" id="c-name">إسلام رقام</p>
+        <p class="card__role">تصميم وإدارة المواقع — الجزائر العاصمة</p>
+      </header>
+
+      <h2 class="card__head" id="c-head">موقع لمدرستك،<br>ومتابعة كل شهر</h2>
+      <p class="card__sub" id="c-sub">لا موقع يُبنى ويُترك — بل حضور يتجدّد طوال الموسم.</p>
+
+      <ul class="card__list" id="c-list"></ul>
+
+      <div class="card__qr">
+        <div class="qr" id="qr"><span class="qr__fallback" id="qr-fallback">امسح الرابط أدناه</span></div>
+        <div class="card__qrtext">
+          <strong>امسح الكود</strong>
+          <span>وشاهد نموذجًا حقيقيًا كاملًا</span>
+          <code id="c-link">…</code>
+        </div>
+      </div>
+
+      <footer class="card__foot">
+        <p class="card__price" id="c-price">من 10 000 دج شهريًا</p>
+        <p class="card__phone" id="c-phone">0550 00 00 00</p>
+      </footer>
+    </article>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="card.js"></script>
+</body>
+</html>

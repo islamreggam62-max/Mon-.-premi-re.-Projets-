@@ -1,0 +1,183 @@
+/* =========================================================
+   بطاقة العرض — أداة تعبئة وطباعة بقياس A5
+   عالم بصري واحد فاتح: تُطبع على ورق أبيض بحبر واحد ملوّن،
+   فكل لون هنا مُصرَّح به ولا يتبع سمة المتصفّح.
+   ========================================================= */
+
+:root {
+  --ink:    #12161a;
+  --ink-2:  #46525a;   /* رمادي مائل للأخضر المزرقّ، لا رمادي محايد */
+  --paper:  #ffffff;
+  --sand:   #efe9df;   /* أرضية الشاشة */
+  --sand-2: #e2d9cb;
+  --accent: #0b6e5f;   /* أخضر مزرقّ عميق — لون واحد يكفي للطباعة */
+  --accent-2: #084f44;
+  --warn-bg: #fdf3e0;
+  --warn-line: #d9a441;
+
+  --display: "Readex Pro", "Segoe UI", Tahoma, sans-serif;
+  --body:    "Tajawal", "Segoe UI", "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: var(--body);
+  color: var(--ink);
+  background: var(--sand);
+  line-height: 1.75;
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 2rem;
+  align-items: start;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* ---------- لوحة التحكّم (شاشة فقط) ---------- */
+.panel {
+  position: sticky; top: 2rem;
+  background: var(--paper);
+  border: 1px solid var(--sand-2);
+  border-radius: 16px;
+  padding: 1.6rem;
+}
+.panel h1 {
+  font-family: var(--display); font-size: 1.35rem; font-weight: 700;
+  margin: 0 0 .35em;
+}
+.panel__intro { margin: 0 0 1.2rem; color: var(--ink-2); font-size: .92rem; }
+
+.warn {
+  background: var(--warn-bg);
+  border-inline-start: 3px solid var(--warn-line);
+  border-radius: 0 10px 10px 0;
+  padding: .85rem 1rem;
+  font-size: .87rem;
+  margin-bottom: 1.4rem;
+}
+.warn strong { display: block; margin-bottom: .2em; }
+
+.f { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .9rem; }
+.f > span { font-size: .84rem; font-weight: 700; }
+.f input, .f select {
+  font: inherit; color: var(--ink); background: var(--sand);
+  border: 1px solid var(--sand-2); border-radius: 9px;
+  padding: .6rem .75rem; width: 100%;
+}
+.f input:focus, .f select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.print {
+  width: 100%; font: inherit; font-weight: 700;
+  background: var(--accent); color: #fff;
+  border: 0; border-radius: 999px; padding: .85rem 1rem;
+  cursor: pointer; margin-top: .5rem;
+  transition: background-color .16s;
+}
+.print:hover { background: var(--accent-2); }
+.hint { margin: .9rem 0 0; font-size: .82rem; color: var(--ink-2); }
+
+/* ---------- ورقة المعاينة ---------- */
+.sheet { display: grid; place-items: start center; }
+
+.card {
+  width: 148mm; min-height: 210mm;
+  background: var(--paper);
+  padding: 16mm 14mm;
+  display: flex; flex-direction: column;
+  box-shadow: 0 2px 4px rgba(18,22,26,.06), 0 22px 50px rgba(18,22,26,.14);
+  border-top: 6mm solid var(--accent);
+}
+
+.card__top { border-bottom: 1px solid var(--sand-2); padding-bottom: 5mm; margin-bottom: 9mm; }
+.card__who {
+  font-family: var(--display); font-size: 20pt; font-weight: 700;
+  margin: 0; line-height: 1.25;
+}
+.card__role { margin: .1em 0 0; font-size: 10pt; color: var(--ink-2); letter-spacing: .02em; }
+
+.card__head {
+  font-family: var(--display); font-weight: 700;
+  font-size: 27pt; line-height: 1.35; margin: 0 0 4mm;
+  text-wrap: balance;
+}
+.card__sub { margin: 0 0 8mm; font-size: 11.5pt; color: var(--ink-2); }
+
+.card__list { list-style: none; padding: 0; margin: 0 0 auto; }
+.card__list li {
+  position: relative; padding-inline-start: 8mm; margin-bottom: 4mm;
+  font-size: 11.5pt; line-height: 1.65;
+}
+.card__list li::before {
+  content: ""; position: absolute; inset-inline-start: 0; top: 3.6mm;
+  width: 4mm; height: 4mm; border-radius: 50%;
+  border: 1.4mm solid var(--accent);
+}
+
+.card__qr {
+  display: flex; align-items: center; gap: 6mm;
+  background: var(--sand); border-radius: 4mm;
+  padding: 5mm; margin: 9mm 0 6mm;
+}
+.qr {
+  width: 32mm; height: 32mm; flex: none;
+  background: #fff; border-radius: 2mm; padding: 1.5mm;
+  display: grid; place-items: center;
+}
+.qr canvas { width: 100% !important; height: 100% !important; display: block; }
+.qr__fallback { font-size: 8pt; color: var(--ink-2); text-align: center; padding: 2mm; }
+
+.card__qrtext { display: flex; flex-direction: column; gap: .4mm; min-width: 0; }
+.card__qrtext strong { font-family: var(--display); font-size: 13pt; }
+.card__qrtext span { font-size: 10pt; color: var(--ink-2); }
+.card__qrtext code {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 8.5pt; color: var(--accent-2);
+  margin-top: 1.5mm; word-break: break-all; direction: ltr; text-align: start;
+}
+
+.card__foot {
+  border-top: 1px solid var(--sand-2); padding-top: 5mm;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 4mm;
+}
+.card__price { margin: 0; font-size: 11pt; color: var(--ink-2); }
+.card__phone {
+  margin: 0; font-family: var(--display); font-weight: 700;
+  font-size: 19pt; color: var(--accent);
+  direction: ltr; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- الطباعة: البطاقة وحدها ---------- */
+@page { size: A5 portrait; margin: 0; }
+
+@media print {
+  body { background: #fff; }
+  .stage { display: block; padding: 0; min-height: 0; }
+  .panel { display: none; }
+  .sheet { display: block; }
+  .card {
+    width: 148mm; height: 210mm; box-shadow: none;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  /* نُجبر طباعة الخلفيات الملوّنة، وإلا خرجت البطاقة بيضاء تمامًا */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ---------- الشاشات الصغيرة ---------- */
+@media (max-width: 1000px) {
+  .stage { grid-template-columns: 1fr; padding: 1rem; }
+  .panel { position: static; }
+  .card { width: 100%; min-height: 0; padding: 8mm 7mm; border-top-width: 4mm; }
+  .card__head { font-size: 21pt; }
+  .card__who { font-size: 17pt; }
+  .card__phone { font-size: 16pt; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}
