@@ -79,7 +79,8 @@
     │   ├── 05-execution-decisions.md # تنفيذ الأحكام والتكليف بالوفاء
     │   ├── 06-atteintes-canalisations.md # المحيط الأمني والبناء غير المشروع
     │   ├── 07-reporting-veille.md    # Flash، الوضعيات الدورية، اليقظة القانونية
-    │   └── 08-registre-commerce.md   # السجل التجاري والأنشطة الثانوية
+    │   ├── 08-registre-commerce.md   # السجل التجاري والأنشطة الثانوية
+    │   └── 09-constitution-avocat.md # تنصيب محامٍ أو محضر قضائي
     └── modeles/                     # نماذج جاهزة للملء
         ├── mise-en-demeure.md       # إعذار (عربي + فرنسي)
         ├── requete-introductive.md  # عريضة افتتاح دعوى
