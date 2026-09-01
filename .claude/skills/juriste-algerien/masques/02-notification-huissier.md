@@ -29,8 +29,8 @@ objet rempli.
 
 Veuillez agréer, cher Maître, l'expression de notre parfaite considération.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - Une (01) [mise en demeure] datée du [date].
 ```
@@ -55,8 +55,8 @@ Comptons sur votre habituelle collaboration.
 
 Salutations.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - Une (01) copie de la mise en demeure du [date].
 ```

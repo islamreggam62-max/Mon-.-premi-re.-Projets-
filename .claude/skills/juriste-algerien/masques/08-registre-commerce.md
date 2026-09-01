@@ -34,8 +34,8 @@ délai de [durée].
 
 Salutations.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 ```
 
 ---

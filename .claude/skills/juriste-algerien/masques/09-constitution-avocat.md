@@ -57,8 +57,8 @@ pour toutes autres informations complémentaires jugées nécessaires.
 
 Veuillez agréer, cher Maître, l'expression de notre parfaite considération.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - [liste des pièces].
 ```

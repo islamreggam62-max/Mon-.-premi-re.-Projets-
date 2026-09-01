@@ -35,8 +35,8 @@ défendre les intérêts de Naftal.
 
 Veuillez agréer, chère Maître, l'expression de notre parfaite considération.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - [pièces].
 ```

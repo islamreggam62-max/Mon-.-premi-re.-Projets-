@@ -28,8 +28,8 @@ Direction Juridique, arrêté au [date], reprenant :
 Veuillez agréer, Monsieur le Directeur de la Branche, l'expression de notre parfaite
 considération.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - Le flash hebdomadaire arrêté au [date].
 ```
@@ -50,9 +50,9 @@ litiges en matière sociale de la Branche Carburants, arrêtée au [date].
 
 Salutations.
 
-                                        P/LE DIRECTEUR JURIDIQUE
+                                        P/LA DIRECTRICE JURIDIQUE
                                         Le Responsable Intérimaire
-                                        [I.NOM]
+                                        M.LAMANI
 
 PJ : - La situation trimestrielle arrêtée au [date].
 ```

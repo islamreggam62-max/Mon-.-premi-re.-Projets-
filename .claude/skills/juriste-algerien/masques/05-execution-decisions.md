@@ -53,8 +53,8 @@ Urgence signalée
 
 Salutations.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ    : - [liste des copies transmises].
 Copie : - Monsieur le Directeur du District CBR [ville], pour information.

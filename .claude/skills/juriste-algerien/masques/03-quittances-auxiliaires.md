@@ -29,8 +29,8 @@ ainsi qu'un reçu de versement dûment ordonnancé et signé par nos soins.
 
 Salutations.
 
-                                        [LA DIRECTRICE JURIDIQUE]
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 
 PJ : - Une (01) demande de paiement dûment signée ;
      - Un (01) reçu de versement ordonnancé et signé ;

@@ -29,8 +29,8 @@ niveau du CNRC territorialement compétent].
 
 Cordiales Salutations.
 
-                                        LE DIRECTEUR JURIDIQUE
-                                        [I.NOM]
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 ```
 
 > **Réitération** : si c'est une relance, remplacer l'attaque par

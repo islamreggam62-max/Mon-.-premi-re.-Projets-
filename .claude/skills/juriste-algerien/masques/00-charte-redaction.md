@@ -134,16 +134,24 @@ Copie : - [destinataire], pour information.
 
 ---
 
-## 6. كتلة التوقيع
+## 6. كتلة التوقيع — ثابتة
+
+**كل رسالة تُختم بهذه الكتلة، دائماً**:
 
 ```
-LE DIRECTEUR JURIDIQUE            |  LA DIRECTRICE JURIDIQUE
-[I.NOM]                           |  [I.NOM]
-
-P/LE DIRECTEUR JURIDIQUE          |  [I.NOM] P/I
-Le Responsable Intérimaire        |
-[I.NOM]                           |
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
 ```
+
+**البدائل** (لا تُستعمل إلا إذا طلبها المستعمل صراحةً):
+
+```
+P/LA DIRECTRICE JURIDIQUE          |  M.LAMANI P/I
+Le Responsable Intérimaire         |
+M.LAMANI                           |
+```
+
+⚠️ لا تكتب `LE DIRECTEUR JURIDIQUE` ولا تترك `[I.NOM]` فارغاً — التوقيع معروف ومحدّد.
 
 ---
 
