@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 620" width="520" height="620" role="img" aria-label="ماكينة تشذيب شعر الأنف والأذن">
+  <defs>
+    <linearGradient id="bodyG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d6270"/><stop offset="38%" stop-color="#3d8b98"/>
+      <stop offset="62%" stop-color="#2d7683"/><stop offset="100%" stop-color="#174e5a"/>
+    </linearGradient>
+    <linearGradient id="bodyH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#17505c"/><stop offset="30%" stop-color="#41919e"/>
+      <stop offset="55%" stop-color="#2f7683"/><stop offset="100%" stop-color="#14454f"/>
+    </linearGradient>
+    <linearGradient id="capG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#20262b"/><stop offset="35%" stop-color="#4a555d"/>
+      <stop offset="65%" stop-color="#2b333a"/><stop offset="100%" stop-color="#171c20"/>
+    </linearGradient>
+    <radialGradient id="ledG" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a8ffbf"/><stop offset="45%" stop-color="#35d95f"/>
+      <stop offset="100%" stop-color="#35d95f" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="260" cy="576" rx="132" ry="22" fill="#0d2a30" opacity="0.16" filter="url(#soft)"/>
+
+  <!-- الجسم -->
+  <path d="M148 250 a112 112 0 0 1 224 0 v238 a56 56 0 0 1 -56 56 h-112 a56 56 0 0 1 -56 -56 z" fill="url(#bodyH)"/>
+  <!-- الرأس الشفّاف -->
+  <path d="M148 250 a112 112 0 0 1 224 0 v22 h-224 z" fill="url(#capG)"/>
+  <path d="M186 196 a74 74 0 0 1 148 0 v18 h-148 z" fill="#0e1316" opacity="0.55"/>
+  <!-- شفرة دوّارة في الأعلى -->
+  <ellipse cx="260" cy="196" rx="30" ry="11" fill="#5c666e"/>
+  <ellipse cx="260" cy="193" rx="21" ry="7" fill="#0f1417"/>
+  <g stroke="#9aa4ac" stroke-width="2.5" opacity="0.85">
+    <line x1="245" y1="193" x2="275" y2="193"/>
+    <line x1="252" y1="189" x2="268" y2="197"/>
+    <line x1="252" y1="197" x2="268" y2="189"/>
+  </g>
+  <!-- لمعة جانبية -->
+  <rect x="196" y="286" width="26" height="212" rx="13" fill="#ffffff" opacity="0.17"/>
+  <!-- الشعار -->
+  <circle cx="260" cy="372" r="27" fill="#ffffff" opacity="0.9"/>
+  <path d="M266 356 l-16 21 h11 l-5 19 16 -22 h-11 z" fill="#1d6270"/>
+  <!-- مؤشّر التشغيل -->
+  <circle cx="260" cy="470" r="26" fill="url(#ledG)" opacity="0.9"/>
+  <circle cx="260" cy="470" r="9" fill="#2ee65c"/>
+</svg>
