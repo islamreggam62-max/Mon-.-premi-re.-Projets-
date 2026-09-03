@@ -2,6 +2,10 @@
 
 مساعد قانوني جزائري لـ **Claude Code**: يحلّل النزاع، يحدّد النص المطبَّق والمحكمة المختصة والآجال، يقترح حلولاً متدرّجة من الودّي إلى القضائي، ويصوغ الوثائق (إعذار، شكوى، عريضة، تظلّم، عقود).
 
+ويضمّ المشروع **وكيلين متخصّصين**:
+- `juriste-algerien` — الاستشارة القانونية العامة والمنازعات،
+- `juriste-contrats` — **قسم العقود**: التحرير، المراجعة، التفاوض، الضمانات، التنفيذ والفسخ.
+
 > ⚠️ **تنبيه**: هذا المشروع أداة توجيهية تعليمية، **وليس بديلاً عن محامٍ معتمد**. النصوص الجزائرية كثيرة التعديل — المرجع الرسمي الوحيد هو الجريدة الرسمية **[www.joradp.dz](https://www.joradp.dz)**.
 
 ---
@@ -34,6 +38,31 @@
 
 > النماذج **مفرّغة من كل اسم أو مبلغ أو عنوان حقيقي** — كل معطى بين `[…]`.
 
+### قسم العقود 📑
+
+وكيل مستقلّ `juriste-contrats` ومهارة كاملة لكل ما يخصّ العقود: التحرير، المراجعة البندية،
+التفاوض، الإسناد ودفاتر الشروط، أوامر الخدمة، الغرامات، الكفالات ورفع اليد، الاستلام،
+الملاحق، الفسخ، والمنازعة العقدية.
+
+```
+راجعلي هذا العقد وقلّي واش المخاطر على المؤسسة
+حرّرلي عقد نقل منتجات بترولية مع ناقل خاص
+البند تاع غرامات التأخير هذا مقبول؟ واش نردّ عليهم؟
+المورّد تأخّر 40 يوم — واش ندير بالضبط وبأي ترتيب؟
+حرّرلي إعذار عقدي ثم رسالة فسخ على مسؤوليته
+الكفالة تنقضي صلاحيتها الشهر الجاي والعقد ما زال — واش ندير؟
+حرّرلي ملحق تمديد أجل بلا ما نتنازل على الغرامات
+```
+
+كل مراجعة تُسلَّم في الشكل نفسه: **بطاقة العقد ← الآجال الحرجة ← جدول المخاطر مع الصياغة
+البديلة ← البنود الغائبة ← القرار (يُوقَّع / يُعدَّل / لا يُوقَّع)**.
+
+أو استدعِ المهارة صراحةً:
+
+```
+/juriste-contrats شوفلي دفتر الشروط هذا قبل ما نبعثوه للمتعهّدين
+```
+
 ### أرسل صورة الوثيقة 📸
 
 تقدر تصوّر الوثيقة وترسلها: حكم، استدعاء للجلسة، محضر تبليغ، قرار إداري، قرار تسريح، عقد، شيك مرفوض، كشف راتب، محضر شرطة، شهادة طبية، أو حتى لقطة شاشة لمحادثة.
@@ -55,39 +84,71 @@
 ```
 .claude/
 ├── agents/
-│   └── juriste-algerien.md          # وكيل متخصّص يمكن استدعاؤه بمفرده
-└── skills/juriste-algerien/
-    ├── SKILL.md                     # الدور، القواعد الصارمة، منهجية الاستشارة
-    ├── references/                  # المراجع القانونية حسب الفرع
-    │   ├── droit-civil.md           # العقود، المسؤولية، التقادم، الملكية، الإثبات
-    │   ├── droit-famille.md         # زواج، طلاق، خلع، حضانة، نفقة، نسب، ميراث
-    │   ├── droit-penal.md           # الجرائم، الشكوى، التوقيف للنظر، الطعون الجزائية
-    │   ├── droit-travail.md         # العقد، التسريح، مفتشية العمل، القسم الاجتماعي
-    │   ├── droit-commercial.md      # الشركات، السجل التجاري، الشيك، الإفلاس
-    │   ├── droit-immobilier.md      # الدفتر العقاري، العقد العرفي، الإيجار، الترقية
-    │   ├── droit-administratif.md   # التظلّم، دعوى الإلغاء، الوظيفة العمومية، الصفقات
-    │   ├── procedure-civile.md      # المحاكم، العرائض، الآجال، الطعون، التنفيذ
-    │   ├── consommation-numerique.md# المستهلك، التجارة الإلكترونية، المعطيات الشخصية
-    │   ├── methodologie.md          # شبكة تحليل النزاع وبناء الملف
-    │   └── lecture-documents.md     # تحليل الوثائق المصوّرة واستخراج الآجال
-    ├── masques/                     # الأسلوب البيتي لمراسلات المديرية القانونية
-    │   ├── 00-charte-redaction.md    # الهيكل الثابت، الاختصارات، الصيغ البيتية
-    │   ├── 01-delegation-pouvoir.md  # التفويض بالتوقيع
-    │   ├── 02-notification-huissier.md # التبليغ بمحضر قضائي والتذكيرات
-    │   ├── 03-quittances-auxiliaires.md # أتعاب مساعدي القضاء
-    │   ├── 04-gestion-affaires.md    # تسيير الملفات، المحامي، النقض، الترجمة
-    │   ├── 05-execution-decisions.md # تنفيذ الأحكام والتكليف بالوفاء
-    │   ├── 06-atteintes-canalisations.md # المحيط الأمني والبناء غير المشروع
-    │   ├── 07-reporting-veille.md    # Flash، الوضعيات الدورية، اليقظة القانونية
-    │   ├── 08-registre-commerce.md   # السجل التجاري والأنشطة الثانوية
-    │   └── 09-constitution-avocat.md # تنصيب محامٍ أو محضر قضائي
-    └── modeles/                     # نماذج جاهزة للملء
-        ├── mise-en-demeure.md       # إعذار (عربي + فرنسي)
-        ├── requete-introductive.md  # عريضة افتتاح دعوى
-        ├── plainte.md               # شكوى لدى وكيل الجمهورية
-        ├── recours-administratif.md # تظلّم ولائي / رئاسي
-        ├── contrat-travail.md       # عقد عمل
-        └── contrat-bail.md          # عقد إيجار سكني
+│   ├── juriste-algerien.md          # وكيل الاستشارة القانونية العامة
+│   └── juriste-contrats.md          # وكيل قسم العقود
+└── skills/
+    ├── juriste-algerien/
+    │   ├── SKILL.md                     # الدور، القواعد الصارمة، منهجية الاستشارة
+    │   ├── references/                  # المراجع القانونية حسب الفرع
+    │   │   ├── droit-civil.md           # العقود، المسؤولية، التقادم، الملكية، الإثبات
+    │   │   ├── droit-famille.md         # زواج، طلاق، خلع، حضانة، نفقة، نسب، ميراث
+    │   │   ├── droit-penal.md           # الجرائم، الشكوى، التوقيف للنظر، الطعون الجزائية
+    │   │   ├── droit-travail.md         # العقد، التسريح، مفتشية العمل، القسم الاجتماعي
+    │   │   ├── droit-commercial.md      # الشركات، السجل التجاري، الشيك، الإفلاس
+    │   │   ├── droit-immobilier.md      # الدفتر العقاري، العقد العرفي، الإيجار، الترقية
+    │   │   ├── droit-administratif.md   # التظلّم، دعوى الإلغاء، الوظيفة العمومية، الصفقات
+    │   │   ├── procedure-civile.md      # المحاكم، العرائض، الآجال، الطعون، التنفيذ
+    │   │   ├── consommation-numerique.md# المستهلك، التجارة الإلكترونية، المعطيات الشخصية
+    │   │   ├── methodologie.md          # شبكة تحليل النزاع وبناء الملف
+    │   │   └── lecture-documents.md     # تحليل الوثائق المصوّرة واستخراج الآجال
+    │   ├── masques/                     # الأسلوب البيتي لمراسلات المديرية القانونية
+    │   │   ├── 00-charte-redaction.md    # الهيكل الثابت، الاختصارات، الصيغ البيتية
+    │   │   ├── 01-delegation-pouvoir.md  # التفويض بالتوقيع
+    │   │   ├── 02-notification-huissier.md # التبليغ بمحضر قضائي والتذكيرات
+    │   │   ├── 03-quittances-auxiliaires.md # أتعاب مساعدي القضاء
+    │   │   ├── 04-gestion-affaires.md    # تسيير الملفات، المحامي، النقض، الترجمة
+    │   │   ├── 05-execution-decisions.md # تنفيذ الأحكام والتكليف بالوفاء
+    │   │   ├── 06-atteintes-canalisations.md # المحيط الأمني والبناء غير المشروع
+    │   │   ├── 07-reporting-veille.md    # Flash، الوضعيات الدورية، اليقظة القانونية
+    │   │   ├── 08-registre-commerce.md   # السجل التجاري والأنشطة الثانوية
+    │   │   └── 09-constitution-avocat.md # تنصيب محامٍ أو محضر قضائي
+    │   └── modeles/                     # نماذج جاهزة للملء
+    │       ├── mise-en-demeure.md       # إعذار (عربي + فرنسي)
+    │       ├── requete-introductive.md  # عريضة افتتاح دعوى
+    │       ├── plainte.md               # شكوى لدى وكيل الجمهورية
+    │       ├── recours-administratif.md # تظلّم ولائي / رئاسي
+    │       ├── contrat-travail.md       # عقد عمل
+    │       └── contrat-bail.md          # عقد إيجار سكني
+    └── juriste-contrats/            # 📑 قسم العقود
+        ├── SKILL.md                 # الدور، القواعد، أنماط الطلب، منهجية المراجعة
+        ├── references/
+        │   ├── formation-contrat.md      # الأركان، الشكلية، التفويض بالتوقيع، التسجيل
+        │   ├── clauses-et-relecture.md   # شبكة 22 بنداً: الخطر + الصياغة البديلة
+        │   ├── passation-consultation.md # الاستشارة، دفتر الشروط، تقييم العروض، الإسناد
+        │   ├── execution-garanties.md    # ODS، الآجال، الغرامات، الملاحق، الاستلام، الكفالات
+        │   ├── contentieux-contractuel.md# الإعذار، الفسخ، التعويض، التقادم، التحكيم، الصلح
+        │   ├── contrats-naftal.md        # المحطات، الموزّعون، النقل، الغاز، الإيجارات
+        │   ├── contrats-internationaux.md# Incoterms، الدفع، التوطين، الجباية، التحكيم الدولي
+        │   └── lecture-contrat.md        # قراءة عقد وارد واستخراج بطاقته وآجاله
+        ├── masques/                 # الأسلوب البيتي لمراسلات قسم العقود
+        │   ├── 00-charte-contrats.md
+        │   ├── 01-consultation-cahier-charges.md
+        │   ├── 02-attribution-rejet.md
+        │   ├── 03-ordre-service.md
+        │   ├── 04-mise-en-demeure-contractuelle.md
+        │   ├── 05-avenant-prorogation.md
+        │   ├── 06-garanties-mainlevee.md
+        │   ├── 07-reception-decompte.md
+        │   └── 08-resiliation.md
+        └── modeles/
+            ├── contrat-fourniture.md
+            ├── contrat-prestation-services.md
+            ├── contrat-travaux.md
+            ├── contrat-transport-produits.md
+            ├── avenant.md
+            ├── protocole-transaction.md
+            ├── clausier-types.md         # بنود جاهزة للنسخ
+            └── note-analyse-contrat.md   # الشكل المعتمد لتسليم المراجعة
 ```
 
 ---
@@ -167,6 +228,13 @@ solutions graduées (amiable → administratif → judiciaire) et rédige les ac
 contrats). Références couvrant le droit civil, de la famille, pénal, du
 travail, commercial, immobilier, administratif, la procédure civile et
 administrative, ainsi que la consommation et le numérique.
+
+Un second agent, **`juriste-contrats`**, est dédié au département Contrats :
+rédaction et relecture clause par clause (grille de 22 clauses avec rédactions de
+remplacement), passation et cahiers des charges, ordres de service, pénalités,
+cautions et mainlevées, réceptions et décomptes, avenants, résiliation, contentieux
+contractuel et arbitrage, contrats internationaux (Incoterms, paiement, domiciliation,
+fiscalité), ainsi que les familles de contrats propres à la distribution pétrolière.
 
 **Avertissement** : outil d'orientation, ne remplace pas un avocat agréé.
 Vérifiez toujours les textes sur [joradp.dz](https://www.joradp.dz).
