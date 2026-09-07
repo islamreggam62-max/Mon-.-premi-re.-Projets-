@@ -56,6 +56,45 @@ PJ    : - deux (02) projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure
 
 ---
 
+## 9.1 bis — عقد وحيد (تراضٍ بسيط / وطني) مع تسمية المتعامل
+
+يُستعمل حين يرسل الهيكل **عقداً واحداً** لا مشروعين، وحين يذكر البوردورو **اسم المتعامل**
+(`PARTENAIRE : […]`)، كما في عقود **gré à gré simple**.
+
+```
+                                        [Monsieur le Directeur /
+                                        Madame la Directrice] [structure]
+
+Objet : A/S Contrat de gré à gré simple n°[…]/[année]/NAFTAL/B.CBR/[structure].
+Réf   : V/E n°[…]/[sigle structure]/[année] du [JJ.MM.AAAA].
+
+Faisant suite à votre envoi visé en référence, nous vous retournons le contrat de gré à gré
+simple n°[…]/[année]/NAFTAL/B.CBR/[structure], conclu avec le partenaire [dénomination],
+relatif à [objet], dûment visé par nos soins dans ses clauses juridiques, ainsi de la fiche
+d'examen et de validation des clauses contractuelles, dûment signée par nos soins.
+
+Aussi, il vous appartient de soumettre le contrat à la Commission Compétente pour visa de
+conformité avant sa signature.
+
+Salutations.
+
+                                        LA DIRECTRICE JURIDIQUE
+                                        M.LAMANI
+
+PJ    : - un (01) contrat de gré à gré simple n°[…]/[année]/NAFTAL/B.CBR/[structure], visé ;
+        - une (01) fiche de suivi contrat ;
+        - une (01) fiche d'examen et de validation des clauses contractuelles, signée.
+```
+
+⚠️ **خاص بالتراضي البسيط**: قبل التأشير، تحقّق من وجود **مذكّرة تبرير اللجوء إلى التراضي**
+في الملف (سبب الاستثناء، والمرجع الذي يجيزه في الإجراء الداخلي). ملف تراضٍ بلا تبرير مكتوب
+هو أول ما يُسأل عنه عند التدقيق — وإن غاب، اطلبه بالنموذج 9.3 قبل التأشير.
+
+⚠️ **الصفة في النداء تتبع من وقّع الإرسال**: `Madame la Directrice […]` إذا كان الإرسال
+موقّعاً من مديرة، و`Monsieur le Directeur […]` إن كان العكس.
+
+---
+
 ## 9.2 — إعادة المشروع مع تحفّظات (بنود يجب تعديلها قبل التوقيع)
 
 ```

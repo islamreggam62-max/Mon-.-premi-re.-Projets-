@@ -47,6 +47,7 @@ Réf. [initiales rédacteur] N°            /[année]
 | `Monsieur le Directeur Finances et Comptabilité` | الدفع، الكفالات، الاقتطاعات، الغرامات |
 | `Monsieur le Directeur Technique / Exploitation` | المواصفات، الاستلام التقني، HSE |
 | `Monsieur le Directeur Aviation` / `Marine` / `Commercial` | مشاريع العقود الواردة من مديريات النشاط للتأشير القانوني |
+| `Madame la Directrice Canalisations` / `Monsieur le Directeur Canalisations` | عقود القنوات ومحطات الضخّ والصيانة المرتبطة بها |
 | `Monsieur le Directeur Central Juridique` | التصعيد، الصلح، التحكيم، العقود الدولية |
 | `Monsieur le Gérant de la société [dénomination]` | المتعامل المتعاقد (المورّد/المقاول/الناقل) |
 | `Monsieur le Directeur de l'Agence [banque] — [ville]` | الكفالات: التمديد، التفعيل، رفع اليد |
