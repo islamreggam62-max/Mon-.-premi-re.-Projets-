@@ -128,7 +128,22 @@
 | التسجيل | حسب طبيعة العقد | راجع `formation-contrat.md` §4 |
 | الانطلاق | **أمر بالخدمة (ODS)** مبلَّغ | **هو نقطة انطلاق الآجال** — راجع `execution-garanties.md` |
 
-📄 نماذج المراسلات: `masques/01-consultation-cahier-charges.md` و`masques/02-attribution-rejet.md`.
+### المسار الداخلي للتأشير — Visa juridique puis visa de conformité
+
+قبل التوقيع، يمرّ مشروع العقد بمرحلتي تأشير متتاليتين لا تُختصر إحداهما بالأخرى:
+
+1. **التأشيرة القانونية** (Direction Juridique): الهيكل الطالب يرسل مشروع العقد (وشقّيه
+   الوطني والدولي عند الاقتضاء)؛ تفحص المديرية **البنود القانونية**، وتُعيد المشاريع
+   **مؤشَّراً عليها** مرفقةً بـ **fiche d'examen et de validation des clauses contractuelles**
+   موقّعة — أو مصحوبةً بتحفّظات تُرفع قبل التأشير النهائي.
+2. **visa de conformité** من **اللجنة المختصة** (Commission Compétente): يعرضها **الهيكل
+   الطالب** لا المديرية القانونية، **قبل التوقيع**.
+
+⚠️ التأشيرة القانونية **لا تغطّي** المطابقة التقنية ولا الملاءمة التجارية ولا سلامة مسار
+الإسناد — تُذكر هذه الحدود صراحةً عند إبداء التحفّظ.
+
+📄 نماذج المراسلات: `masques/01-consultation-cahier-charges.md`،
+`masques/02-attribution-rejet.md`، و**`masques/09-visa-projets-contrat.md`** (التأشير).
 
 ---
 

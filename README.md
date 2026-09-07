@@ -139,7 +139,8 @@
         │   ├── 05-avenant-prorogation.md
         │   ├── 06-garanties-mainlevee.md
         │   ├── 07-reception-decompte.md
-        │   └── 08-resiliation.md
+        │   ├── 08-resiliation.md
+        │   └── 09-visa-projets-contrat.md
         └── modeles/
             ├── contrat-fourniture.md
             ├── contrat-prestation-services.md
