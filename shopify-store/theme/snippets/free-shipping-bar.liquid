@@ -1,0 +1,57 @@
+{%- comment -%}
+  Free-shipping progress bar for the cart / cart drawer.
+
+  Include inside the cart drawer and on the cart page:
+    {% render 'free-shipping-bar', threshold_cents: 20000 %}
+
+  threshold_cents is in the STORE'S base currency, in cents.
+  Pass 0 (or omit) when shipping is free on every order — the snippet then
+  renders a simple confirmation instead of a progress bar.
+
+  Only claim a threshold that actually exists in Settings > Shipping.
+{%- endcomment -%}
+
+{%- assign threshold = threshold_cents | default: 0 -%}
+
+{%- if threshold > 0 -%}
+  {%- assign remaining = threshold | minus: cart.total_price -%}
+  {%- if remaining > 0 -%}
+    {%- assign pct = cart.total_price | times: 100 | divided_by: threshold -%}
+    <div class="fsb" role="status">
+      <p class="fsb__text">
+        Add <strong>{{ remaining | money }}</strong> more for free shipping
+      </p>
+      <div class="fsb__track">
+        <div class="fsb__fill" style="inline-size: {{ pct }}%;"></div>
+      </div>
+    </div>
+  {%- else -%}
+    <div class="fsb fsb--done" role="status">
+      <p class="fsb__text">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <strong>You qualify for free shipping</strong>
+      </p>
+      <div class="fsb__track"><div class="fsb__fill" style="inline-size: 100%;"></div></div>
+    </div>
+  {%- endif -%}
+{%- else -%}
+  <div class="fsb fsb--done" role="status">
+    <p class="fsb__text">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+      <strong>Free delivery to Saudi Arabia &amp; the UAE</strong>
+    </p>
+  </div>
+{%- endif -%}
+
+<style>
+  .fsb { padding: 12px 14px; border-radius: 12px; background: var(--cs-bg-soft, #f6f8fa);
+         border: 1px solid var(--cs-line, #e4e8ee); margin-block-end: 14px; }
+  .fsb__text { margin: 0 0 9px; font-size: .9rem; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+  .fsb__text svg { inline-size: 17px; block-size: 17px; flex: none; color: var(--cs-accent, #0f766e); }
+  .fsb--done .fsb__text { margin-block-end: 0; }
+  .fsb--done .fsb__track { margin-block-start: 9px; }
+  .fsb__track { block-size: 6px; border-radius: 999px; background: var(--cs-line, #e4e8ee); overflow: hidden; }
+  .fsb__fill  { block-size: 100%; border-radius: 999px; background: var(--cs-accent, #0f766e);
+                transition: inline-size .35s ease; }
+  @media (prefers-reduced-motion: reduce) { .fsb__fill { transition: none; } }
+</style>

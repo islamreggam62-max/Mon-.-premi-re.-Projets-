@@ -1,0 +1,88 @@
+{%- comment -%}
+  Sticky Add to Cart bar for mobile product pages.
+
+  Include at the END of your product section (main-product.liquid):
+    {% render 'sticky-atc', product: product %}
+
+  It appears once the real Add to Cart button scrolls out of view, so the
+  customer never has to scroll back up to buy. This is one of the highest-impact
+  mobile conversion changes you can make.
+
+  Requires the real button to carry a stable selector. Set MAIN_ATC below to
+  match your theme (inspect the page if unsure).
+{%- endcomment -%}
+
+{%- assign v = product.selected_or_first_available_variant -%}
+
+<div class="satc" id="StickyATC" hidden>
+  <div class="satc__inner">
+    {%- if product.featured_image -%}
+      <img class="satc__img"
+           src="{{ product.featured_image | image_url: width: 120 }}"
+           alt="" width="48" height="48" loading="lazy" decoding="async">
+    {%- endif -%}
+
+    <div class="satc__info">
+      <span class="satc__title">{{ product.title | escape | truncate: 40 }}</span>
+      <span class="satc__price">
+        {{ v.price | money }}
+        {%- if v.compare_at_price > v.price -%}
+          <s>{{ v.compare_at_price | money }}</s>
+        {%- endif -%}
+      </span>
+    </div>
+
+    {%- if product.available -%}
+      {%- form 'product', product, class: 'satc__form', id: 'StickyATCForm' -%}
+        <input type="hidden" name="id" value="{{ v.id }}">
+        <button type="submit" class="satc__btn">Add to cart</button>
+      {%- endform -%}
+    {%- else -%}
+      <button class="satc__btn satc__btn--out" disabled>Sold out</button>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .satc { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 60;
+          background: var(--cs-bg, #fff); border-block-start: 1px solid var(--cs-line, #e4e8ee);
+          box-shadow: 0 -6px 24px rgba(0,0,0,.09);
+          padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+          transform: translateY(100%); transition: transform .25s ease; }
+  .satc.is-visible { transform: translateY(0); }
+  .satc__inner { display: flex; align-items: center; gap: 11px; max-width: 700px; margin-inline: auto; }
+  .satc__img { inline-size: 48px; block-size: 48px; object-fit: cover; border-radius: 9px; flex: none; }
+  .satc__info { display: flex; flex-direction: column; min-inline-size: 0; flex: 1; }
+  .satc__title { font-size: .84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .satc__price { font-size: .95rem; font-weight: 700; display: flex; gap: 7px; align-items: baseline; }
+  .satc__price s { font-weight: 400; font-size: .82rem; color: var(--cs-ink-soft, #5a6472); }
+  .satc__form { flex: none; margin: 0; }
+  .satc__btn { min-block-size: 46px; padding-inline: 22px; border: 0; border-radius: 999px;
+               background: var(--cs-accent, #0f766e); color: #fff; font-weight: 650; font-size: .93rem;
+               cursor: pointer; white-space: nowrap; }
+  .satc__btn:focus-visible { outline: 3px solid var(--cs-ink, #14181d); outline-offset: 2px; }
+  .satc__btn--out { background: var(--cs-ink-soft, #5a6472); cursor: not-allowed; }
+  @media (min-width: 750px) { .satc { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .satc { transition: none; } }
+</style>
+
+<script>
+(function () {
+  var MAIN_ATC = '[name="add"], .product-form__submit, button[type="submit"][name="add"]';
+
+  var bar = document.getElementById('StickyATC');
+  if (!bar) return;
+
+  var main = document.querySelector(MAIN_ATC);
+  if (!main) return;  // theme selector did not match — leave the bar hidden
+
+  bar.hidden = false;
+
+  // Show the sticky bar only while the real button is off screen.
+  if (!('IntersectionObserver' in window)) return;
+
+  new IntersectionObserver(function (entries) {
+    bar.classList.toggle('is-visible', !entries[0].isIntersecting);
+  }, { rootMargin: '0px 0px -60px 0px' }).observe(main);
+})();
+</script>

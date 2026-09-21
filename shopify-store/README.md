@@ -29,9 +29,16 @@ shopify-store/
 │
 ├── theme/
 │   ├── README.md .............. تعليمات التركيب خطوة بخطوة
-│   ├── sections/ .............. Hero, Benefits, Best Sellers, FAQ, Trust
-│   ├── snippets/ .............. كتلة الشحن لصفحة المنتج
+│   ├── sections/ .............. Announcement, Hero, Benefits, Best Sellers,
+│   │                            FAQ, Trust Badges, Footer
+│   ├── snippets/ .............. شحن صفحة المنتج، شريط الشحن المجاني،
+│   │                            زر الإضافة الثابت للجوال
 │   └── assets/custom-store.css  تنسيقات (RTL + وضع ليلي + جوال أولاً)
+│
+├── translations/ar/ ........... المحتوى العربي (ضروري لسوق خليجي)
+│   ├── products-ar.md ......... وصف + مواصفات + FAQ + SEO للمنتجات الثلاثة
+│   ├── pages-ar.md ............ الشحن، الاسترجاع، التتبّع، التواصل
+│   └── ui-strings-ar.md ....... نصوص كل أقسام الثيم والقوائم والسلة
 │
 ├── setup/
 │   ├── markets-currencies-shipping.md .. SAR/AED، اللغة، الشحن، VAT
@@ -57,6 +64,7 @@ shopify-store/
 3  أرسل لي صور المنتجات الثلاثة                ← إجراء منك
 4  املأ قيم pages/_PLACEHOLDERS.md             ← بياناتك الحقيقية
 5  ركّب أقسام الثيم (theme/README.md)
+5ب أضف اللغة العربية وترجم من translations/ar/
 6  انشر المنتجات والصفحات (scripts/)
 7  اضبط Markets + العملات + الشحن (setup/)
 8  اضبط SEO واربط الكتالوجات (setup/seo-checklist.md)

@@ -1,0 +1,167 @@
+{%- comment -%}
+  Footer — 4 columns, policy links, trust row, newsletter.
+  Replace your theme's footer with this section, or add it below the theme footer
+  and hide the original. RTL-safe.
+{%- endcomment -%}
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+
+    <div class="site-footer__grid">
+      {%- comment -%} Brand column {%- endcomment -%}
+      <div class="site-footer__brand">
+        {%- if section.settings.logo != blank -%}
+          <img class="site-footer__logo"
+               src="{{ section.settings.logo | image_url: width: 300 }}"
+               alt="{{ shop.name | escape }}"
+               width="150" height="44" loading="lazy" decoding="async">
+        {%- else -%}
+          <p class="site-footer__name">{{ shop.name }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.blurb != blank -%}
+          <p class="site-footer__blurb">{{ section.settings.blurb | escape }}</p>
+        {%- endif -%}
+
+        <ul class="site-footer__contact">
+          {%- if section.settings.email != blank -%}
+            <li><a href="mailto:{{ section.settings.email }}">{{ section.settings.email }}</a></li>
+          {%- endif -%}
+          {%- if section.settings.whatsapp != blank -%}
+            <li><a href="https://wa.me/{{ section.settings.whatsapp | remove: '+' | remove: ' ' }}" rel="noopener">WhatsApp: {{ section.settings.whatsapp }}</a></li>
+          {%- endif -%}
+          {%- if section.settings.hours != blank -%}
+            <li>{{ section.settings.hours | escape }}</li>
+          {%- endif -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Link columns {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'menu' -%}
+          <div class="site-footer__col" {{ block.shopify_attributes }}>
+            <h3 class="site-footer__coltitle">{{ block.settings.title | escape }}</h3>
+            {%- assign menu = linklists[block.settings.menu] -%}
+            {%- if menu != blank -%}
+              <ul class="site-footer__links">
+                {%- for link in menu.links -%}
+                  <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%} Newsletter {%- endcomment -%}
+      {%- if section.settings.show_newsletter -%}
+        <div class="site-footer__col site-footer__news">
+          <h3 class="site-footer__coltitle">{{ section.settings.news_title | escape }}</h3>
+          {%- if section.settings.news_text != blank -%}
+            <p class="site-footer__newstext">{{ section.settings.news_text | escape }}</p>
+          {%- endif -%}
+          {%- form 'customer', class: 'site-footer__form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="visually-hidden" for="FooterEmail">Email</label>
+            <div class="site-footer__field">
+              <input id="FooterEmail" type="email" name="contact[email]"
+                     placeholder="{{ section.settings.news_placeholder | escape }}"
+                     autocomplete="email" required>
+              <button type="submit">{{ section.settings.news_button | escape }}</button>
+            </div>
+            {%- if form.posted_successfully? -%}
+              <p class="site-footer__ok">{{ section.settings.news_success | escape }}</p>
+            {%- endif -%}
+            {%- if form.errors -%}
+              <p class="site-footer__err">{{ form.errors.messages.email }}</p>
+            {%- endif -%}
+          {%- endform -%}
+          <p class="site-footer__consent">{{ section.settings.news_consent | escape }}</p>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Trust + payment row {%- endcomment -%}
+    <div class="site-footer__trust">
+      <ul class="site-footer__badges">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'badge' -%}
+            <li {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 120 }}"
+                     alt="{{ block.settings.label | escape }}"
+                     width="60" height="38" loading="lazy" decoding="async">
+              {%- else -%}
+                <span>{{ block.settings.label | escape }}</span>
+              {%- endif -%}
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    {%- comment -%} Bottom bar {%- endcomment -%}
+    <div class="site-footer__bottom">
+      <p class="site-footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+      {%- assign legal = linklists[section.settings.legal_menu] -%}
+      {%- if legal != blank -%}
+        <ul class="site-footer__legal">
+          {%- for link in legal.links -%}
+            <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "tag": "footer",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Footer logo" },
+    { "type": "textarea", "id": "blurb", "label": "Short description",
+      "default": "Products that solve one real everyday problem — delivered to Saudi Arabia and the UAE." },
+    { "type": "header", "content": "Contact" },
+    { "type": "text", "id": "email", "label": "Support email" },
+    { "type": "text", "id": "whatsapp", "label": "WhatsApp number", "info": "International format, e.g. +9715xxxxxxx" },
+    { "type": "text", "id": "hours", "label": "Support hours", "default": "Sunday to Thursday, 9:00-18:00 GST" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter signup", "default": true },
+    { "type": "text", "id": "news_title", "label": "Title", "default": "Get 10% off your first order" },
+    { "type": "text", "id": "news_text", "label": "Text", "default": "New products and offers. No spam." },
+    { "type": "text", "id": "news_placeholder", "label": "Input placeholder", "default": "Your email" },
+    { "type": "text", "id": "news_button", "label": "Button text", "default": "Subscribe" },
+    { "type": "text", "id": "news_success", "label": "Success message", "default": "Thanks! Check your inbox." },
+    { "type": "text", "id": "news_consent", "label": "Consent line",
+      "default": "By subscribing you agree to receive marketing emails. Unsubscribe any time." },
+    { "type": "header", "content": "Bottom bar" },
+    { "type": "link_list", "id": "legal_menu", "label": "Legal menu",
+      "info": "Create a menu containing Shipping Policy, Refund Policy, Privacy Policy and Terms of Service." }
+  ],
+  "blocks": [
+    { "type": "menu", "name": "Link column", "limit": 3,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Column title", "default": "Help" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ] },
+    { "type": "badge", "name": "Payment badge",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Badge image" },
+        { "type": "text", "id": "label", "label": "Label / alt text", "default": "Visa" }
+      ] }
+  ],
+  "presets": [
+    { "name": "Footer",
+      "blocks": [
+        { "type": "menu",  "settings": { "title": "Help" } },
+        { "type": "menu",  "settings": { "title": "Shop" } },
+        { "type": "badge", "settings": { "label": "Visa" } },
+        { "type": "badge", "settings": { "label": "Mastercard" } },
+        { "type": "badge", "settings": { "label": "Apple Pay" } }
+      ] }
+  ]
+}
+{% endschema %}
