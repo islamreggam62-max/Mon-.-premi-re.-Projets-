@@ -1,0 +1,744 @@
+<title>Gulf Storefront Preview</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    /* Store palette — identical tokens to theme/assets/custom-store.css */
+    --ink:        #14181d;
+    --ink-soft:   #5a6472;
+    --line:       #e4e8ee;
+    --bg:         #ffffff;
+    --bg-soft:    #f6f8fa;
+    --accent:     #0f766e;
+    --accent-ink: #ffffff;
+    --danger:     #b42318;
+
+    /* Harness chrome — cooler and darker so it reads as "not the store" */
+    --h-bg:    #eceff3;
+    --h-panel: #ffffff;
+    --h-ink:   #222932;
+    --h-soft:  #66707e;
+    --h-line:  #d6dce4;
+
+    --radius: 14px;
+    --maxw:   1120px;
+
+    --font-display: "Bricolage Grotesque", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+    --font-body:    "IBM Plex Sans Arabic", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eef2f6; --ink-soft: #9aa5b4; --line: #2a313b;
+      --bg: #12161b;  --bg-soft: #1a1f26;
+      --accent: #2dd4bf; --accent-ink: #06231f;
+      --danger: #f97066;
+      --h-bg: #0c0f13; --h-panel: #161b21; --h-ink: #e6ebf1;
+      --h-soft: #8b96a5; --h-line: #272e37;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eef2f6; --ink-soft: #9aa5b4; --line: #2a313b;
+    --bg: #12161b;  --bg-soft: #1a1f26;
+    --accent: #2dd4bf; --accent-ink: #06231f;
+    --danger: #f97066;
+    --h-bg: #0c0f13; --h-panel: #161b21; --h-ink: #e6ebf1;
+    --h-soft: #8b96a5; --h-line: #272e37;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--h-bg);
+    color: var(--h-ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===================== Harness ===================== */
+
+  .harness { padding: 20px 16px 48px; }
+  .harness__head {
+    max-width: var(--maxw); margin-inline: auto;
+    display: flex; flex-wrap: wrap; align-items: flex-end;
+    justify-content: space-between; gap: 14px; margin-block-end: 16px;
+  }
+  .harness__title { margin: 0; font-family: var(--font-display); font-size: 1.22rem; font-weight: 700; letter-spacing: -.015em; }
+  .harness__note  { margin: 3px 0 0; font-size: .84rem; color: var(--h-soft); max-width: 62ch; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+  .seg {
+    display: inline-flex; background: var(--h-panel);
+    border: 1px solid var(--h-line); border-radius: 999px; padding: 3px; gap: 2px;
+  }
+  .seg button {
+    appearance: none; border: 0; background: none; cursor: pointer;
+    font: inherit; font-size: .8rem; font-weight: 600; color: var(--h-soft);
+    padding: 6px 13px; border-radius: 999px; line-height: 1.3;
+    transition: background .15s ease, color .15s ease;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Device frame */
+  .frame {
+    max-width: var(--maxw); margin-inline: auto;
+    background: var(--h-panel); border: 1px solid var(--h-line);
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 18px 44px -24px rgba(15, 25, 40, .38);
+    transition: max-width .28s ease;
+  }
+  .frame.is-phone { max-width: 400px; }
+
+  .frame__chrome {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 14px; border-block-end: 1px solid var(--h-line);
+    background: var(--h-bg);
+  }
+  .dot { inline-size: 9px; block-size: 9px; border-radius: 50%; background: var(--h-line); flex: none; }
+  .frame__url {
+    flex: 1; font-size: .72rem; color: var(--h-soft); text-align: center;
+    font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ===================== Store ===================== */
+
+  .store {
+    background: var(--bg); color: var(--ink);
+    container-type: inline-size;
+  }
+  .store :where(h1,h2,h3) { font-family: var(--font-display); letter-spacing: -.02em; text-wrap: balance; margin: 0; }
+  .store[dir="rtl"] :where(h1,h2,h3) { font-family: var(--font-body); letter-spacing: 0; font-weight: 700; }
+  .wrap { max-width: 1000px; margin-inline: auto; padding-inline: 18px; }
+
+  /* Announcement */
+  .ann { background: var(--ink); color: var(--bg); font-size: .78rem; }
+  .ann .wrap { padding-block: 8px; text-align: center; }
+
+  /* Header */
+  .hdr {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end: 1px solid var(--line);
+  }
+  .hdr .wrap { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-block: 12px; }
+  .brand { font-family: var(--font-display); font-weight: 800; font-size: 1.04rem; letter-spacing: -.03em; }
+  .store[dir="rtl"] .brand { font-family: var(--font-body); letter-spacing: 0; }
+  .nav { display: flex; gap: 20px; font-size: .85rem; font-weight: 500; color: var(--ink-soft); }
+  .hdr__right { display: flex; align-items: center; gap: 12px; }
+  .pill {
+    font-size: .72rem; font-weight: 600; border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 10px; color: var(--ink-soft);
+  }
+  .cart { display: flex; align-items: center; gap: 5px; font-size: .82rem; font-weight: 600; }
+  .cart svg { inline-size: 17px; block-size: 17px; }
+  @container (max-width: 640px) { .nav { display: none; } }
+
+  /* Hero */
+  .hero { position: relative; isolation: isolate; background: var(--bg-soft); overflow: hidden; }
+  .hero__art { position: absolute; inset: 0; z-index: -1; opacity: .5; }
+  .hero .wrap {
+    padding-block: clamp(46px, 8cqi, 86px);
+    display: grid; gap: 15px; justify-items: center; text-align: center;
+  }
+  .eyebrow {
+    font-size: .72rem; font-weight: 700; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .store[dir="rtl"] .eyebrow { letter-spacing: 0; }
+  .hero h1 { font-size: clamp(1.95rem, 6.2cqi, 3.15rem); line-height: 1.06; font-weight: 800; max-width: 17ch; }
+  .hero p  { margin: 0; font-size: clamp(.95rem, 1.9cqi, 1.1rem); color: var(--ink-soft); max-width: 48ch; line-height: 1.6; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-block-start: 6px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-block-size: 48px; padding-inline: 27px; border-radius: 999px;
+    font-weight: 650; font-size: .95rem; border: 1.5px solid transparent; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn--primary { background: var(--accent); color: var(--accent-ink); }
+  .btn--ghost   { background: transparent; color: var(--ink); border-color: var(--line); }
+  .trustline {
+    display: flex; flex-wrap: wrap; gap: 7px 20px; justify-content: center;
+    font-size: .8rem; color: var(--ink-soft); margin-block-start: 8px;
+  }
+  .trustline span { display: flex; align-items: center; gap: 6px; }
+  .trustline span::before { content: ""; inline-size: 5px; block-size: 5px; border-radius: 50%; background: var(--accent); }
+
+  /* Benefits */
+  .benefits { background: var(--bg); border-block: 1px solid var(--line); }
+  .benefits .wrap { padding-block: 26px; }
+  .benefits__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 14px; }
+  @container (min-width: 720px) { .benefits__grid { grid-template-columns: repeat(4, 1fr); } }
+  .benefit { display: grid; justify-items: center; text-align: center; gap: 5px; }
+  .benefit svg { inline-size: 25px; block-size: 25px; color: var(--accent); }
+  .benefit b { font-size: .89rem; font-weight: 650; }
+  .benefit small { font-size: .78rem; color: var(--ink-soft); line-height: 1.45; }
+
+  /* Products */
+  .products .wrap { padding-block: clamp(38px, 6cqi, 62px); }
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-block-end: 22px; }
+  .sec-head h2 { font-size: clamp(1.4rem, 3.4cqi, 1.95rem); font-weight: 700; }
+  .link-all { font-size: .85rem; font-weight: 600; color: var(--ink); }
+
+  .grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @container (min-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .card { display: grid; gap: 9px; align-content: start; }
+  .card__media {
+    position: relative; aspect-ratio: 1; border-radius: var(--radius);
+    background: var(--bg-soft); border: 1px solid var(--line);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .card__media svg { inline-size: 58%; block-size: 58%; color: var(--ink-soft); opacity: .85; }
+  .card__ph {
+    position: absolute; inset-block-end: 8px; inset-inline: 8px;
+    font-size: .64rem; text-align: center; color: var(--ink-soft);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    border-radius: 7px; padding: 3px 6px; letter-spacing: .02em;
+  }
+  .badge {
+    position: absolute; inset-block-start: 9px; inset-inline-start: 9px;
+    background: var(--danger); color: #fff; font-size: .7rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums;
+  }
+  .card h3 { font-size: .93rem; font-weight: 650; line-height: 1.38; letter-spacing: -.005em; }
+  .price { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+  .price b { font-size: 1rem; font-weight: 700; }
+  .price s { font-size: .84rem; color: var(--ink-soft); }
+  .card .btn { min-block-size: 44px; font-size: .88rem; inline-size: 100%; padding-inline: 12px; }
+
+  /* FAQ */
+  .faq { background: var(--bg-soft); border-block-start: 1px solid var(--line); }
+  .faq .wrap { padding-block: clamp(38px, 6cqi, 62px); max-width: 720px; }
+  .faq h2 { font-size: clamp(1.4rem, 3.4cqi, 1.95rem); font-weight: 700; text-align: center; margin-block-end: 20px; }
+  .q { border-block-end: 1px solid var(--line); }
+  .q:first-child { border-block-start: 1px solid var(--line); }
+  .q summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding-block: 15px; cursor: pointer; font-weight: 620; font-size: .95rem; list-style: none;
+  }
+  .q summary::-webkit-details-marker { display: none; }
+  .q svg { inline-size: 17px; block-size: 17px; flex: none; color: var(--ink-soft); transition: transform .2s ease; }
+  .q[open] svg { transform: rotate(180deg); }
+  .q p { margin: 0; padding-block-end: 16px; color: var(--ink-soft); font-size: .89rem; line-height: 1.65; }
+
+  /* Trust */
+  .trust { background: var(--bg); border-block-start: 1px solid var(--line); }
+  .trust .wrap { padding-block: 26px; text-align: center; display: grid; gap: 11px; justify-items: center; }
+  .trust b { font-size: .92rem; font-weight: 650; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip {
+    font-size: .74rem; font-weight: 600; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 7px; padding: 6px 11px; background: var(--bg-soft);
+  }
+  .trust small { font-size: .77rem; color: var(--ink-soft); max-width: 50ch; line-height: 1.5; }
+
+  /* Footer */
+  .ftr { background: var(--bg-soft); border-block-start: 1px solid var(--line); }
+  .ftr .wrap { padding-block: 34px 20px; }
+  .ftr__grid { display: grid; gap: 26px; grid-template-columns: 1fr; }
+  @container (min-width: 720px) { .ftr__grid { grid-template-columns: 1.7fr 1fr 1fr 1.4fr; } }
+  .ftr h4 {
+    margin: 0 0 11px; font-size: .71rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .store[dir="rtl"] .ftr h4 { letter-spacing: 0; }
+  .ftr ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: .85rem; color: var(--ink-soft); }
+  .ftr__brand b { font-family: var(--font-display); font-size: 1.02rem; font-weight: 800; letter-spacing: -.03em; display: block; margin-block-end: 8px; }
+  .store[dir="rtl"] .ftr__brand b { font-family: var(--font-body); letter-spacing: 0; }
+  .ftr__brand p { margin: 0 0 12px; font-size: .84rem; color: var(--ink-soft); max-width: 34ch; line-height: 1.6; }
+  .news { display: flex; gap: 7px; }
+  .news input {
+    flex: 1; min-inline-size: 0; min-block-size: 42px; padding-inline: 13px;
+    border: 1.5px solid var(--line); border-radius: 999px;
+    background: var(--bg); color: var(--ink); font: inherit; font-size: .88rem;
+  }
+  .news button {
+    min-block-size: 42px; padding-inline: 17px; border: 0; border-radius: 999px;
+    background: var(--accent); color: var(--accent-ink); font: inherit;
+    font-weight: 650; font-size: .84rem; cursor: pointer; white-space: nowrap;
+  }
+  .ftr__bottom {
+    margin-block-start: 22px; padding-block-start: 16px; border-block-start: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 9px;
+    font-size: .78rem; color: var(--ink-soft);
+  }
+  .ftr__legal { display: flex; flex-wrap: wrap; gap: 6px 15px; }
+
+  /* Mobile sticky ATC demo strip */
+  .satc-demo {
+    display: none; align-items: center; gap: 10px;
+    padding: 9px 16px; border-block-start: 1px solid var(--line);
+    background: var(--bg); box-shadow: 0 -5px 18px rgba(0,0,0,.07);
+  }
+  .frame.is-phone .satc-demo { display: flex; }
+  .satc-demo__sq { inline-size: 38px; block-size: 38px; border-radius: 8px; background: var(--bg-soft); border: 1px solid var(--line); flex: none; }
+  .satc-demo__txt { flex: 1; min-inline-size: 0; display: grid; }
+  .satc-demo__txt b { font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .satc-demo__txt span { font-size: .86rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .satc-demo .btn { min-block-size: 40px; padding-inline: 18px; font-size: .85rem; inline-size: auto; }
+
+  /* Legend under the frame */
+  .legend {
+    max-width: var(--maxw); margin: 18px auto 0;
+    display: grid; gap: 10px; grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) { .legend { grid-template-columns: repeat(3, 1fr); } }
+  .legend div {
+    background: var(--h-panel); border: 1px solid var(--h-line);
+    border-radius: 11px; padding: 13px 15px;
+  }
+  .legend b { display: block; font-size: .83rem; font-weight: 650; margin-block-end: 3px; }
+  .legend p { margin: 0; font-size: .79rem; color: var(--h-soft); line-height: 1.5; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+
+<div class="harness">
+
+  <div class="harness__head">
+    <div>
+      <h1 class="harness__title">Gulf Storefront Preview</h1>
+      <p class="harness__note" id="note">
+        The design in <code>shopify-store/theme/</code>, rendered with your real products and approved prices. Switch language, currency and device to check every state before it touches the store.
+      </p>
+    </div>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">English</button>
+        <button type="button" data-lang="ar" aria-pressed="false">العربية</button>
+      </div>
+      <div class="seg" role="group" aria-label="Currency">
+        <button type="button" data-cur="usd" aria-pressed="true">USD</button>
+        <button type="button" data-cur="sar" aria-pressed="false">SAR</button>
+        <button type="button" data-cur="aed" aria-pressed="false">AED</button>
+      </div>
+      <div class="seg" role="group" aria-label="Device">
+        <button type="button" data-dev="desk" aria-pressed="true">Desktop</button>
+        <button type="button" data-dev="phone" aria-pressed="false">Phone</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame" id="frame">
+    <div class="frame__chrome">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="frame__url" id="url">your-store.com</span>
+    </div>
+
+    <div class="store" id="store" dir="ltr" lang="en">
+
+      <!-- Announcement -->
+      <div class="ann">
+        <div class="wrap" data-en="🚚 Free delivery to Saudi Arabia &amp; the UAE · 30-day returns"
+                          data-ar="🚚 توصيل مجاني للسعودية والإمارات · استرجاع خلال ٣٠ يوم">🚚 Free delivery to Saudi Arabia &amp; the UAE · 30-day returns</div>
+      </div>
+
+      <!-- Header -->
+      <header class="hdr">
+        <div class="wrap">
+          <span class="brand" data-en="YOUR STORE" data-ar="متجرك">YOUR STORE</span>
+          <nav class="nav">
+            <span data-en="Shop" data-ar="المتجر">Shop</span>
+            <span data-en="Best Sellers" data-ar="الأكثر مبيعاً">Best Sellers</span>
+            <span data-en="Track Order" data-ar="تتبّع الطلب">Track Order</span>
+            <span data-en="Contact" data-ar="تواصل معنا">Contact</span>
+          </nav>
+          <div class="hdr__right">
+            <span class="pill" id="curpill">USD $</span>
+            <span class="cart">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Hero -->
+      <section class="hero">
+        <svg class="hero__art" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <rect width="1200" height="500" fill="url(#hg)"/>
+          <circle cx="980" cy="120" r="200" fill="var(--accent)" opacity=".07"/>
+          <circle cx="180" cy="420" r="150" fill="var(--accent)" opacity=".05"/>
+        </svg>
+        <div class="wrap">
+          <span class="eyebrow" data-en="Free delivery to KSA &amp; UAE" data-ar="توصيل مجاني للسعودية والإمارات">Free delivery to KSA &amp; UAE</span>
+          <h1 data-en="Smart solutions for everyday problems" data-ar="حلول ذكية لمشاكل يومية">Smart solutions for everyday problems</h1>
+          <p data-en="Carefully selected products that solve one real problem — and solve it well."
+             data-ar="منتجات مختارة بعناية — كل واحد منها يحلّ مشكلة حقيقية واحدة، ويحلّها صح.">Carefully selected products that solve one real problem — and solve it well.</p>
+          <div class="cta-row">
+            <button class="btn btn--primary" data-en="Shop best sellers" data-ar="تسوّق الأكثر مبيعاً">Shop best sellers</button>
+            <button class="btn btn--ghost" data-en="About us" data-ar="تعرّف علينا">About us</button>
+          </div>
+          <div class="trustline">
+            <span data-en="Free shipping" data-ar="شحن مجاني">Free shipping</span>
+            <span data-en="30-day returns" data-ar="استرجاع ٣٠ يوم">30-day returns</span>
+            <span data-en="Secure checkout" data-ar="دفع آمن">Secure checkout</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Benefits -->
+      <section class="benefits">
+        <div class="wrap">
+          <div class="benefits__grid">
+            <div class="benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <b data-en="Free delivery" data-ar="توصيل مجاني">Free delivery</b>
+              <small data-en="On every order to KSA &amp; UAE" data-ar="على كل طلب للسعودية والإمارات">On every order to KSA &amp; UAE</small>
+            </div>
+            <div class="benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+              <b data-en="30-day returns" data-ar="استرجاع ٣٠ يوم">30-day returns</b>
+              <small data-en="Simple, no-argument returns" data-ar="بسيط وبدون تعقيد">Simple, no-argument returns</small>
+            </div>
+            <div class="benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.4 9.3-8 10-4.6-.7-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+              <b data-en="Secure checkout" data-ar="دفع آمن">Secure checkout</b>
+              <small data-en="Encrypted payment processing" data-ar="معاملات مشفّرة بالكامل">Encrypted payment processing</small>
+            </div>
+            <div class="benefit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.8 8.8 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1 3.7-11.3 8.8 8.8 0 0 1 12.4 6.8z"/></svg>
+              <b data-en="24h support" data-ar="دعم خلال ٢٤ ساعة">24h support</b>
+              <small data-en="Real people, real answers" data-ar="أشخاص حقيقيون وإجابات حقيقية">Real people, real answers</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products -->
+      <section class="products">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <div class="eyebrow" data-en="Most loved" data-ar="الأكثر طلباً">Most loved</div>
+              <h2 data-en="Best Sellers" data-ar="الأكثر مبيعاً">Best Sellers</h2>
+            </div>
+            <span class="link-all" data-en="View all →" data-ar="عرض الكل ←">View all →</span>
+          </div>
+
+          <div class="grid">
+            <!-- Clothesline -->
+            <article class="card">
+              <div class="card__media">
+                <span class="badge" data-pct="43">-43%</span>
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="10" y="36" width="20" height="28" rx="4"/>
+                  <circle cx="20" cy="50" r="6"/>
+                  <path d="M30 50h56"/>
+                  <path d="M86 40v20"/>
+                  <path d="M44 50v9l-5 5h10l-5-5"/>
+                  <path d="M60 50v7l-4 4h8l-4-4"/>
+                  <path d="M74 50v10l-5 5h10l-5-5"/>
+                </svg>
+                <span class="card__ph" data-en="your product photo here" data-ar="صورة منتجك هنا">your product photo here</span>
+              </div>
+              <h3 data-en="Smart Retractable Clothesline — Wall-Mounted Drying Line"
+                  data-ar="حبل غسيل ذكي قابل للسحب — منشر جداري للبلكونة">Smart Retractable Clothesline — Wall-Mounted Drying Line</h3>
+              <p class="price">
+                <b data-usd="$39.90" data-sar="149.90 ر.س" data-aed="147.90 د.إ">$39.90</b>
+                <s data-usd="$69.90" data-sar="262.90 ر.س" data-aed="257.90 د.إ">$69.90</s>
+              </p>
+              <button class="btn btn--ghost" data-en="Add to cart" data-ar="أضف للسلة">Add to cart</button>
+            </article>
+
+            <!-- Trimmer -->
+            <article class="card">
+              <div class="card__media">
+                <span class="badge" data-pct="44">-44%</span>
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="34" y="14" width="32" height="62" rx="10"/>
+                  <path d="M40 22h20"/>
+                  <path d="M38 40h24"/>
+                  <path d="M42 50h16"/>
+                  <path d="M34 66h32"/>
+                  <path d="M40 76v8M50 76v10M60 76v8"/>
+                  <circle cx="50" cy="31" r="3.5"/>
+                </svg>
+                <span class="card__ph" data-en="your product photo here" data-ar="صورة منتجك هنا">your product photo here</span>
+              </div>
+              <h3 data-en="Cordless Split-End Trimmer — Salon-Style Hair Dusting at Home"
+                  data-ar="جهاز قص الأطراف المتقصّفة اللاسلكي — عناية صالون في بيتك">Cordless Split-End Trimmer — Salon-Style Hair Dusting at Home</h3>
+              <p class="price">
+                <b data-usd="$49.90" data-sar="187.90 ر.س" data-aed="183.90 د.إ">$49.90</b>
+                <s data-usd="$89.90" data-sar="337.90 ر.س" data-aed="329.90 د.إ">$89.90</s>
+              </p>
+              <button class="btn btn--ghost" data-en="Add to cart" data-ar="أضف للسلة">Add to cart</button>
+            </article>
+
+            <!-- CarPlay -->
+            <article class="card">
+              <div class="card__media">
+                <span class="badge" data-pct="42">-42%</span>
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="26" y="44" width="40" height="26" rx="7"/>
+                  <path d="M66 53h8a4 4 0 0 1 0 8h-8"/>
+                  <circle cx="38" cy="57" r="2.6"/>
+                  <path d="M46 62c3-3 8-3 11 0"/>
+                  <path d="M52 22a22 22 0 0 1 16 7"/>
+                  <path d="M54 32a13 13 0 0 1 9 4"/>
+                </svg>
+                <span class="card__ph" data-en="your product photo here" data-ar="صورة منتجك هنا">your product photo here</span>
+              </div>
+              <h3 data-en="Wireless CarPlay Adapter — Wired to Wireless in 5 Seconds"
+                  data-ar="محوّل CarPlay لاسلكي — من السلكي للاسلكي في ٥ ثوانٍ">Wireless CarPlay Adapter — Wired to Wireless in 5 Seconds</h3>
+              <p class="price">
+                <b data-usd="$69.90" data-sar="262.90 ر.س" data-aed="257.90 د.إ">$69.90</b>
+                <s data-usd="$119.90" data-sar="449.90 ر.س" data-aed="439.90 د.إ">$119.90</s>
+              </p>
+              <button class="btn btn--ghost" data-en="Add to cart" data-ar="أضف للسلة">Add to cart</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="faq">
+        <div class="wrap">
+          <h2 data-en="Frequently asked questions" data-ar="الأسئلة الشائعة">Frequently asked questions</h2>
+
+          <details class="q" open>
+            <summary>
+              <span data-en="How long does delivery take?" data-ar="كم تستغرق مدة التوصيل؟">How long does delivery take?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <p data-en="Orders are processed in 1–3 business days, then delivered within the window shown on each product page. You get a tracking number by SMS and email as soon as your parcel ships."
+               data-ar="تُجهّز الطلبات خلال ١–٣ أيام عمل، ثم تُسلَّم خلال المدة الموضّحة في صفحة كل منتج. يصلك رقم التتبّع عبر الرسائل النصية والبريد فور الشحن.">Orders are processed in 1–3 business days, then delivered within the window shown on each product page. You get a tracking number by SMS and email as soon as your parcel ships.</p>
+          </details>
+
+          <details class="q">
+            <summary>
+              <span data-en="Do you ship to Saudi Arabia and the UAE?" data-ar="هل تشحنون للسعودية والإمارات؟">Do you ship to Saudi Arabia and the UAE?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <p data-en="Yes — both, with free standard tracked shipping on every order."
+               data-ar="نعم — للبلدين، مع شحن قياسي مجاني ومتتبَّع على كل طلب.">Yes — both, with free standard tracked shipping on every order.</p>
+          </details>
+
+          <details class="q">
+            <summary>
+              <span data-en="What if the product isn't right for me?" data-ar="ماذا لو لم يناسبني المنتج؟">What if the product isn't right for me?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <p data-en="Return it within 30 days of delivery, unused and in its original packaging. If it arrived damaged or faulty, we cover return shipping and refund you in full."
+               data-ar="أرجعه خلال ٣٠ يوماً من الاستلام، غير مستخدم وفي عبوته الأصلية. وإذا وصلك تالفاً أو معيباً، نتحمّل تكلفة الإرجاع ونصرف استرداداً كاملاً.">Return it within 30 days of delivery, unused and in its original packaging. If it arrived damaged or faulty, we cover return shipping and refund you in full.</p>
+          </details>
+        </div>
+      </section>
+
+      <!-- Trust -->
+      <section class="trust">
+        <div class="wrap">
+          <b data-en="Secure checkout" data-ar="دفع آمن">Secure checkout</b>
+          <div class="chips">
+            <span class="chip">Visa</span>
+            <span class="chip">Mastercard</span>
+            <span class="chip">mada</span>
+            <span class="chip">Apple&nbsp;Pay</span>
+            <span class="chip">Tabby</span>
+          </div>
+          <small data-en="Payment badges shown are examples — display only the methods your gateway actually approves."
+                 data-ar="شارات الدفع هنا أمثلة — اعرض فقط الوسائل التي تعتمدها بوابتك فعلياً.">Payment badges shown are examples — display only the methods your gateway actually approves.</small>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="ftr">
+        <div class="wrap">
+          <div class="ftr__grid">
+            <div class="ftr__brand">
+              <b data-en="YOUR STORE" data-ar="متجرك">YOUR STORE</b>
+              <p data-en="Products that solve one real everyday problem — delivered to Saudi Arabia and the UAE."
+                 data-ar="منتجات تحلّ مشكلة يومية حقيقية — توصيل للسعودية والإمارات.">Products that solve one real everyday problem — delivered to Saudi Arabia and the UAE.</p>
+              <ul>
+                <li>support@your-store.com</li>
+                <li data-en="Sunday–Thursday, 9:00–18:00 GST" data-ar="الأحد–الخميس، ٩:٠٠–١٨:٠٠ بتوقيت الخليج">Sunday–Thursday, 9:00–18:00 GST</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 data-en="Help" data-ar="المساعدة">Help</h4>
+              <ul>
+                <li data-en="Track Order" data-ar="تتبّع الطلب">Track Order</li>
+                <li data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</li>
+                <li data-en="Contact Us" data-ar="تواصل معنا">Contact Us</li>
+                <li data-en="Shipping Policy" data-ar="سياسة الشحن">Shipping Policy</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 data-en="Shop" data-ar="المتجر">Shop</h4>
+              <ul>
+                <li data-en="All products" data-ar="كل المنتجات">All products</li>
+                <li data-en="Best Sellers" data-ar="الأكثر مبيعاً">Best Sellers</li>
+                <li data-en="Hair Care" data-ar="العناية بالشعر">Hair Care</li>
+                <li data-en="Home &amp; Laundry" data-ar="المنزل والغسيل">Home &amp; Laundry</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 data-en="Get 10% off" data-ar="خصم ١٠٪">Get 10% off</h4>
+              <p style="margin:0 0 10px;font-size:.84rem;color:var(--ink-soft);line-height:1.55"
+                 data-en="New products and offers. No spam." data-ar="منتجات وعروض جديدة. بدون إزعاج.">New products and offers. No spam.</p>
+              <div class="news">
+                <input id="previewEmail" type="email" placeholder="Your email" aria-label="Email">
+                <button type="button" data-en="Subscribe" data-ar="اشترك">Subscribe</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ftr__bottom">
+            <span>© 2026 Your Store</span>
+            <div class="ftr__legal">
+              <span data-en="Shipping Policy" data-ar="سياسة الشحن">Shipping Policy</span>
+              <span data-en="Refund Policy" data-ar="سياسة الاسترجاع">Refund Policy</span>
+              <span data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</span>
+              <span data-en="Terms of Service" data-ar="الشروط والأحكام">Terms of Service</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Sticky ATC, phone only -->
+      <div class="satc-demo">
+        <span class="satc-demo__sq"></span>
+        <span class="satc-demo__txt">
+          <b data-en="Cordless Split-End Trimmer" data-ar="جهاز قص الأطراف المتقصّفة">Cordless Split-End Trimmer</b>
+          <span data-usd="$49.90" data-sar="187.90 ر.س" data-aed="183.90 د.إ">$49.90</span>
+        </span>
+        <button class="btn btn--primary" data-en="Add to cart" data-ar="أضف للسلة">Add to cart</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="legend">
+    <div>
+      <b id="lg1t">Everything here is real</b>
+      <p id="lg1b">Titles, prices and FAQ answers are the exact copy in <code>shopify-store/</code>. Only the product photos are placeholders, because you haven't sent the images yet.</p>
+    </div>
+    <div>
+      <b id="lg2t">Arabic is not an afterthought</b>
+      <p id="lg2b">Switch to العربية: the whole layout mirrors to RTL with no extra CSS, because the sections use logical properties throughout.</p>
+    </div>
+    <div>
+      <b id="lg3t">Phone view shows the sticky bar</b>
+      <p id="lg3b">Switch to Phone and the mobile add-to-cart strip appears at the bottom — the single highest-impact mobile conversion change in the kit.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var store  = document.getElementById('store');
+    var frame  = document.getElementById('frame');
+    var curPill = document.getElementById('curpill');
+    var url    = document.getElementById('url');
+    var note   = document.getElementById('note');
+
+    var lang = 'en';
+    var cur  = 'usd';
+
+    var CUR_LABEL = { usd: 'USD $', sar: 'SAR ر.س', aed: 'AED د.إ' };
+
+    var COPY = {
+      en: {
+        note: 'The design in shopify-store/theme/, rendered with your real products and approved prices. Switch language, currency and device to check every state before it touches the store.',
+        url: 'your-store.com',
+        email: 'Your email',
+        lg1t: 'Everything here is real',
+        lg1b: 'Titles, prices and FAQ answers are the exact copy in shopify-store/. Only the product photos are placeholders, because you haven’t sent the images yet.',
+        lg2t: 'Arabic is not an afterthought',
+        lg2b: 'Switch to العربية: the whole layout mirrors to RTL with no extra CSS, because the sections use logical properties throughout.',
+        lg3t: 'Phone view shows the sticky bar',
+        lg3b: 'Switch to Phone and the mobile add-to-cart strip appears at the bottom — the single highest-impact mobile conversion change in the kit.'
+      },
+      ar: {
+        note: 'التصميم الموجود في shopify-store/theme/ معروضاً بمنتجاتك الحقيقية والأسعار المعتمدة. بدّل اللغة والعملة والجهاز لتفحص كل حالة قبل تطبيقها على المتجر.',
+        url: 'متجرك.com',
+        email: 'بريدك الإلكتروني',
+        lg1t: 'كل شيء هنا حقيقي',
+        lg1b: 'العناوين والأسعار وإجابات الأسئلة الشائعة هي نفس النصوص الموجودة في shopify-store/. الصور وحدها مؤقتة لأنك لم ترسل صور المنتجات بعد.',
+        lg2t: 'العربية ليست إضافة لاحقة',
+        lg2b: 'بدّل إلى العربية: التخطيط كله ينعكس RTL بدون أي CSS إضافي، لأن الأقسام تستخدم الخصائص المنطقية بالكامل.',
+        lg3t: 'وضع الجوال يُظهر الشريط الثابت',
+        lg3b: 'بدّل إلى الجوال ويظهر شريط الإضافة للسلة في الأسفل — أقوى تحسين تحويل منفرد على الجوال في الحزمة.'
+      }
+    };
+
+    function applyLang() {
+      var rtl = lang === 'ar';
+      store.dir = rtl ? 'rtl' : 'ltr';
+      store.lang = rtl ? 'ar' : 'en';
+
+      store.querySelectorAll('[data-en]').forEach(function (el) {
+        var v = el.getAttribute('data-' + lang);
+        if (v !== null) el.innerHTML = v;
+      });
+
+      var t = COPY[lang];
+      note.textContent = t.note;
+      url.textContent  = t.url;
+      document.getElementById('previewEmail').placeholder = t.email;
+      ['lg1t','lg1b','lg2t','lg2b','lg3t','lg3b'].forEach(function (k) {
+        document.getElementById(k).textContent = t[k];
+      });
+    }
+
+    function applyCur() {
+      curPill.textContent = CUR_LABEL[cur];
+      store.querySelectorAll('[data-usd]').forEach(function (el) {
+        el.textContent = el.getAttribute('data-' + cur);
+      });
+    }
+
+    document.querySelectorAll('[data-lang]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        lang = b.dataset.lang;
+        document.querySelectorAll('[data-lang]').forEach(function (x) {
+          x.setAttribute('aria-pressed', String(x === b));
+        });
+        applyLang();
+      });
+    });
+
+    document.querySelectorAll('[data-cur]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        cur = b.dataset.cur;
+        document.querySelectorAll('[data-cur]').forEach(function (x) {
+          x.setAttribute('aria-pressed', String(x === b));
+        });
+        applyCur();
+      });
+    });
+
+    document.querySelectorAll('[data-dev]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        frame.classList.toggle('is-phone', b.dataset.dev === 'phone');
+        document.querySelectorAll('[data-dev]').forEach(function (x) {
+          x.setAttribute('aria-pressed', String(x === b));
+        });
+      });
+    });
+
+    applyLang();
+    applyCur();
+  })();
+</script>
