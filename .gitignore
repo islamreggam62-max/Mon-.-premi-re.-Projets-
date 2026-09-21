@@ -7,3 +7,8 @@ authorization.yaml
 reports/
 *.report.json
 *.report.txt
+
+# Never commit Shopify credentials.
+.env
+.env.*
+*.shopify-token

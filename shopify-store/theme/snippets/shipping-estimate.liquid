@@ -1,0 +1,32 @@
+{%- comment -%}
+  Shipping reassurance block for the product page.
+  Include just under the Add to Cart button:
+    {% render 'shipping-estimate' %}
+  Edit the text below to match your REAL delivery window.
+{%- endcomment -%}
+
+<ul class="shipping-estimate">
+  <li>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    <span><strong>Free delivery</strong> to Saudi Arabia &amp; the UAE</span>
+  </li>
+  <li>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <span>Arrives in <strong>[[DELIVERY_WINDOW]] business days</strong></span>
+  </li>
+  <li>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+    <span><strong>[[RETURN_WINDOW]]-day returns</strong> — <a href="/pages/refund-policy">see policy</a></span>
+  </li>
+  <li>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>Secure encrypted checkout</span>
+  </li>
+</ul>
+
+<style>
+  .shipping-estimate { list-style: none; margin: 18px 0 0; padding: 16px; display: grid; gap: 11px;
+    border: 1px solid var(--cs-line, #e4e8ee); border-radius: 12px; font-size: .92rem; }
+  .shipping-estimate li { display: flex; align-items: center; gap: 11px; }
+  .shipping-estimate svg { inline-size: 19px; block-size: 19px; flex: none; color: var(--cs-accent, #0f766e); }
+</style>

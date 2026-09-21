@@ -1,0 +1,94 @@
+{%- comment -%}
+  Best Sellers — pulls live products from a chosen collection.
+  Set the collection in Customize. Create a "Best Sellers" collection first.
+{%- endcomment -%}
+
+{%- assign coll = collections[section.settings.collection] -%}
+
+<div class="best-sellers">
+  <div class="best-sellers__inner">
+    <div class="best-sellers__head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="best-sellers__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h2 class="best-sellers__heading">{{ section.settings.heading | escape }}</h2>
+      </div>
+      {%- if section.settings.show_view_all and coll != blank -%}
+        <a class="best-sellers__viewall" href="{{ coll.url }}">{{ section.settings.view_all_text | escape }} &rarr;</a>
+      {%- endif -%}
+    </div>
+
+    {%- if coll != blank and coll.products_count > 0 -%}
+      <ul class="best-sellers__grid">
+        {%- for product in coll.products limit: section.settings.products_to_show -%}
+          <li class="bs-card">
+            <a class="bs-card__link" href="{{ product.url }}">
+              <div class="bs-card__media">
+                {%- if product.featured_image -%}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 600 }}"
+                    srcset="{{ product.featured_image | image_url: width: 400 }} 400w,
+                            {{ product.featured_image | image_url: width: 700 }} 700w"
+                    sizes="(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                    loading="lazy" decoding="async">
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'bs-card__placeholder' }}
+                {%- endif -%}
+
+                {%- if product.compare_at_price > product.price -%}
+                  {%- assign pct = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round -%}
+                  <span class="bs-card__badge">-{{ pct }}%</span>
+                {%- endif -%}
+                {%- unless product.available -%}
+                  <span class="bs-card__badge bs-card__badge--out">Sold out</span>
+                {%- endunless -%}
+              </div>
+
+              <h3 class="bs-card__title">{{ product.title | escape }}</h3>
+
+              <p class="bs-card__price">
+                <span class="bs-card__price-now">{{ product.price | money }}</span>
+                {%- if product.compare_at_price > product.price -%}
+                  <s class="bs-card__price-was">{{ product.compare_at_price | money }}</s>
+                {%- endif -%}
+              </p>
+            </a>
+
+            {%- if section.settings.show_quick_add and product.available and product.variants.size == 1 -%}
+              {%- form 'product', product, class: 'bs-card__form' -%}
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                <button type="submit" class="bs-card__add">{{ section.settings.quick_add_text | escape }}</button>
+              {%- endform -%}
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="best-sellers__empty">
+        Select a collection for this section in the theme editor.
+      </p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Best Sellers",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Most loved" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Best Sellers" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show \"view all\" link", "default": true },
+    { "type": "text", "id": "view_all_text", "label": "View all text", "default": "View all" },
+    { "type": "checkbox", "id": "show_quick_add", "label": "Show quick add to cart", "default": true },
+    { "type": "text", "id": "quick_add_text", "label": "Quick add text", "default": "Add to cart" }
+  ],
+  "presets": [ { "name": "Best Sellers" } ]
+}
+{% endschema %}

@@ -1,0 +1,60 @@
+{
+  "_comment": "Product payloads for deploy_to_shopify.py. Prices reflect the RECOMMENDED pricing in products/pricing-and-margins.md. Change 'price'/'compareAtPrice' here if you decide otherwise. 'images' takes public URLs — fill them once you have hosted product images.",
+  "products": [
+    {
+      "handle": "smart-retractable-clothesline",
+      "title": "Smart Retractable Clothesline — Wall-Mounted Drying Line for Balcony & Bathroom",
+      "productType": "Home & Laundry",
+      "tags": ["retractable clothesline", "laundry", "balcony", "space saving", "wall mounted", "home organization", "KSA", "UAE"],
+      "price": "39.90",
+      "compareAtPrice": "69.90",
+      "weightKg": 0.8,
+      "seo": {
+        "title": "Retractable Clothesline — Space-Saving Balcony Drying Line",
+        "description": "Wall-mounted retractable clothesline with 4.2 m of line for up to 20 kg of laundry. Folds flat when not in use. Free delivery to Saudi Arabia and the UAE."
+      },
+      "descriptionFile": "../products/01-smart-retractable-clothesline.md",
+      "images": []
+    },
+    {
+      "handle": "cordless-split-end-trimmer",
+      "title": "Cordless Split-End Trimmer — Salon-Style Hair Dusting at Home",
+      "productType": "Hair Care Tools",
+      "tags": ["split end trimmer", "hair care", "cordless", "rechargeable", "hair dusting", "damaged hair", "beauty", "KSA", "UAE"],
+      "price": "49.90",
+      "compareAtPrice": "89.90",
+      "weightKg": 0.35,
+      "seo": {
+        "title": "Cordless Split-End Trimmer — Trim Split Ends, Keep Length",
+        "description": "Remove split ends at home without losing length. Cordless USB-C trimmer with 3, 6 and 9 mm settings for all hair types. Free delivery to Saudi Arabia and UAE."
+      },
+      "descriptionFile": "../products/02-cordless-split-end-trimmer.md",
+      "images": []
+    },
+    {
+      "handle": "wireless-carplay-adapter",
+      "title": "Wireless CarPlay Adapter — Turn Your Wired CarPlay Wireless in 5 Seconds",
+      "productType": "Car Electronics",
+      "tags": ["wireless carplay", "carplay adapter", "car accessories", "apple carplay", "plug and play", "car tech", "KSA", "UAE"],
+      "price": "69.90",
+      "compareAtPrice": "119.90",
+      "weightKg": 0.15,
+      "seo": {
+        "title": "Wireless CarPlay Adapter — Wireless Apple CarPlay Dongle",
+        "description": "Convert factory wired Apple CarPlay to wireless. Plug and play, auto-connects in about 5 seconds. Free delivery to Saudi Arabia and the UAE. iPhone only."
+      },
+      "descriptionFile": "../products/03-wireless-carplay-adapter.md",
+      "images": []
+    }
+  ],
+  "pages": [
+    { "handle": "shipping-policy",   "title": "Shipping Policy",          "file": "../pages/shipping-policy.html" },
+    { "handle": "refund-policy",     "title": "Refund & Return Policy",   "file": "../pages/refund-policy.html" },
+    { "handle": "privacy-policy",    "title": "Privacy Policy",           "file": "../pages/privacy-policy.html" },
+    { "handle": "terms-of-service",  "title": "Terms of Service",         "file": "../pages/terms-of-service.html" },
+    { "handle": "contact-us",        "title": "Contact Us",               "file": "../pages/contact-us.html" },
+    { "handle": "about-us",          "title": "About Us",                 "file": "../pages/about-us.html" },
+    { "handle": "faq",               "title": "FAQ",                      "file": "../pages/faq.html" },
+    { "handle": "track-order",       "title": "Track Your Order",         "file": "../pages/track-order.html" }
+  ]
+}
