@@ -35,7 +35,8 @@ shopify-store/
 │
 ├── setup/
 │   ├── markets-currencies-shipping.md .. SAR/AED، اللغة، الشحن، VAT
-│   ├── payment-gateways-ksa-uae.md ..... ⚠️ يحتاج قرارك القانوني
+│   ├── payment-gateways-ksa-uae.md ..... مرجع كل البوابات الخليجية
+│   ├── payment-decision-no-gulf-entity.md  ⚠️ ← وضعك أنت: الخطة والتكاليف
 │   ├── seo-checklist.md ................ 12 قسماً + قائمة تحقّق
 │   └── cro-checklist.md ................ 37 بنداً مرتّبة بالأثر
 │
@@ -51,7 +52,7 @@ shopify-store/
 ## ترتيب التنفيذ
 
 ```
-1  اقرأ 00-STATUS.md وقرّر الأسعار            ← قرار منك
+1  ✅ الأسعار اعتُمدت (39.90 / 49.90 / 69.90 $)
 2  أعد ربط Shopify connector                   ← إجراء منك
 3  أرسل لي صور المنتجات الثلاثة                ← إجراء منك
 4  املأ قيم pages/_PLACEHOLDERS.md             ← بياناتك الحقيقية
@@ -60,7 +61,7 @@ shopify-store/
 7  اضبط Markets + العملات + الشحن (setup/)
 8  اضبط SEO واربط الكتالوجات (setup/seo-checklist.md)
 9  نفّذ قائمة CRO (setup/cro-checklist.md)
-10 ← أخيراً: بوابة الدفع (setup/payment-gateways-ksa-uae.md)
+10 ← أخيراً: الدفع (setup/payment-decision-no-gulf-entity.md)
 ```
 
 ## النشر الآلي
