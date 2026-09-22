@@ -23,7 +23,7 @@ Réf. N°            /[année]
 Objet : A/S Projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure].
 Réf   : V/E n°[…]/[année] du [JJ/MM/AAAA].
 
-Faisant suite à votre envoi visé en référence, nous vous retournons les deux (02) projets de
+Faisant suite à votre envoi cité en référence, nous vous retournons les deux (02) projets de
 contrat national et international n°[…]/[année]/Naftal/B.CBR/[structure], portant sur la
 fourniture de [Vingt-cinq (25) conductimètres], dûment visés par nos soins dans leurs clauses
 juridiques, ainsi de la fiche d'examen et de validation des clauses contractuelles, dûment
@@ -40,6 +40,11 @@ Salutations.
 PJ    : - deux (02) projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure], visés ;
         - une (01) fiche d'examen et de validation des clauses contractuelles, signée.
 ```
+
+> ✅ **مطابَق مع مدوّنة السجل (323 مراسلة)**: صيغة الافتتاح البيتية هي
+> `Faisant suite à votre envoi cité en référence` (284 مرة)، والوثيقة المرافقة تُسمّى غالباً
+> **`fiche de suivi`** (48) لا `fiche d'examen et de validation` (10) — اتبع تسمية بوردورو
+> الإرسال. تفاصيل الصيغ في `masques/11-corpus-formules.md`.
 
 ### ملاحظات ضبط على النموذج
 
@@ -68,7 +73,7 @@ PJ    : - deux (02) projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure
 Objet : A/S Contrat de gré à gré simple n°[…]/[année]/NAFTAL/B.CBR/[structure].
 Réf   : V/E n°[…]/[sigle structure]/[année] du [JJ.MM.AAAA].
 
-Faisant suite à votre envoi visé en référence, nous vous retournons le contrat de gré à gré
+Faisant suite à votre envoi cité en référence, nous vous retournons le contrat de gré à gré
 simple n°[…]/[année]/NAFTAL/B.CBR/[structure], conclu avec le partenaire [dénomination],
 relatif à [objet], dûment visé par nos soins dans ses clauses juridiques, ainsi de la fiche
 d'examen et de validation des clauses contractuelles, dûment signée par nos soins.
@@ -101,7 +106,7 @@ PJ    : - un (01) contrat de gré à gré simple n°[…]/[année]/NAFTAL/B.CBR/
 Objet : A/S Projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure].
 Réf   : V/E n°[…]/[année] du [JJ/MM/AAAA].
 
-Faisant suite à votre envoi visé en référence, nous vous retournons les [deux (02)] projets de
+Faisant suite à votre envoi cité en référence, nous vous retournons les [deux (02)] projets de
 contrat n°[…]/[année]/Naftal/B.CBR/[structure], portant sur [objet], accompagnés de nos
 observations sur leurs clauses juridiques.
 
@@ -134,7 +139,7 @@ PJ    : - [deux (02)] projets de contrat annotés ;
 Objet : A/S Projets de contrat n°[…]/[année]/Naftal/B.CBR/[structure].
 Réf   : V/E n°[…]/[année] du [JJ/MM/AAAA].
 
-Faisant suite à votre envoi visé en référence, nous vous informons que l'examen des clauses
+Faisant suite à votre envoi cité en référence, nous vous informons que l'examen des clauses
 juridiques des projets de contrat cités en objet ne peut être engagé, en l'état, en l'absence
 des pièces suivantes :
 

@@ -74,7 +74,7 @@ PJ    : - [……] exemplaires de l'avenant n°[…].
 Objet : A/S demande de prorogation du délai — contrat n°[…] du [JJ.MM.AAAA].
 Réf   : - V/E du [JJ.MM.AAAA].
 
-En réponse à votre envoi visé en référence, par lequel vous sollicitez la prorogation du délai
+En réponse à votre envoi cité en référence, par lequel vous sollicitez la prorogation du délai
 d'exécution du contrat cité en objet [/ la révision du montant du contrat], nous avons le
 regret de vous informer que votre demande ne peut être satisfaite.
 

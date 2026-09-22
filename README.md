@@ -140,7 +140,9 @@
         │   ├── 06-garanties-mainlevee.md
         │   ├── 07-reception-decompte.md
         │   ├── 08-resiliation.md
-        │   └── 09-visa-projets-contrat.md
+        │   ├── 09-visa-projets-contrat.md
+        │   ├── 10-bordereau-envoi.md
+        │   └── 11-corpus-formules.md   # الصيغ الحقيقية من سجل 323 مراسلة
         └── modeles/
             ├── contrat-fourniture.md
             ├── contrat-prestation-services.md

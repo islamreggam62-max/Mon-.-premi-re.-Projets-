@@ -21,7 +21,7 @@ Réf. [I] N°            /[année]
 Objet : A/S résiliation du contrat n°[…] du [JJ.MM.AAAA] relatif à [objet].
 Réf   : - Notre mise en demeure n°[…] du [JJ.MM.AAAA], notifiée le [JJ.MM.AAAA].
 
-Par notre envoi visé en référence, nous vous avons mis en demeure de [rappel de l'obligation]
+Par notre envoi cité en référence, nous vous avons mis en demeure de [rappel de l'obligation]
 dans un délai de quinze (15) jours à compter de sa réception, soit au plus tard le
 [JJ.MM.AAAA].
 
@@ -70,7 +70,7 @@ Copie : - Monsieur le Directeur du District CBR [ville], pour exécution ;
 Objet : A/S résiliation d'un commun accord du contrat n°[…] du [JJ.MM.AAAA].
 Réf   : - V/E du [JJ.MM.AAAA].
 
-En réponse à votre envoi visé en référence, nous vous informons que NAFTAL accepte la
+En réponse à votre envoi cité en référence, nous vous informons que NAFTAL accepte la
 résiliation, d'un commun accord, du contrat cité en objet, à compter du [JJ.MM.AAAA].
 
 Cette résiliation intervient dans les conditions suivantes :
