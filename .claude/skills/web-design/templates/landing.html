@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>اسم العلامة — عرض القيمة في جملة</title>
+  <meta name="description" content="وصف مختصر للصفحة يظهر في نتائج البحث (أقل من 155 حرفاً).">
+  <meta property="og:title" content="اسم العلامة — عرض القيمة">
+  <meta property="og:description" content="وصف مختصر للمشاركة على الشبكات الاجتماعية.">
+  <meta property="og:image" content="https://placehold.co/1200x630">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Design tokens ===== */
+    :root {
+      color-scheme: light dark;
+      --color-primary: #2f5bea;
+      --color-primary-hover: #2449c4;
+      --color-on-primary: #ffffff;
+      --color-accent: #f5a524;
+      --color-bg: #ffffff;
+      --color-surface: #f6f7f9;
+      --color-border: #e3e6eb;
+      --color-text: #14171f;
+      --color-text-muted: #5b6270;
+
+      --font-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
+      --font-display: "Cairo", var(--font-sans);
+      --text-sm: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
+      --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+      --text-xl: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+      --text-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+      --text-3xl: clamp(2.25rem, 1.7rem + 2.6vw, 3.5rem);
+
+      --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem; --space-8: 4rem;
+      --container: 1200px;
+      --gutter: clamp(1rem, 4vw, 2rem);
+      --section-y: clamp(3rem, 8vw, 6rem);
+
+      --radius: 12px; --radius-lg: 20px; --radius-full: 999px;
+      --shadow: 0 4px 16px rgb(0 0 0 / .08);
+      --ease: cubic-bezier(.2, .8, .2, 1);
+      --dur: 200ms;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --color-primary: #6d8cff; --color-primary-hover: #8aa3ff; --color-on-primary: #0b0d12;
+        --color-bg: #0e1015; --color-surface: #171a21; --color-border: #262a33;
+        --color-text: #eef0f4; --color-text-muted: #a0a7b4;
+        --shadow: 0 4px 16px rgb(0 0 0 / .4);
+      }
+    }
+    :root[data-theme="dark"] {
+      --color-primary: #6d8cff; --color-primary-hover: #8aa3ff; --color-on-primary: #0b0d12;
+      --color-bg: #0e1015; --color-surface: #171a21; --color-border: #262a33;
+      --color-text: #eef0f4; --color-text-muted: #a0a7b4;
+      --shadow: 0 4px 16px rgb(0 0 0 / .4);
+    }
+
+    /* ===== Base ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--color-bg); color: var(--color-text);
+      font: 400 var(--text-base)/1.7 var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    h1, h2, h3 { font-family: var(--font-display); line-height: 1.25; margin: 0 0 var(--space-4); }
+    h1 { font-size: var(--text-3xl); font-weight: 800; }
+    h2 { font-size: var(--text-2xl); font-weight: 700; }
+    h3 { font-size: var(--text-lg); font-weight: 700; }
+    p { margin: 0 0 var(--space-4); }
+    a { color: var(--color-primary); }
+    :focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
+    .container { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+    .section { padding-block: var(--section-y); }
+    .section--alt { background: var(--color-surface); }
+    .muted { color: var(--color-text-muted); }
+    .center { text-align: center; }
+    .lead { font-size: var(--text-lg); max-width: 60ch; }
+    .center .lead { margin-inline: auto; }
+    .skip { position: absolute; inset-inline-start: -999px; }
+    .skip:focus { inset-inline-start: var(--space-4); top: var(--space-4); z-index: 100; background: var(--color-bg); padding: var(--space-2) var(--space-4); }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+      min-height: 48px; padding-inline: var(--space-6); border-radius: var(--radius-full);
+      font: 600 var(--text-base)/1 var(--font-sans); text-decoration: none; cursor: pointer;
+      border: 2px solid transparent; transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn--primary { background: var(--color-primary); color: var(--color-on-primary); }
+    .btn--primary:hover { background: var(--color-primary-hover); }
+    .btn--ghost { background: transparent; color: var(--color-text); border-color: var(--color-border); }
+    .btn--ghost:hover { border-color: var(--color-text-muted); }
+    [dir="rtl"] .icon-dir { transform: scaleX(-1); }
+
+    /* ===== Header ===== */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+      backdrop-filter: blur(10px); border-block-end: 1px solid var(--color-border);
+    }
+    .header__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 68px; }
+    .logo { font: 800 var(--text-xl)/1 var(--font-display); color: var(--color-text); text-decoration: none; }
+    .nav { display: flex; gap: var(--space-5); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; font-weight: 500; }
+    .nav a:hover { color: var(--color-text); }
+    @media (max-width: 767px) { .nav { display: none; } }
+
+    /* ===== Hero ===== */
+    .hero__grid { display: grid; gap: var(--space-7); align-items: center; }
+    @media (min-width: 900px) { .hero__grid { grid-template-columns: 1.1fr 1fr; } }
+    .badge { display: inline-block; padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); background: var(--color-surface); color: var(--color-text-muted); font-size: var(--text-sm); margin-block-end: var(--space-4); }
+    .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-block-start: var(--space-6); }
+    .hero__media { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 4 / 3; }
+    .hero__media img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ===== Cards / grids ===== */
+    .grid { display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); margin-block-start: var(--space-7); }
+    .card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-6); }
+    .section--alt .card { background: var(--color-bg); }
+    .card__icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: var(--radius); background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary); margin-block-end: var(--space-4); }
+    .step__num { font: 800 var(--text-2xl)/1 var(--font-display); color: var(--color-primary); margin-block-end: var(--space-3); }
+    .quote { font-size: var(--text-lg); }
+    .quote__author { font-weight: 600; margin: 0; }
+
+    /* ===== FAQ ===== */
+    .faq { max-width: 760px; margin: var(--space-7) auto 0; }
+    .faq details { border-block-end: 1px solid var(--color-border); padding-block: var(--space-4); }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: var(--text-lg); list-style: none; display: flex; justify-content: space-between; gap: var(--space-4); }
+    .faq summary::after { content: "+"; color: var(--color-primary); }
+    .faq details[open] summary::after { content: "−"; }
+    .faq p { margin-block-start: var(--space-3); color: var(--color-text-muted); }
+
+    /* ===== CTA / footer ===== */
+    .cta { background: var(--color-primary); color: var(--color-on-primary); border-radius: var(--radius-lg); padding: var(--space-8) var(--gutter); text-align: center; }
+    .cta .btn { background: var(--color-on-primary); color: var(--color-primary); margin-block-start: var(--space-5); }
+    .footer { border-block-start: 1px solid var(--color-border); padding-block: var(--space-7); font-size: var(--text-sm); }
+    .footer__inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); }
+
+    /* Sticky mobile CTA */
+    .mobile-cta { display: none; }
+    @media (max-width: 767px) {
+      .mobile-cta { display: block; position: fixed; inset-inline: var(--space-4); bottom: var(--space-4); z-index: 60; }
+      .mobile-cta .btn { width: 100%; box-shadow: var(--shadow); }
+      body { padding-block-end: 88px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="#">علامتك</a>
+      <nav class="nav" aria-label="القائمة الرئيسية">
+        <a href="#features">المزايا</a>
+        <a href="#how">كيف يعمل</a>
+        <a href="#reviews">آراء العملاء</a>
+        <a href="#faq">أسئلة شائعة</a>
+      </nav>
+      <a class="btn btn--primary" href="#order">ابدأ الآن</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="section">
+      <div class="container hero__grid">
+        <div>
+          <span class="badge">جديد · توصيل لكل الولايات</span>
+          <h1>عنوان يشرح القيمة الأساسية بوضوح</h1>
+          <p class="lead muted">جملة أو جملتان توضّحان لمن هذا المنتج، وما المشكلة التي يحلّها، ولماذا هو أفضل من البدائل.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#order">
+              اطلب الآن
+              <svg class="icon-dir" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a class="btn btn--ghost" href="#how">كيف يعمل؟</a>
+          </div>
+        </div>
+        <div class="hero__media">
+          <img src="https://placehold.co/800x600" alt="صورة المنتج أثناء الاستعمال" width="800" height="600" fetchpriority="high">
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section section--alt" id="features">
+      <div class="container center">
+        <h2>لماذا تختارنا؟</h2>
+        <p class="lead muted">ثلاث مزايا رئيسية، كل واحدة تجيب عن اعتراض محتمل لدى الزبون.</p>
+        <div class="grid" style="text-align: start">
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">★</div>
+            <h3>جودة مضمونة</h3>
+            <p class="muted">صِف الفائدة للزبون، لا الخاصية التقنية فقط.</p>
+          </article>
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">⚡</div>
+            <h3>توصيل سريع</h3>
+            <p class="muted">المدّة الحقيقية للتوصيل والمناطق المغطّاة.</p>
+          </article>
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">✓</div>
+            <h3>الدفع عند الاستلام</h3>
+            <p class="muted">أزل الخوف من الشراء: ضمان، إرجاع، دعم.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" id="how">
+      <div class="container center">
+        <h2>كيف يعمل؟</h2>
+        <div class="grid" style="text-align: start">
+          <div class="card"><div class="step__num">1</div><h3>اختر</h3><p class="muted">الخطوة الأولى ببساطة.</p></div>
+          <div class="card"><div class="step__num">2</div><h3>اطلب</h3><p class="muted">الخطوة الثانية ببساطة.</p></div>
+          <div class="card"><div class="step__num">3</div><h3>استلم</h3><p class="muted">النتيجة التي يحصل عليها الزبون.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews (replace with real customer reviews) -->
+    <section class="section section--alt" id="reviews">
+      <div class="container center">
+        <h2>ماذا يقول عملاؤنا</h2>
+        <div class="grid" style="text-align: start">
+          <figure class="card" style="margin: 0">
+            <blockquote class="quote" style="margin: 0 0 var(--space-4)">«ضع هنا رأياً حقيقياً لزبون.»</blockquote>
+            <figcaption><p class="quote__author">اسم الزبون</p><p class="muted" style="margin: 0">المدينة</p></figcaption>
+          </figure>
+          <figure class="card" style="margin: 0">
+            <blockquote class="quote" style="margin: 0 0 var(--space-4)">«ضع هنا رأياً حقيقياً لزبون.»</blockquote>
+            <figcaption><p class="quote__author">اسم الزبون</p><p class="muted" style="margin: 0">المدينة</p></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <h2 class="center">أسئلة شائعة</h2>
+        <div class="faq">
+          <details><summary>كم تستغرق مدّة التوصيل؟</summary><p>الإجابة الحقيقية هنا.</p></details>
+          <details><summary>هل يمكنني إرجاع المنتج؟</summary><p>الإجابة الحقيقية هنا.</p></details>
+          <details><summary>كيف أدفع؟</summary><p>الإجابة الحقيقية هنا.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="section" id="order">
+      <div class="container">
+        <div class="cta">
+          <h2>جاهز للبدء؟</h2>
+          <p class="lead" style="margin-inline: auto">ذكّر بالقيمة الأساسية والعرض الحالي.</p>
+          <a class="btn" href="#">اطلب الآن</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="muted" style="margin: 0">© 2026 علامتك. جميع الحقوق محفوظة.</p>
+      <nav aria-label="روابط التذييل" style="display: flex; gap: var(--space-5)">
+        <a href="#">سياسة الإرجاع</a>
+        <a href="#">الخصوصية</a>
+        <a href="#">تواصل معنا</a>
+      </nav>
+    </div>
+  </footer>
+
+  <div class="mobile-cta"><a class="btn btn--primary" href="#order">اطلب الآن</a></div>
+</body>
+</html>
