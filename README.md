@@ -101,6 +101,27 @@ python -m pytest -q
 
 <div dir="rtl">
 
+## وكالات الدروبشيبينغ على Shopify (Claude Code)
+
+مدير عام + خمس وكالات، كل وكالة متكلّفة بجزء واحد من الدروبشيبينغ على Shopify:
+
+| الوكالة | الملف | المهمّة |
+|---------|-------|---------|
+| المدير العام | `.claude/skills/dropshipping/SKILL.md` | يوزّع الطلب على الوكالات ويجمع النتائج |
+| 1. البحث عن المنتجات | `.claude/agents/ds-product-research.md` | منتجات رابحة، مورّدون، هامش |
+| 2. بناء المتجر | `.claude/agents/ds-store-builder.md` | المنتجات، الأوصاف، المجموعات، SEO |
+| 3. الطلبات والتنفيذ | `.claude/agents/ds-orders-fulfillment.md` | الطلبات، التتبّع، المخزون، الاسترداد |
+| 4. التسويق | `.claude/agents/ds-marketing.md` | خصومات، إعلانات، إيميل، تصاميم |
+| 5. التحليلات والأرباح | `.claude/agents/ds-analytics-profit.md` | تقارير، ربح صافي، Scale/Kill |
+
+الاستعمال: اكتب في Claude Code مثلاً
+`/dropshipping حاب نطلق منتج جديد في نيش المطبخ للسوق الفرنسي`.
+يحتاج موصّل Shopify (و Canva اختيارياً للتصاميم) مفعّلاً.
+
+</div>
+
+<div dir="rtl">
+
 ## الرخصة
 
 MIT
