@@ -123,6 +123,16 @@ MIT
 | `shopify-linear`   | Linear           | تدقيق المتجر وتحويل مشاكله إلى مهام، ومشاريع الإطلاق           |
 | `shopify-notion`   | Notion           | قاعدة بيانات المنتجات، دليل خدمة العملاء، التقارير الشهرية     |
 | `shopify-github`   | GitHub           | كود الثيم (Liquid) والتطبيقات، عبر فروع وPR فقط                |
+| `shopify-slack`        | Slack ⚠️          | ملخّصات المبيعات اليومية وتنبيهات الطلبات والمخزون              |
+| `shopify-paypal`       | PayPal ⚠️         | مطابقة المدفوعات مع الطلبات، النزاعات، تقارير الإيرادات         |
+| `shopify-microsoft365` | Microsoft 365 ⚠️  | مسودّات Outlook، تقارير OneDrive، تحديثات Teams                 |
+| `shopify-atlassian`    | Atlassian ⚠️      | تذاكر Jira من تدقيق المتجر، توثيق Confluence                    |
+| `shopify-gamma`        | Gamma ⚠️          | عروض أداء، كتالوجات، صفحات هبوط                                  |
+| `shopify-gcp`          | Compute Engine ⚠️ | خوادم تطبيقات Shopify والـ webhooks                              |
+| `shopify-chatgpt`      | ChatGPT ⚠️        | رأي ثانٍ في أوصاف المنتجات وSEO والإعلانات                       |
+| `shopify-manus`        | Manus ⚠️          | بحث المنافسين والموردين واتجاهات السوق                          |
+
+⚠️ = الموصّل غير مربوط حاليًّا؛ أعِد ربطه من إعدادات Claude → Connectors ليعمل الوكيل.
 
 الوكلاء المساعدون يقرؤون من Shopify فقط؛ أي كتابة في المتجر تمرّ عبر وكيل
 `shopify` وبعد موافقتك.
