@@ -1,33 +1,31 @@
 ---
 name: arena
 description: >-
-  Arène de skills : lance la même tâche sur plusieurs skills ou agents en
-  parallèle, puis les compare et les classe selon des critères clairs. À utiliser
-  quand l'utilisateur dit « arena », « compare ces skills », « quel skill est le
-  meilleur pour… ». Runs one task through several skills/agents and ranks them.
+  حلبة المهارات: تُشغّل المهمة نفسها على عدّة skills أو وكلاء (حتى 16) بالتوازي،
+  ثم تقارنهم وترتّبهم حسب معايير واضحة. استخدمها عند قول «arena» أو «قارن هذه
+  المهارات» أو «أي وكيل هو الأفضل لـ…». Runs one task through up to 16 skills/agents and ranks them.
 ---
 
-# Arena — comparer des skills
+# Arena — حلبة حتى 16 متنافساً
 
-## Étapes
+## الخطوات
 
-1. **Cadrer** : récupère la tâche à tester et la liste des concurrents (skills ou
-   `subagent_type`). Si aucune liste n'est donnée, propose 2 à 4 candidats pertinents
-   parmi `.claude/skills/` et `.claude/agents/`.
-2. **Critères** : fixe 4 à 5 critères notés de 1 à 5 (exactitude, complétude, clarté,
-   respect des consignes, coût/rapidité). Annonce-les avant de lancer.
-3. **Combat** : lance chaque concurrent en parallèle via `Agent`, avec exactement le
-   même prompt. Ne leur dis pas qu'ils sont comparés. Les tâches qui écrivent
-   (boutique, fichiers) sont refusées : utilise uniquement des tâches en lecture
-   seule ou sur des données d'exemple.
-4. **Jugement** : note chaque résultat sur les critères, avec une phrase de
-   justification. Ne favorise pas le plus long.
-5. **Verdict** : tableau de classement + points forts/faibles de chacun + recommandation
-   (quel skill utiliser, pour quel type de tâche).
+1. **التحديد**: خذ المهمة وقائمة المتنافسين (skills أو `subagent_type`، حتى 16).
+   إن لم تُحدَّد القائمة فاقترح المتنافسين من `.claude/skills/` و`.claude/agents/`
+   واعرضها على المستخدم قبل البدء. إن وُجد أقل من 16 فلا تكرّر أحداً لملء العدد.
+2. **المعايير**: ثبّت 4–5 معايير بدرجة 1–5 (الدقة، الاكتمال، الوضوح، الالتزام
+   بالتعليمات، السرعة/التكلفة) وأعلنها قبل الإطلاق.
+3. **النزال**: أرسل المهمة نفسها حرفياً إلى كل متنافس عبر `Agent`، على دفعات
+   متوازية من 4 كحدّ أقصى لتفادي الازدحام (4 دفعات لـ16). لا تُخبرهم أنهم
+   يُقارَنون. المهام الكتابية (المتجر، الملفات) ممنوعة؛ استخدم مهام قراءة فقط
+   أو بيانات تجريبية. نبّه المستخدم أن 16 وكيلاً يعني تكلفة مرتفعة.
+4. **التحكيم**: قيّم كل نتيجة على المعايير مع جملة تبرير. لا تفضّل الأطول.
+5. **الحكم**: جدول ترتيب + نقاط القوة والضعف + توصية (أي وكيل لأي نوع مهمة).
+   عند 16 متنافساً اعرض الأفضل 5 بالتفصيل والباقي بسطر واحد لكلٍّ.
 
-## Format de sortie
+## شكل المخرجات
 
-| Rang | Concurrent | Total | Point fort | Point faible |
-|------|------------|-------|------------|--------------|
+| الترتيب | المتنافس | المجموع | نقطة القوة | نقطة الضعف |
+|---------|----------|---------|------------|------------|
 
-Termine par une recommandation en une phrase.
+اختم بتوصية في جملة واحدة.
