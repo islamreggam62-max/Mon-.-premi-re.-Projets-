@@ -1,0 +1,34 @@
+[
+  {
+    "annee": 2026,
+    "destinataire": ["Monsieur le Directeur", "Technique et Maintenance"],
+    "objet": "A/S Avenant d'ajustement de quantités définitives du marché au contrat de base n°[NN]/[AAAA]/Naftal/B.CBR/DTM, relatif à [OBJET]",
+    "lignes": [
+      ["Partenaire", "[RAISON SOCIALE]"],
+      ["REF", ["V/E n°[NN] du [JJ/MM/AAAA]", "N/E n°[NN] du [JJ/MM/AAAA]", "V/E n°[NN] du [JJ/MM/AAAA] reçu le [JJ/MM/AAAA]"]]
+    ],
+    "corps": [
+      "Faisant suite à votre dernier envoi cité en référence, et après examen de l'avenant mentionné en objet, nous portons à votre connaissance que ledit avenant porte sur un **glissement de délai**, alors que son intitulé mentionne un ajustement des quantités définitives du marché.",
+      "Aussi, nous vous rappelons les dispositions de __l'article [NN]__ de [TEXTE] qui stipule que : « [CITATION EXACTE] ».",
+      "De ce qui précède, nous vous retournons l'avenant susvisé **non visé** par nos soins ainsi que la fiche de suivi non signée."
+    ],
+    "signature": ["LA DIRECTRICE JURIDIQUE", "[SIGNATAIRE]"],
+    "copie": ["Monsieur le Directeur Finances et Comptabilité", "Monsieur le Directeur de la Branche Carburants"]
+  },
+  {
+    "destinataire": ["Monsieur le Directeur", "District CBR [VILLE]"],
+    "objet": "A/S Demande de résiliation de contrat",
+    "lignes": [
+      ["Contrat", "n°[NN]/[AAAA]/Naftal/CBR/DTM, relatif à [OBJET]"],
+      ["Partenaire", "[RAISON SOCIALE]"],
+      ["Réf", "V/E n°[NN] du [JJ/MM/AAAA]"]
+    ],
+    "corps": [
+      "Faisant suite à votre envoi cité en référence, et afin de nous permettre de procéder à la résiliation du contrat susvisé, nous vous prions de bien vouloir nous transmettre ce qui suit :",
+      "- Une genèse détaillée du contrat ;",
+      "- Une copie de la mise en demeure adressée au cocontractant.",
+      "Ces éléments nous permettront de procéder à l'examen juridique de la demande de résiliation."
+    ],
+    "signature": ["P/LA DIRECTRICE JURIDIQUE", "La Responsable Intérimaire", "[SIGNATAIRE]"]
+  }
+]

@@ -7,3 +7,6 @@ authorization.yaml
 reports/
 *.report.json
 *.report.txt
+# Naftal: internal references and generated letters stay local (repo is public).
+.claude/skills/naftal-contrats/prive/
+courriers/
