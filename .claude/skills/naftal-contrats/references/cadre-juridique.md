@@ -38,7 +38,8 @@
 | الاستثمار | Loi n° 22-18 du 24/07/2022 |
 | النقل | Ordonnance n° 76-80 (Code maritime) ; Loi n° 01-13 du 07/08/2001 (transports terrestres) ; Loi n° 98-06 (aviation civile) |
 | الأملاك والعقار | Loi n° 90-30 (loi domaniale, modifiée) ; Ordonnance n° 08-04 du 01/09/2008 (concession de terrains) |
-| الصرف | Règlements de la Banque d'Algérie relatifs au contrôle des changes (vérifier le texte en vigueur) |
+| الصرف | Ordonnance n° 96-22 du 09/07/1996 (infractions de change), mod. Ordonnance n° 03-01 du 19/02/2003 et Ordonnance n° 10-03 du 26/08/2010 ; Règlement de la Banque d'Algérie n° 07-01 du 03/02/2007 (art. 29 : domiciliation des importations) ; Note aux banques N°01/DGC/2026 du 14/05/2026 : **domiciliation bancaire avant l'expédition** des marchandises importées |
+| الإعذار والتبليغ | C. civ. art. 180 (mise en demeure par sommation ou acte équivalent) ; CPCA art. 406-412 (signification par huissier) ; Loi n° 06-03 du 20/02/2006 (huissiers de justice), art. 14 : l'acte original en langue arabe |
 | الجباية | Code des impôts directs, Code des taxes sur le chiffre d'affaires, Code du timbre, Code de l'enregistrement, Lois de finances |
 
 ## 3. مواد مفتاحية من القانون المدني (للتحقّق)

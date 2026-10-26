@@ -50,7 +50,8 @@ annulation) · نطاق التأشير (« dans ses clauses juridiques » أو �
 ## المخرجات
 1. جدول ملخّص: `| # | المرسَل إليه | الوثيقة | القرار | fiche | CMB |`
 2. نصّ كل مراسلة.
-3. ملف واحد `courriers/lettres-visees-<AAAAMMJJ>.json` (قائمة بكل المراسلات، بصيغة
+3. لكل وثيقة: سطر جاهز لـ«الوضعية الدورية للوثائق المؤشَّرة» (النموذج M13 بأعمدته).
+4. ملف واحد `courriers/lettres-visees-<AAAAMMJJ>.json` (قائمة بكل المراسلات، بصيغة
    `.claude/skills/naftal-contrats/scripts/exemple.json`) ⇒ يولَّد منه ملف Word واحد بعدّة
    صفحات عبر `courrier_docx.py`.
 

@@ -5,6 +5,9 @@
 > les références exactes des procédures et notes internes sont dans le fichier
 > local non publié `.claude/skills/naftal-contrats/prive/references-internes.md`
 > (à lire s'il existe ; sinon demander à l'utilisateur).
+> Les **précédents réels** du département (courriers récents, état périodique des visas,
+> leçons tirées) sont dans le fichier local `prive/travaux-realises.md` : y chercher un cas
+> similaire avant de rédiger.
 
 ## 1. Mise en page (identique au modèle Word)
 
@@ -125,7 +128,12 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
   dans ses/leurs clauses juridiques [contractuelles].
 - …, dûment corrigé(e)(s) par nos soins [dans ses clauses juridiques].
 - …, dûment examiné par nos soins, ainsi que le projet de contrat dûment visé …
-- … ainsi que la fiche de suivi dûment signée / non signée.
+- … ainsi que la fiche de suivi [contrat / avenant] dûment signée / non signée.
+- …, en douze (12) exemplaires, dont six (06) en langue française et six (06) en langue arabe, …
+- …, dûment visé une deuxième fois par nos soins dans ses clauses juridiques, après exploitation
+  de [la pièce actualisée].
+- Plusieurs lots / partenaires : objet suivi d'une liste (« Lots N°01 & N°02 : [PARTENAIRE] ;
+  Lot N°03 : [PARTENAIRE]. ») et accord au pluriel (« dûment visés … dans leurs clauses »).
 - …, par messagerie Outlook à l'adresse « [ADRESSE] », …
 - Aussi, il vous appartient de soumettre ledit <document> à la CMB [à la commission
   compétente] pour visa de conformité avant sa signature.
@@ -213,6 +221,24 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 19. **Visa caduc** : objet modifié (ex. suppression d'une partie des prestations) ou
     changement de type de contrat ⇒ annuler expressément le visa antérieur (n° et date
     du B.E).
+20. **Achats de produits destinés à la revente** (lubrifiants, graisses…) : vérifier si une
+    procédure particulière interne s'applique au lieu de la procédure générale de passation
+    (références dans le fichier privé).
+21. **Origine et acheminement** : tout DAO et tout contrat d'achat doivent identifier le pays
+    d'origine des biens, composants et services et leur itinéraire d'acheminement
+    (instruction du groupe, octobre 2026 — détail dans le fichier privé).
+22. **Importations** : clause interdisant toute expédition avant notification écrite de la
+    domiciliation bancaire (Note BA N°01/DGC/2026), frais d'une expédition anticipée à la charge
+    du fournisseur.
+23. **Contrat de base expiré** : pas d'avenant sur un contrat dont la durée est expirée ⇒
+    « Attention attirée sur l'expiration de la durée du contrat de base. »
+24. **Prolongation unilatérale** (clients internationaux) : si le contrat permet une
+    prolongation par simple préavis, l'avenant n'est pas nécessaire ⇒ le signaler.
+25. **Fiche de suivi** sans colonne pour la signature de la Direction Juridique ⇒ retour non
+    signée avec demande d'ajout de cette colonne.
+26. **Mise en demeure** : partie établie en Algérie ⇒ signification par huissier (original en
+    arabe) ; partie étrangère ⇒ clause de notification du contrat ; toujours viser l'article
+    contractuel.
 
 ## 6. Modèles
 
@@ -323,6 +349,16 @@ Destinataire : `Messieurs et Mesdames les Directeurs d'Activités`
 > Afin de nous permettre d'assurer [OBJECTIF], nous vous demandons de bien vouloir
 > [DEMANDE]. Nous tenons également à porter à votre connaissance que [CONSTAT].
 > A cet effet, nous vous remercions de bien vouloir [MODALITÉ].
+
+### M13 — Ligne de l'état périodique des documents visés
+Tableau « Etat des documents contractuels (convention, contrat, avenant) visés » transmis à la
+Direction Centrale Juridique. Colonnes :
+`N° d'ordre | Type de document | N° et Objet | Structure | Mode de passation | Partenaires |
+Montants (DA / devise) | Délai contrat / avenant(s) | Date de visa | Observations`.
+Observations types : « Contrat à soumettre à la commission compétente pour visa de conformité
+avant sa signature. » · « Fiche de suivi contrat à transmettre à la Direction Juridique pour
+signature. » · « Visé en [six (06)] exemplaires (arabe et français). » · « Contrat retourné une
+seconde fois (déjà visé par lettre n°… du …). » · « Attention attirée sur … ».
 
 ### M12 — Genèse d'un dossier (à la hiérarchie)
 > Comme convenu lors de notre entretien du JJ/MM/AAAA, nous vous communiquons
