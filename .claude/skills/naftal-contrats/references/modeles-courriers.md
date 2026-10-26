@@ -130,6 +130,13 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 - …, dûment corrigé(e)(s) par nos soins [dans ses clauses juridiques].
 - …, dûment examiné par nos soins, ainsi que le projet de contrat dûment visé …
 - … ainsi que la fiche de suivi [contrat / avenant] dûment signée / non signée.
+  **Règle fixée par l'utilisateur** : toujours préciser le type —
+  « ainsi que la fiche de suivi **contrat** dûment signée. » pour un contrat ;
+  « ainsi que la fiche de suivi **avenant** dûment signée. » pour un avenant.
+  **Aucune fiche jointe à l'envoi ⇒ aucune mention de fiche** (ne pas l'inventer).
+- Retour d'un document transmis par bordereau : `Réf : V/Bordereau d'envoi N°[NN]/[SIGLE]/[AA]
+  du [JJ/MM/AAAA].` ; nombre d'exemplaires repris de la colonne « Nbre » du bordereau
+  (« en un (01) exemplaire »).
 - …, en douze (12) exemplaires, dont six (06) en langue française et six (06) en langue arabe, …
 - …, dûment visé une deuxième fois par nos soins dans ses clauses juridiques, après exploitation
   de [la pièce actualisée].

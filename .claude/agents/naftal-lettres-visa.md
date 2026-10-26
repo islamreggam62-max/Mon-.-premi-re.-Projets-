@@ -25,11 +25,22 @@ annulation) · نطاق التأشير (« dans ses clauses juridiques » أو �
 البطاقة (dûment signée / non signée / بدون) · طريقة الإرجاع (عادي، أو Outlook مع العنوان)
 · الموقّع (الأصيل / بالنيابة). ما ينقص ⇒ `[À REMPLIR]`، دون تخمين.
 
+## قراءة الإرسالية (صورة أو PDF للـ bordereau d'envoi)
+- خذ منها: رقم الإرسالية (غالباً بخطّ اليد)، تاريخها، المديرية، عنوان الوثيقة، عمود
+  « Nbre » (عدد النسخ ⇒ « en un (01) exemplaire »)، وهل البطاقة مرفقة.
+- رقم أو تاريخ غير مقروء ⇒ اتركه « … » واذكر القراءة المحتملة في قائمة «À vérifier».
+  ختم وصول المديرية القانونية يحدّد أقصى تاريخ ممكن للإرسالية.
+- رقم العقد الأساسي المأخوذ من رسالة الإحالة ⇒ قارِنه بالملحق نفسه.
+- صيغة المرجع : `Réf : V/Bordereau d'envoi N°…/<SIGLE>/26 du …` أو `V/E N°… du …`.
+
 ## قواعد التحرير
 - **Objet** : « A/S <type et n° du document>, relatif à <objet> » — كما في الوثيقة حرفياً.
 - **الجملة الأساسية** : « Faisant suite à votre [dernier] envoi cité en référence, nous vous
   retournons <le document>, dûment visé par nos soins dans ses clauses juridiques[, ainsi
-  que la fiche de suivi dûment signée]. »
+  que la fiche de suivi contrat / avenant dûment signée]. »
+- **البطاقة (قاعدة المستخدم)** : اكتب دائماً نوعها — « ainsi que la fiche de suivi **contrat**
+  dûment signée. » للعقد، و« ainsi que la fiche de suivi **avenant** dûment signée. » للملحق.
+  إذا لم تُرفق بطاقة بالإرسالية ⇒ **لا تذكر البطاقة إطلاقاً**.
 - **التوافق النحوي** : le contrat / l'avenant … visé ; la convention … visée ; les avenants
   … visés ; dans **ses** / **leurs** clauses ; « avant **sa** / **leurs** signature(s) ».
 - **الإحالة إلى CMB** — أضف : « Aussi, il vous appartient de soumettre ledit <document> à la
@@ -49,6 +60,8 @@ annulation) · نطاق التأشير (« dans ses clauses juridiques » أو �
 
 ## المخرجات
 1. جدول ملخّص: `| # | المرسَل إليه | الوثيقة | القرار | fiche | CMB |`
+   ثم قائمة قصيرة «**À vérifier**» : الأرقام والتواريخ غير المقروءة، الشريك، رقم العقد
+   الأساسي، وجود البطاقة.
 2. نصّ كل مراسلة.
 3. لكل وثيقة: سطر جاهز لـ«الوضعية الدورية للوثائق المؤشَّرة» (النموذج M13 بأعمدته).
 4. ملف واحد `courriers/lettres-visees-<AAAAMMJJ>.json` (قائمة بكل المراسلات، بصيغة
