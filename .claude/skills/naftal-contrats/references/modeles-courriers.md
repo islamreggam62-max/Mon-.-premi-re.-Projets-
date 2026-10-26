@@ -94,6 +94,7 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 | Visa antérieur devenu caduc (objet modifié…) | annulation du visa | M8 |
 | Résiliation | note au Directeur de Branche + lettre de résiliation | M9 + M10 |
 | Rappel / information générale | note aux Directeurs d'Activités | M11 |
+| Relance sur un point déjà répondu | rappel de la réponse antérieure | M14 |
 | Dossier à présenter à la hiérarchie | genèse chronologique | M12 |
 
 **Renvois systématiques** (ne pas trancher à la place de la structure compétente) :
@@ -349,6 +350,21 @@ Destinataire : `Messieurs et Mesdames les Directeurs d'Activités`
 > Afin de nous permettre d'assurer [OBJECTIF], nous vous demandons de bien vouloir
 > [DEMANDE]. Nous tenons également à porter à votre connaissance que [CONSTAT].
 > A cet effet, nous vous remercions de bien vouloir [MODALITÉ].
+
+### M14 — Réponse à une relance déjà traitée
+Ligne « Copie : » vers la structure qui doit agir.
+> Faisant suite à votre envoi cité en référence, par lequel vous nous faites part que vous
+> demeurez toujours dans l'attente d'une réponse à votre préoccupation relative à [OBJET], nous
+> ne pouvons que vous exprimer notre étonnement quant à son contenu.
+>
+> En effet, une suite a déjà été réservée à vos envois N°[NN] du [JJ/MM/AAAA] et N°[NN] du
+> [JJ/MM/AAAA], par notre lettre N°[NN] du [JJ/MM/AAAA], [adressée à … , dont copie vous a été
+> transmise,] et que votre envoi vise d'ailleurs lui-même en référence.
+>
+> Pour rappel, aux termes de ladite lettre, [RÉSUMÉ DES ORIENTATIONS].
+>
+> Aussi, la concrétisation de cette opération demeure-t-elle tributaire des dispositions à
+> prendre par [STRUCTURE], conformément aux orientations rappelées ci-dessus.
 
 ### M13 — Ligne de l'état périodique des documents visés
 Tableau « Etat des documents contractuels (convention, contrat, avenant) visés » transmis à la
