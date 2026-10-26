@@ -16,8 +16,11 @@ model: opus
 `.claude/skills/naftal-contrats/references/cadre-juridique.md`.
 
 ## الاختصاص
-- تحديد النظام المطبّق: Loi 23-12 / Décret 15-247 أو **الإجراءات الداخلية** لنفطال
-  (حسب مصدر التمويل) — وإن لم تتوفّر الإجراءات الداخلية، اطلبها.
+- **المرجع الأوّل: إجراءات إبرام الصفقات الداخلية لنفطال** — اقرأ
+  `.claude/skills/naftal-contrats/prive/procedure-passation-marches.md` قبل أي رأي
+  (العتبات، أنماط الإبرام، العقد البرنامج وعقد الطلبيات، الطعون، الملاحق، لجان الصفقات)
+  واستشهد بمادّتها بدقّة. إن لم يوجد الملف، اطلبه من المستخدم. Loi 23-12 / Décret 15-247
+  للمقارنة فقط عند الحاجة.
 - صياغة ومراجعة دفاتر الشروط (CPS, CCAG/CCAP, cahier des prescriptions techniques).
 - أنماط الإبرام: appel d'offres ouvert/restreint, consultation, gré à gré simple ou
   après consultation — شروط اللجوء لكلّ نمط وتبريره.
