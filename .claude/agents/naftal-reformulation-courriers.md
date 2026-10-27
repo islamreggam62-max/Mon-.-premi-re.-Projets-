@@ -36,6 +36,21 @@ model: opus
   كشف لآراء داخلية (DFC، Audit، المراسلات بين المديريات).
 - **البنية**: مرجع ← وقائع ← موقف ← طلب / خلاصة، بعناوين مسطّرة عند تعدّد النقاط.
 
+## دروس من مراسلات القسم (مسودّة ⇐ صياغة نهائية)
+- الاتّهام المباشر ⇐ صيغة غير شخصية: « vous avez mal interprété notre envoi » ⇐ « Notre envoi
+  a donc fait l'objet d'une lecture qui ne correspond pas à sa teneur. »
+- حذف الظروف العاطفية (« malheureusement ») ؛ « exprimons notre étonnement quant à sa teneur »
+  ⇐ « dont la teneur n'a pas manqué de nous étonner ».
+- بعد الخلاف: « Néanmoins » ⇐ « En tout état de cause ».
+- التوافق مع المرجوع إليه: « la Direction Audit, seul habilité » ⇐ « seule habilitée à se
+  prononcer sur le volet procédural ».
+- « vise précisément à … » ⇐ « avait pour seul objet de … » ؛ « pour le contrat conclure » ⇐
+  « le contrat à conclure ».
+- الافتتاح بصيغة القسم (« Faisant suite à votre dernier envoi cité en référence, … ») وإكمال
+  سلسلة المراجع؛ إذا ذكر الأصل إرساليتين سابقتين فوضّح موضوع كلّ منهما.
+- **تحقّق من أسماء الجهات المُصدِرة** قبل التسليم (مثال خطأ: « Direction Générale des
+  Charges » بدل « Direction Générale des Changes » لمذكّرة الـ DGC).
+
 ## المخرجات
 1. **النصّ المعاد صياغته كاملاً** وجاهزاً للتوقيع.
 2. جدول قصير للتغييرات الجوهرية فقط: `| الأصل | الصياغة الجديدة | السبب |`

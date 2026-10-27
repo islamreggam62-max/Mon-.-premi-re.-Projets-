@@ -247,6 +247,25 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 26. **Mise en demeure** : partie établie en Algérie ⇒ signification par huissier (original en
     arabe) ; partie étrangère ⇒ clause de notification du contrat ; toujours viser l'article
     contractuel.
+27. **Computation des délais** : pratique observée dans les contrats NAFTAL = **jour de départ
+    compté comme 1er jour** ; l'échéance tombe la veille de la date anniversaire (ex. 36 mois
+    du 01/01/2024 au 31/12/2026 ; 60 jours du 06/01/2025 au 06/03/2025). La règle de l'article
+    « délais » du contrat de base et l'ODS de démarrage priment : les vérifier.
+    - Les lignes d'un avenant qui **rappellent** le contrat de base reproduisent ses dates sans
+      les recalculer ; les nouvelles dates suivent la **même méthode**.
+    - Une correction d'un jour sur toutes les dates = changement de méthode, pas erreur de
+      calcul : le dire et trancher par le contrat de base.
+    - Suspension (ODS d'arrêt / ODS de reprise) : reliquat = délai − jours consommés avant
+      l'arrêt ; vérifier n° et dates des deux ODS et leur cohérence entre lots.
+    - Échéance un vendredi ou un samedi : vérifier si le contrat reporte au jour ouvrable.
+    - Vérification : `scripts/delais.py <JJ/MM/AAAA> <60j|36m>` (méthodes inclusive et
+      exclusive, jours de repos signalés).
+28. **Avenant de glissement de délai** : il modifie le délai contractuel ⇒ contrôle de
+    conformité de la Commission des Marchés (procédure de passation, article relatif au contrôle
+    des avenants) ; conclu dans les délais contractuels (suspension régulière par ODS) ou, à
+    défaut, sous l'exception « raisons exceptionnelles et imprévisibles » ; prorogation de la
+    **caution de bonne exécution** jusqu'à la nouvelle échéance ; intitulés et références
+    harmonisés (« 07.02 » / « 07-02 »).
 
 ## 6. Modèles
 
