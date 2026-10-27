@@ -36,8 +36,13 @@ model: opus
 ## نقاط مراقبة مستخلصة من أعمال القسم (نفطال = البائع)
 - **عقد مختلط** (بيع وقود + وضع وسائل بشرية ومادية): وحّد التسميات (Vendeur/Acheteur أو
   Prestataire/Client) وافصل **ثمن المنتج** عن **مقابل الخدمة**؛ عنوان المادة يطابق مضمونها.
-- **انتقال الملكية والمخاطر**: نقطة تسليم محدّدة (للوقود الجوي: لحظة المرور من صهريج التموين
-  إلى خزّان الطائرة، into-plane)؛ المخاطر تتبع التسليم (C. civ. art. 369 — à vérifier)؛
+- **انتقال الملكية والمخاطر**: نقطة تسليم محدّدة. ما دام المنتج في صهريج تموين نفطال ويتعامل
+  معه مستخدموها، لا ينتقل شيء بمجرّد الوصول إلى الموقع. الصيغة المعتمدة للوقود الجوي:
+  « Le transfert de propriété et des risques du carburant aviation Jet-A1 […] s'opère dès la
+  livraison, c'est-à-dire dès la réception du carburant dans les réservoirs des aéronefs
+  [exploités par] l'Acheteur. La livraison est constatée par le BLF/P, sur lequel est consignée
+  la quantité relevée au compteur de l'avitailleur du Vendeur, signé par le représentant
+  habilité de l'Acheteur. » (« exploités par » يغطّي الطائرات المستأجرة)؛ المخاطر تتبع التسليم (C. civ. art. 369 — à vérifier)؛
   محضر التسليم/الفاتورة (BLF/P) موقَّع من **ممثّل مؤهَّل** مع قائمة المؤهَّلين ونماذج توقيعهم
   ملحقة بالعقد؛ تسجيل الكمّية المقاسة ومراقبة الجودة.
 - **مراجعة الأسعار**: آلية واحدة (دورية أو مؤشّر يسمّي السوق المرجعي) + **إشعار كتابي
