@@ -266,6 +266,15 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
     défaut, sous l'exception « raisons exceptionnelles et imprévisibles » ; prorogation de la
     **caution de bonne exécution** jusqu'à la nouvelle échéance ; intitulés et références
     harmonisés (« 07.02 » / « 07-02 »).
+29. **Identification de NAFTAL dans le contrat** : contrôler la raison sociale, le capital
+    social et l'adresse/qualité du signataire d'après une source officielle à jour (en-tête et
+    pied de page officiels) ; appliquer la règle de comparution retenue par la Direction
+    Juridique (siège social ou Branche signataire — voir fichier privé).
+30. **Champ de la procédure avant le mode de passation** : vérifier d'abord si la prestation
+    est exclue de la procédure de passation (géomètres, notaires, huissiers, contrôle technique,
+    etc.) avant de demander un numéro de consultation ou d'appliquer un seuil.
+31. **Pièces du cocontractant** : agrément, NIF, NIS, RC ; annexes annoncées mais vides ⇒
+    commentaire au structure contractante.
 
 ## 6. Modèles
 
@@ -289,6 +298,13 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 >
 > [Aussi, nous vous signalons qu'il y a lieu de prendre en considération les
 > corrections déjà portées dans notre envoi du JJ/MM/AAAA.]
+
+**Livrables d'une correction** : le document corrigé en **deux fichiers Word avec la mise en
+page d'origine** — une version **avec révisions** (modifications suivies + commentaires
+indiquant à la structure ce qu'elle doit compléter), qui est celle retournée, et une version
+**propre** (corrections acceptées). Retour par Outlook ⇒ « nous vous retournons, via la
+messagerie électronique « Outlook » ([ADRESSE]), le [DOCUMENT] …, dûment corrigé par nos
+soins. » et la version avec révisions en pièce jointe. Pas de fiche jointe ⇒ pas de mention.
 
 ### M4 — Non visé (motivé)
 > Faisant suite à votre envoi cité en référence, et après examen de [DOCUMENT], nous
