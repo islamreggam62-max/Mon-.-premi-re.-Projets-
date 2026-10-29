@@ -8,6 +8,12 @@
 > Les **précédents réels** du département (courriers récents, état périodique des visas,
 > leçons tirées) sont dans le fichier local `prive/travaux-realises.md` : y chercher un cas
 > similaire avant de rédiger.
+>
+> **Priorité** : les compétences de l'utilisateur (`contrat`, `lettres-direction-commercialisation`,
+> `examen-contrat`, `correction-avenant`, `francais-juridique`) priment sur ce fichier ; résumé dans
+> `competences-utilisateur.md`. En particulier, une lettre de retour d'un document (visé ou
+> corrigé) tient en **une seule phrase**, sans observations, avec les formules et la mise en page
+> de la compétence `contrat`.
 
 ## 1. Mise en page (identique au modèle Word)
 
@@ -299,12 +305,14 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 > [Aussi, nous vous signalons qu'il y a lieu de prendre en considération les
 > corrections déjà portées dans notre envoi du JJ/MM/AAAA.]
 
-**Livrables d'une correction** : le document corrigé en **deux fichiers Word avec la mise en
-page d'origine** — une version **avec révisions** (modifications suivies + commentaires
-indiquant à la structure ce qu'elle doit compléter), qui est celle retournée, et une version
-**propre** (corrections acceptées). Retour par Outlook ⇒ « nous vous retournons, via la
-messagerie électronique « Outlook » ([ADRESSE]), le [DOCUMENT] …, dûment corrigé par nos
-soins. » et la version avec révisions en pièce jointe. Pas de fiche jointe ⇒ pas de mention.
+**Livrables d'une correction** (compétence `correction-avenant`, qui prime) : le document en
+**mode révision Word** — plus petite modification possible, révisions déjà présentes conservées,
+pas de commentaires Word sauf demande, fond commercial signalé et non corrigé — avec un tableau
+**N° | Emplacement | Texte initial | Correction | Raison** et trois points au plus sur les
+questions de fond. Une version propre seulement si l'utilisateur la demande. Retour par
+Outlook ⇒ « nous vous retournons, via la messagerie électronique « Outlook » ([ADRESSE]), le
+[DOCUMENT] …, dûment corrigé par nos soins. ». Pas de fiche jointe ⇒ pas de mention. La
+phrase « Aussi, nous vous signalons… » ci-dessus ne s'emploie que si l'utilisateur la demande.
 
 ### M4 — Non visé (motivé)
 > Faisant suite à votre envoi cité en référence, et après examen de [DOCUMENT], nous

@@ -49,6 +49,12 @@ model: opus
   + مراسلة «non visé» معلَّلة (النموذج M4).
 
 ## المخرجات
+- **كفاءات المستخدم لها الأولوية**: اقرأ `.claude/skills/naftal-contrats/references/competences-utilisateur.md`
+  ثم النصّ الكامل للكفاءة المعنية (`/root/.claude/skills/synced/*/<nom>/SKILL.md`، أو النسخة المحلّية
+  `.claude/skills/naftal-contrats/prive/competences/<nom>/SKILL.md`): رسالة الإرجاع جملة واحدة بلا ملاحظات
+  (`contrat`، `lettres-direction-commercialisation`)، الفحص قبل التأشير بجدول واقتراح والقرار للمستخدم
+  (`examen-contrat`)، التصحيح بأصغر تعديل دون المساس بالفحوى التجاري (`correction-avenant`)،
+  وكل نصّ فرنسي بقواعد `francais-juridique`.
 1. جدول التصحيحات:
    `| الحقل | المكتوب في البطاقة | الصحيح | المصدر (مادة / صفحة من الوثيقة) |`
 2. القرار (موقّعة / غير موقّعة) وتعليله في سطرين.

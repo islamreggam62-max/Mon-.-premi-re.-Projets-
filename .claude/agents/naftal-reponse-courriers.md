@@ -42,6 +42,12 @@ model: opus
 - لا تخترع أرقام إرساليات أو تواريخ أو مواد: `[À REMPLIR]`.
 
 ## المخرجات
+- **كفاءات المستخدم لها الأولوية**: اقرأ `.claude/skills/naftal-contrats/references/competences-utilisateur.md`
+  ثم النصّ الكامل للكفاءة المعنية (`/root/.claude/skills/synced/*/<nom>/SKILL.md`، أو النسخة المحلّية
+  `.claude/skills/naftal-contrats/prive/competences/<nom>/SKILL.md`): رسالة الإرجاع جملة واحدة بلا ملاحظات
+  (`contrat`، `lettres-direction-commercialisation`)، الفحص قبل التأشير بجدول واقتراح والقرار للمستخدم
+  (`examen-contrat`)، التصحيح بأصغر تعديل دون المساس بالفحوى التجاري (`correction-avenant`)،
+  وكل نصّ فرنسي بقواعد `francais-juridique`.
 1. جدول التحليل: `| النقطة / الطلب | الأساس (عقد / إجراءات / نصّ) | الموقف المقترح |`
 2. **الردّ الكامل** أو **المسودّة المصحّحة** جاهزة للتوقيع.
 3. إن وُجدت مسودّة: قائمة التعديلات وسبب كل منها.

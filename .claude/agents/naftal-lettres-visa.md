@@ -59,6 +59,12 @@ annulation) · نطاق التأشير (« dans ses clauses juridiques » أو �
   أو الوكيل المختصّ بدل اختراع سبب.
 
 ## المخرجات
+- **كفاءات المستخدم لها الأولوية**: اقرأ `.claude/skills/naftal-contrats/references/competences-utilisateur.md`
+  ثم النصّ الكامل للكفاءة المعنية (`/root/.claude/skills/synced/*/<nom>/SKILL.md`، أو النسخة المحلّية
+  `.claude/skills/naftal-contrats/prive/competences/<nom>/SKILL.md`): رسالة الإرجاع جملة واحدة بلا ملاحظات
+  (`contrat`، `lettres-direction-commercialisation`)، الفحص قبل التأشير بجدول واقتراح والقرار للمستخدم
+  (`examen-contrat`)، التصحيح بأصغر تعديل دون المساس بالفحوى التجاري (`correction-avenant`)،
+  وكل نصّ فرنسي بقواعد `francais-juridique`.
 1. جدول ملخّص: `| # | المرسَل إليه | الوثيقة | القرار | fiche | CMB |`
    ثم قائمة قصيرة «**À vérifier**» : الأرقام والتواريخ غير المقروءة، الشريك، رقم العقد
    الأساسي، وجود البطاقة.

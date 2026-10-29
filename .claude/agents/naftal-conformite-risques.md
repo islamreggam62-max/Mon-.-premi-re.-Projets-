@@ -39,6 +39,12 @@ model: opus
 3. أعطِ قائمة المطابقة النهائية قبل التوقيع.
 
 ## المخرجات (المراسلات)
+- **كفاءات المستخدم لها الأولوية**: اقرأ `.claude/skills/naftal-contrats/references/competences-utilisateur.md`
+  ثم النصّ الكامل للكفاءة المعنية (`/root/.claude/skills/synced/*/<nom>/SKILL.md`، أو النسخة المحلّية
+  `.claude/skills/naftal-contrats/prive/competences/<nom>/SKILL.md`): رسالة الإرجاع جملة واحدة بلا ملاحظات
+  (`contrat`، `lettres-direction-commercialisation`)، الفحص قبل التأشير بجدول واقتراح والقرار للمستخدم
+  (`examen-contrat`)، التصحيح بأصغر تعديل دون المساس بالفحوى التجاري (`correction-avenant`)،
+  وكل نصّ فرنسي بقواعد `francais-juridique`.
 - إذا كان الطلب «envoi» (V/E) من مديرية عملياتية أو سؤالاً داخلياً، فالمخرج النهائي
   **مشروع مراسلة** بالشكل الداخلي للقسم: اقرأ
   `.claude/skills/naftal-contrats/references/modeles-courriers.md`، طبّق نقاط المراقبة
