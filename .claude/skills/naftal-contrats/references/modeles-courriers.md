@@ -99,6 +99,8 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 | Déjà traité | déjà visé (date + n° B.E) | M7 |
 | Visa antérieur devenu caduc (objet modifié…) | annulation du visa | M8 |
 | Résiliation | note au Directeur de Branche + lettre de résiliation | M9 + M10 |
+| Contrat non entré en vigueur (caution non remise) | mise en demeure finale, puis résiliation | M16, puis M9 + M10 bis |
+| Modifications demandées par le partenaire | réponse point par point, position par article | M15 |
 | Rappel / information générale | note aux Directeurs d'Activités | M11 |
 | Relance sur un point déjà répondu | rappel de la réponse antérieure | M14 |
 | Dossier à présenter à la hiérarchie | genèse chronologique | M12 |
@@ -170,6 +172,12 @@ consultation restreinte · appel à la pré-qualification · fiche de suivi.
 - La formulation proposée par le cocontractant ne peut être retenue, dans la mesure
   où nos contrats comportent déjà une clause spécifique encadrant …
 - A votre appréciation.
+- Faisant suite à …, et afin d'écarter toute ambiguïté d'ordre juridique, nous vous informons
+  que … Cependant, … les dispositions de l'article NN « … » du contrat n°… stipulent que :
+  « [citation intégrale] ». … A notre avis, …, sauf avis contraire de la Direction [concernée].
+- Partenaire : « Nous maintenons notre article. » · « La proposition du [client] est acceptée. »
+  · « Nous ne voyons aucun inconvénient à la modification souhaitée. » (voir M15)
+- Cocontractant défaillant : « …, et ce, sans préjudice de tous nos droits. »
 
 **Demande**
 - Afin de nous permettre de …, nous vous saurions gré de bien vouloir nous
@@ -437,3 +445,75 @@ seconde fois (déjà visé par lettre n°… du …). » · « Attention attiré
 > De ce qui précède, [DEMANDE DE LA PARTIE / QUESTION À TRANCHER].
 >
 > A votre appréciation.
+
+### M15 — Réponse aux modifications demandées par un partenaire (point par point)
+Destinataire : la direction qui a transmis les réserves (souvent D.COM ou D.A) — Objet :
+`A/S Avenant N°[NN] au contrat de base [N°]` ou `A/S Contrat N°[…]` — Réf : `V/E N°[…] du […]`.
+> Faisant suite à votre envoi cité en référence, et après exploitation des modifications
+> apportées par [le client / le partenaire] « [DÉNOMINATION] » à [DOCUMENT], [dans le cadre de
+> …], nous vous communiquons ci-après nos éléments de réponse :
+>
+> ✓ __Concernant l'article [NN] : « [INTITULÉ] »__
+> [Le client demande de remplacer / supprimer / ajouter : « CITATION EXACTE ».]
+> [Position, une seule :] Nous maintenons notre article. / La proposition du [client] est
+> acceptée. / Nous ne voyons aucun inconvénient à la modification souhaitée. / Il vous
+> appartient de vous prononcer sur […].
+> [Motif : clause visée dans les mêmes termes dans les contrats similaires ; texte interne du
+> partenaire non opposable à NAFTAL ; mode de passation non modifiable par avenant ; …]
+>
+> ✓ __Concernant l'article [NN] : « [INTITULÉ FINANCIER] »__
+> S'agissant d'une clause financière, nous vous suggérons de saisir la Direction Finances et
+> Comptabilité (DFC), compétente pour se prononcer sur ce point. [Attirer l'attention sur
+> l'effet de la modification pour NAFTAL.]
+>
+> Salutations.
+
+### M16 — Mise en demeure avant résiliation (obligation préalable non exécutée, ex. caution)
+Signée par `Le Directeur de la Branche [...]` — destinataire : `Monsieur le Représentant légal`
++ siège social — Objet : `Mise en demeure avant résiliation – [MANQUEMENT].` — Réf : `Contrat
+N°[…] du […] ; N/Mises en demeure des […]`. Notification par huissier (original en arabe) ou
+recommandé avec accusé de réception.
+> La Société NAFTAL SPA, Branche [...], et la société « [DÉNOMINATION] » ont signé, en date du
+> [JJ/MM/AAAA], le contrat N°[…], relatif à [OBJET], pour un délai d'exécution de [DURÉE] à
+> compter de la date de sa mise en vigueur.
+>
+> Aux termes de l'article [NN] dudit contrat, votre société s'est engagée à [OBLIGATION]. [La
+> remise de cette caution constitue une condition de mise en vigueur du contrat, conformément à
+> son article [NN].] Cette obligation vous incombe depuis la signature du contrat ; son
+> inexécution vous est exclusivement imputable.
+>
+> Or, à ce jour, [FAITS DATÉS], et ce malgré les mises en demeure qui vous ont été adressées les
+> [DATES], restées sans suite. [Les demandes de modification formulées depuis l'attribution
+> n'ayant fait l'objet d'aucun avenant, le contrat demeure régi par ses stipulations initiales.]
+>
+> En conséquence, nous vous mettons en demeure, pour la dernière fois, de [OBLIGATION], dans un
+> délai de [NN] ([NN]) jours à compter de la date de réception de la présente.
+>
+> Passé ce délai, nous procéderons à la résiliation du contrat à vos torts exclusifs,
+> conformément à l'article [NN] du contrat et à l'article 120 du Code civil, sans préjudice de
+> toute action en réparation du préjudice subi par NAFTAL, ni des mesures d'exclusion prévues à
+> l'article 36 de la procédure de passation des marchés de NAFTAL.
+>
+> Nous vous prions d'agréer, Monsieur, l'expression de notre parfaite considération.
+
+### M10 bis — Résiliation d'un contrat non entré en vigueur (suite à M16)
+Objet : `Résiliation du contrat N°[…] à vos torts exclusifs.` — Réf : contrat + toutes les mises
+en demeure (n°, date, date de réception). Après le rappel du contrat et de l'obligation :
+> Cette [caution] n'a jamais été remise, malgré [les mises en demeure …]. Le délai de [NN] jours
+> qui vous était imparti par cette dernière a expiré le [JJ/MM/AAAA] sans que vous ayez
+> satisfait à votre obligation.
+>
+> En conséquence, nous vous notifions, par la présente, la résiliation du contrat N°[…] à vos
+> torts exclusifs, conformément à l'article [NN] du contrat et à l'article 120 du Code civil,
+> avec effet à compter de la date de réception de la présente.
+>
+> En tout état de cause, la condition de mise en vigueur n'ayant jamais été réalisée de votre
+> fait, le contrat n'a reçu aucun commencement d'exécution. La présente résiliation n'ouvre
+> droit, à votre profit, à aucune indemnité de quelque nature que ce soit.
+>
+> NAFTAL se réserve le droit de vous réclamer réparation de l'ensemble des préjudices subis du
+> fait de votre défaillance, et de faire valoir ses droits sur les garanties qu'elle détient.
+> Elle se réserve également d'engager à votre encontre la procédure d'exclusion prévue à
+> l'article 36 de la procédure de passation des marchés de NAFTAL.
+>
+> Nous vous prions d'agréer, Monsieur, l'expression de notre parfaite considération.
