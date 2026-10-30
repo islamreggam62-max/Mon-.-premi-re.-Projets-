@@ -30,8 +30,8 @@
         },
         "sheetName": {
           "__rl": true,
-          "value": "Contrats",
-          "mode": "name"
+          "value": "0",
+          "mode": "id"
         },
         "options": {}
       },
@@ -78,7 +78,7 @@
     },
     {
       "parameters": {
-        "content": "## 🔔 Alertes échéances contrats (J-15)\n\n**À configurer après l'import :**\n1. **Lire le tableau des contrats** : choisis ton compte Google, puis le fichier *Contrats* et l'onglet *Contrats*.\n2. **Envoyer l'alerte Telegram** : crée le credential avec le token de ton bot (@BotFather) et remplace `TON_CHAT_ID`.\n3. Active le workflow (*Active*).\n\n**Tester sans attendre :** dans *Calculer les échéances*, mets `DATE_TEST = '2026-10-31'` puis *Execute workflow*. Remets `''` ensuite.\n\nPlusieurs rappels ? `RAPPELS = [15, 7, 1]`",
+        "content": "## 🔔 Alertes échéances contrats (J-15)\n\n**À configurer après l'import :**\n1. **Lire le tableau des contrats** : choisis ton compte Google, puis le fichier *Contrats*. Le premier onglet est lu, quel que soit son nom.\n2. **Envoyer l'alerte Telegram** : crée le credential avec le token de ton bot (@BotFather) et remplace `TON_CHAT_ID`.\n3. Active le workflow (*Active*).\n\n**Tester sans attendre :** dans *Calculer les échéances*, mets `DATE_TEST = '2026-10-31'` puis *Execute workflow*. Remets `''` ensuite.\n\nPlusieurs rappels ? `RAPPELS = [15, 7, 1]`",
         "height": 340,
         "width": 520,
         "color": 5

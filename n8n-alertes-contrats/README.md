@@ -76,9 +76,10 @@ Chaque matin à 8h ─► Lire le tableau des contrats ─► Calculer les éch�
 
 ### 2. جدول Google Sheets
 
-1. أنشئ Google Sheet جديدًا باسم **Contrats**، وسمِّ الورقة (l'onglet) أيضًا **Contrats**.
+1. أنشئ Google Sheet جديدًا باسم **Contrats**.
 2. **Fichier ← Importer ← Importer** ← ارفع `contrats.csv` ← اختر
-   *Remplacer la feuille actuelle*.
+   *Remplacer la feuille actuelle*. الـworkflow يقرأ **الورقة الأولى** (l'onglet)
+   مهما كان اسمها.
 3. تأكد أن الـlocale هو France أو Algérie (**Fichier ← Paramètres**)، حتى تُكتب التواريخ
    `JJ/MM/AAAA` وليس بالصيغة الأمريكية `MM/JJ/AAAA`.
 
