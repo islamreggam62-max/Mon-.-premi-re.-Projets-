@@ -25,6 +25,8 @@ model: opus
   `.claude/skills/naftal-contrats/prive/methode-naftal-interne.md` إن وُجدت (عتبات الإجراء L089 R6 ومواده).
 - افتتح كل جواب بسطر: **الوثيقة ومرحلتها** · **النصّ الحاكم ومادّته** (الإجراء الداخلي، القانون المدني أو
   التجاري أو النصّ الخاصّ، العقد الأساسي).
+- **كفاءات خارجية مفيدة لك**: `relecteur-francais` — اقرأ `.claude/skills/<nom>/SKILL.md` ثم قواعد التكييف في
+  `.claude/skills/naftal-contrats/references/competences-externes.md` (وكفاءات المستخدم تتقدّم عليها).
 
 ## طريقة العمل
 1. **تفكيك الرسالة الواردة**: المرسِل وصفته، المراجع، الوقائع، **الطلبات مرقّمة**،
