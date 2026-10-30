@@ -1,6 +1,6 @@
 # Compétences externes importées (GitHub) — usage au Dépt Contrats et Conseils
 
-> Trois compétences publiques, vérifiées et installées dans `.claude/skills/` (provenance et licence dans
+> Quatre compétences publiques, vérifiées et installées dans `.claude/skills/` (provenance et licence dans
 > chaque `PROVENANCE.md`). **Les compétences de l'utilisateur et `methode-naftal.md` priment** : en cas de
 > conflit (format, suivi des modifications, formules), on applique la règle de l'utilisateur.
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | `ambiguity-stress-test` | Détecter dans un contrat ou un avenant les clauses qui donneront lieu à litige (contradictions, termes vagues, pouvoirs discrétionnaires, lacunes, tensions entre clauses) et proposer une rédaction qui ferme la brèche | 41 examen avant visa, 16 droit des contrats, 40 comparaison, 44 contrats types |
 | `normalisation-juridique-fr` | Normaliser un document Word juridique français : typographie (apostrophes, insécables, guillemets, ordinaux), impropriétés (« stipuler / disposer »), anglicismes, marques d'écriture IA ; registre réversible (« défais 3, 7-10 ») | 15 français administratif, 42 correction en révision, 12 reformulation |
+| `contract-review` | Revue générale d'un contrat : 15 risques types (responsabilité illimitée, résiliation unilatérale, pénalités excessives, reconduction tacite, juridiction, paiement, absence de force majeure…), liste de complétude, priorités de négociation | 41 examen avant visa, 3 vente clients, 1 marchés, 16 droit des contrats |
 | `relecteur-francais` | Relecture approfondie d'un texte français : grammaire, lexique, typographie, style, cohérence, avec tableau des erreurs par gravité | 15 français administratif, 12 reformulation, 13 réponse aux courriers |
 
 ## Adaptations Naftal (obligatoires)
@@ -38,3 +39,12 @@
 - Texte reçu : relever les fautes, sans réécrire le style (règle `francais-juridique`).
 - Ignorer la catégorie « Sensibilités » et la suggestion d'« Extended thinking ».
 - Le tableau des erreurs (Majeur / Modéré / Mineur) peut accompagner le tableau de `correction-avenant`.
+
+**`contract-review`**
+- Juridictions prévues : États-Unis, UE, Chine, Royaume-Uni — **pas l'Algérie**. N'en retenir que la
+  détection des risques types et la liste de complétude ; l'appréciation se fait selon le droit
+  algérien et `methode-naftal.md` (ex. pénalité : C. civ. art. 183-184 ; force majeure : art. 127).
+- Les sections « Jurisdiction-Specific Knowledge » (droit du travail américain, chinois…) ne s'appliquent
+  pas à Naftal.
+- Le rôle de Naftal (acheteur, vendeur, maître de l'ouvrage) est indiqué au départ ; la sortie est
+  reprise dans le tableau `examen-contrat` (Article | Constat | Proposition | Gravité), en français.
