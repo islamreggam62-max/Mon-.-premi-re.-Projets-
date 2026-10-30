@@ -1,0 +1,9 @@
+reference,intitule,cocontractant,type,date_debut,date_fin,preavis_jours,reconduction_tacite,responsable,statut
+CTR-2026-001,Maintenance du parc informatique,SARL InfoTech Services,Prestation de services,2025-11-15,2026-11-15,30,oui,Amine,Actif
+CTR-2026-002,Bail commercial – local Bab Ezzouar,SARL Immo Atlas,Bail commercial,2024-02-12,2027-02-12,90,oui,Sara,Actif
+CTR-2026-003,Nettoyage des bureaux,EURL Clean Pro,Prestation de services,2026-01-01,2026-12-31,60,oui,Amine,Actif
+CTR-2026-004,Licence logiciel de comptabilité,ComptaPlus Éditions,Licence,2025-11-20,2026-11-20,0,non,Yacine,Actif
+CTR-2026-005,Assurance flotte automobile,Compagnie Assur-Plus,Assurance,2025-12-01,2026-11-30,30,oui,Sara,Actif
+CTR-2026-006,Fourniture de matières premières,SPA Méditerranée Industrie,Fourniture,2026-03-01,2027-03-01,45,non,Yacine,Actif
+CTR-2026-007,Location de véhicules utilitaires,EURL AutoLoc,Location,2025-11-14,2026-11-14,15,non,Amine,Terminé
+CTR-2026-008,Sous-traitance transport,SARL TransExpress,Sous-traitance,2026-06-01,2026-11-25,10,non,Sara,Actif

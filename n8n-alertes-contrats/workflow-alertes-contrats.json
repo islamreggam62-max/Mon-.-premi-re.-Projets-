@@ -1,0 +1,137 @@
+{
+  "name": "Alertes échéances contrats (J-15) → Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "c14c2991-e89d-4861-9e50-1707198558f2",
+      "name": "Chaque matin à 8h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Contrats",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "1efb00aa-9903-4adf-9945-8b608b5cabf8",
+      "name": "Lire le tableau des contrats",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===== Configuration =====\n// Nombre de jours avant l'échéance où l'alerte part. Ex. [15, 7, 1] pour plusieurs rappels.\nconst RAPPELS = [15];\n// Pour tester : une date AAAA-MM-JJ simule « aujourd'hui ». Laisser '' en production.\nconst DATE_TEST = '';\n// Statuts ignorés (contrat clos), comparés sans accents ni majuscules.\nconst STATUTS_IGNORES = ['termine', 'resilie', 'archive'];\n// =========================\n\nconst JOUR_MS = 24 * 60 * 60 * 1000;\nconst JOURS_SEMAINE = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];\n\nfunction normaliser(texte) {\n  return String(texte ?? '').trim().toLowerCase()\n    .normalize('NFD').replace(/[̀-ͯ]/g, '');\n}\n\n// Date du tableau -> minuit UTC en ms, ou null si illisible.\n// Accepte 2026-11-15, 15/11/2026 (ou 15-11-2026, 15.11.2026) et le numéro de série Google Sheets.\nfunction lireDate(valeur) {\n  if (typeof valeur === 'number') return Date.UTC(1899, 11, 30) + Math.floor(valeur) * JOUR_MS;\n  const texte = String(valeur ?? '').trim();\n  let m, a, mo, j;\n  if ((m = texte.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/))) [, a, mo, j] = m;\n  else if ((m = texte.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})$/))) [, j, mo, a] = m;\n  else return null;\n  const d = new Date(Date.UTC(+a, +mo - 1, +j));\n  // Rejette les dates impossibles comme 31/02/2026.\n  if (d.getUTCFullYear() !== +a || d.getUTCMonth() !== +mo - 1 || d.getUTCDate() !== +j) return null;\n  return d.getTime();\n}\n\nconst echapper = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst dateFr = (ms) => new Date(ms).toISOString().slice(0, 10).split('-').reverse().join('/');\nconst dateIso = (ms) => new Date(ms).toISOString().slice(0, 10);\nconst delai = (n) => (n === 0 ? \"aujourd'hui\" : `dans ${n} jour${n > 1 ? 's' : ''}`);\n\n// « Aujourd'hui » dans le fuseau du workflow (Africa/Algiers).\nconst aujourdhui = lireDate(DATE_TEST || $today.toISODate());\nif (aujourdhui === null) throw new Error(`DATE_TEST invalide : « ${DATE_TEST} » (format AAAA-MM-JJ)`);\n\nconst sorties = [];\n\nfunction signaler(c, probleme) {\n  sorties.push({ json: {\n    reference: c.reference || '',\n    type: 'erreur',\n    message: `⚠️ <b>${echapper(c.reference || 'Contrat sans référence')}</b> : ${probleme}. Corrigez la ligne dans le tableau.`,\n  } });\n}\n\nfor (const { json: c } of $input.all()) {\n  if (!c.reference && !c.date_fin) continue; // ligne vide\n  if (STATUTS_IGNORES.includes(normaliser(c.statut))) continue;\n\n  const fin = lireDate(c.date_fin);\n  if (fin === null) {\n    signaler(c, `date_fin illisible (« ${echapper(c.date_fin)} »), format attendu AAAA-MM-JJ ou JJ/MM/AAAA`);\n    continue;\n  }\n  const preavisBrut = String(c.preavis_jours ?? '').trim();\n  const preavis = preavisBrut === '' ? 0 : Number(preavisBrut);\n  if (!Number.isInteger(preavis) || preavis < 0) {\n    signaler(c, `preavis_jours illisible (« ${echapper(preavisBrut)} »), un nombre de jours est attendu`);\n    continue;\n  }\n  const tacite = ['oui', 'yes', 'true', '1', 'x'].includes(normaliser(c.reconduction_tacite));\n\n  // Chaque contrat a jusqu'à deux échéances : la fin, et le dernier jour pour envoyer le préavis.\n  const echeances = [{\n    libelle: 'Fin du contrat',\n    date: fin,\n    conseil: tacite\n      ? 'Sans dénonciation, le contrat sera reconduit automatiquement.'\n      : 'Le contrat prend fin : prévoir le renouvellement ou la clôture.',\n  }];\n  if (preavis > 0) {\n    echeances.push({\n      libelle: `Date limite du préavis (${preavis} j avant la fin)`,\n      date: fin - preavis * JOUR_MS,\n      conseil: tacite\n        ? 'Envoyer la dénonciation avant cette date pour éviter la reconduction tacite.'\n        : 'Dernier jour pour notifier le préavis au cocontractant.',\n    });\n  }\n\n  for (const e of echeances) {\n    const joursRestants = Math.round((e.date - aujourdhui) / JOUR_MS);\n    if (!RAPPELS.includes(joursRestants)) continue;\n\n    const jourSemaine = JOURS_SEMAINE[new Date(e.date).getUTCDay()];\n    const message = [\n      `⏰ <b>Échéance ${delai(joursRestants)}</b>`,\n      '',\n      `📄 <b>${echapper(c.reference)}</b> — ${echapper(c.intitule)}`,\n      `🤝 Cocontractant : ${echapper(c.cocontractant)}`,\n      `📌 ${echapper(e.libelle)}`,\n      `📅 ${jourSemaine} ${dateFr(e.date)}`,\n      `👤 Responsable : ${echapper(c.responsable || '—')}`,\n      '',\n      `➡️ ${e.conseil}`,\n    ].join('\\n');\n\n    sorties.push({ json: {\n      reference: c.reference,\n      type: 'alerte',\n      echeance: e.libelle,\n      date: dateIso(e.date),\n      jours_restants: joursRestants,\n      message,\n    } });\n  }\n}\n\n// Aucune sortie = aucun message Telegram ce jour-là.\nreturn sorties;\n"
+      },
+      "id": "120a8a67-0167-4073-b8b9-bfa4dfe6e68a",
+      "name": "Calculer les échéances",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "TON_CHAT_ID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "5fd966e8-d625-400a-87cd-e136047da8aa",
+      "name": "Envoyer l'alerte Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "webhookId": "37916ac4-fe73-4cf4-9d21-5fec57bd6b67"
+    },
+    {
+      "parameters": {
+        "content": "## 🔔 Alertes échéances contrats (J-15)\n\n**À configurer après l'import :**\n1. **Lire le tableau des contrats** : choisis ton compte Google, puis le fichier *Contrats* et l'onglet *Contrats*.\n2. **Envoyer l'alerte Telegram** : crée le credential avec le token de ton bot (@BotFather) et remplace `TON_CHAT_ID`.\n3. Active le workflow (*Active*).\n\n**Tester sans attendre :** dans *Calculer les échéances*, mets `DATE_TEST = '2026-10-31'` puis *Execute workflow*. Remets `''` ensuite.\n\nPlusieurs rappels ? `RAPPELS = [15, 7, 1]`",
+        "height": 340,
+        "width": 520,
+        "color": 5
+      },
+      "id": "18b00f5d-bc50-4fd7-bdd9-8e0ba76daa75",
+      "name": "Mode d’emploi",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -380
+      ]
+    }
+  ],
+  "connections": {
+    "Chaque matin à 8h": {
+      "main": [
+        [
+          {
+            "node": "Lire le tableau des contrats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire le tableau des contrats": {
+      "main": [
+        [
+          {
+            "node": "Calculer les échéances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculer les échéances": {
+      "main": [
+        [
+          {
+            "node": "Envoyer l'alerte Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Algiers"
+  },
+  "active": false
+}
