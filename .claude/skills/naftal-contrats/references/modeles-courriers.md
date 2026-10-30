@@ -87,6 +87,24 @@ un contrat programme) · contrat à commande · contrat de gré à gré simple
 quantités définitives du marché · dossier d'appel d'offres national (ouvert) ·
 consultation restreinte · appel à la pré-qualification · fiche de suivi.
 
+### Usages de la Direction Juridique (corpus des courriers du département)
+- Simple envoi ou retour de pièces sans position ⇒ **bordereau d'envoi** (« Bonne réception »,
+  colonne « Observations » : Pour visa / Visé / Pour information, reçu daté et signé) ; dès qu'il y a
+  une position, une réserve ou une demande ⇒ **lettre**. Jamais de bordereau pour une mise en
+  demeure, une résiliation ou une mise en jeu de caution.
+- Relances : objet `A/S …` ⇒ `Rappel A/S …` ⇒ `2ème Rappel A/S …` ; corps « Nous réitérons notre
+  demande de … ».
+- Urgence : ligne isolée `Urgence signalée` avant la formule de politesse.
+- Pièces jointes et documents comptés : « une (01) copie de … » ; ordre en bas de page : signature,
+  puis `PJ :`, puis `Copie :`.
+- Visa juridique = clauses juridiques seulement ; il précède le visa de conformité de la
+  commission compétente, que la structure demanderesse sollicite elle-même.
+- Caution : alerte 30 jours avant l'expiration ; demande de prorogation avec « à défaut, NAFTAL se
+  réserve le droit de mettre en jeu la caution avant son expiration » ; mise en jeu par lettre à
+  la banque dans le délai de validité ; mainlevée seulement après réception définitive.
+- Huissier, avocat, traducteur : « Cher Maître » et « Veuillez agréer, cher Maître, l'expression
+  de notre parfaite considération. » ; demander toujours l'original du PV de notification.
+
 ## 3. Choisir le bon type de réponse
 
 | Cas | Issue | Modèle |
