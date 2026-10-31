@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "contract-review": {
+      "source": "claude-office-skills/skills",
+      "sourceType": "github",
+      "skillPath": "contract-review/SKILL.md",
+      "computedHash": "23633a3629f7d98d3fc14bf2a6c8a1d084834b35ee1895ca27c7380a45965ce0"
+    },
+    "contract-review-pro": {
+      "source": "cslawyer1985/contract-review-pro",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "3179c8c7c293779e6f31b0cd89846bfafc71911cee4978f680a8b18995303a3f"
+    }
+  }
+}

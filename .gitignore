@@ -7,3 +7,14 @@ authorization.yaml
 reports/
 *.report.json
 *.report.txt
+# Naftal: internal references and generated letters stay local (repo is public).
+.claude/skills/naftal-contrats/prive/
+courriers/
+# contract-review-pro writes reviewed contracts to the current directory.
+output/
+candidates/
+deviation-log*
+*-审核修订版.docx
+*-法律意见书.docx
+*-法律分析.docx
+*-审核报告.html

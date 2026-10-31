@@ -1,0 +1,57 @@
+[
+ {
+  "fichier": "Note_DB_resiliation.docx",
+  "interligne": 1.3,
+  "entete": [
+   "BRANCHE CARBURANTS",
+   "DIRECTION JURIDIQUE",
+   "Dépt Contrats et Conseils",
+   "Réf : N°            /[AAAA]"
+  ],
+  "destinataire": [
+   "Monsieur le Directeur",
+   "de la Branche Carburants"
+  ],
+  "objet": "A/S Lettre de Résiliation",
+  "corps": [
+   "Nous avons l’honneur de soumettre à votre signature une (01) lettre de résiliation du contrat N°[…], relatif à [OBJET], signé entre Naftal Branche Carburants et la société « [RAISON SOCIALE] » en date du [JJ/MM/AAAA], pour un délai de réalisation de [DURÉE] à compter de sa mise en vigueur.",
+   "[Motif : une mise en demeure de [NN] jours a été adressée en date du [JJ/MM/AAAA] sous le n° [NN] au cocontractant, afin de [OBLIGATION], mais en vain.] La présente résiliation intervient à la suite de la demande de la [STRUCTURE] (envoi n° [NN] du [JJ/MM/AAAA], dont ci-joint copie), conformément à l’article [NN] « Résiliation » dudit contrat.",
+   "Par ailleurs, nous vous proposons :",
+   "- de faire vérifier par la Direction Finances et Comptabilité les garanties détenues (caution de bonne exécution ou, à défaut, caution de soumission), en vue de leur mise en jeu avant leur expiration ;",
+   "- de notifier la lettre de résiliation par voie d’huissier de justice."
+  ],
+  "cloture": "Nous vous prions d’agréer, Monsieur le Directeur de la Branche Carburants, l’expression de notre parfaite considération.",
+  "signature": [
+   "LA DIRECTRICE JURIDIQUE",
+   "M. LAMANI"
+  ]
+ },
+ {
+  "fichier": "Lettre_resiliation.docx",
+  "interligne": 1.3,
+  "entete": [
+   "Le Directeur de la Branche Carburants",
+   "N°            /            /[AAAA]."
+  ],
+  "destinataire": [
+   "[RAISON SOCIALE]",
+   "Monsieur le Représentant légal",
+   "[ADRESSE DU SIÈGE]",
+   "[VILLE]"
+  ],
+  "objet": "Résiliation du contrat N°[…] à vos torts exclusifs.",
+  "ref": "Contrat N°[…] du [JJ/MM/AAAA] ; N/Mise(s) en demeure N°[…] du [JJ/MM/AAAA], reçue le [JJ/MM/AAAA].",
+  "appel": "Monsieur,",
+  "corps": [
+   "La Société NAFTAL SPA, Branche Carburants, et la société « [RAISON SOCIALE] » ont signé, en date du [JJ/MM/AAAA], le contrat N°[…], relatif à [OBJET], pour un délai d’exécution de [DURÉE].",
+   "[Rappel de l’obligation non exécutée, avec l’article du contrat.]",
+   "[Mises en demeure restées sans suite :] le délai de [NN] jours qui vous était imparti par la dernière mise en demeure a expiré le [JJ/MM/AAAA] sans que vous ayez satisfait à votre obligation.",
+   "En conséquence, nous vous notifions, par la présente, la résiliation du contrat N°[…] à vos torts exclusifs, conformément à l’article [NN] du contrat et à l’article 120 du Code civil, avec effet à compter de la date de réception de la présente.",
+   "NAFTAL se réserve le droit de vous réclamer réparation de l’ensemble des préjudices subis du fait de votre défaillance, et de faire valoir ses droits sur les garanties qu’elle détient."
+  ],
+  "cloture": "Nous vous prions d’agréer, Monsieur, l’expression de notre parfaite considération.",
+  "signature": [
+   "Le Directeur de la Branche Carburants"
+  ]
+ }
+]
