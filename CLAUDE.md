@@ -30,6 +30,12 @@ Les livrables sont en français.
   `Contrats_et_Conseils_archives.zip`, le décompresser dans `.claude/skills/naftal-contrats/`
   pour restaurer la base, et lui renvoyer l'archive à jour quand il le demande.
 
+## Consignes générales de l'utilisateur
+@.claude/MASTER_OS.md
+
+Pour les livrables NAFTAL, les compétences de l'utilisateur et `methode-naftal.md` priment sur ces
+consignes générales (voir « Priorité et adaptations » en tête du fichier).
+
 ## Outils
 `.claude/skills/naftal-contrats/scripts/README.md` (courriers Word, correction en révisions,
 délais, tri des conversations exportées de claude.ai).
