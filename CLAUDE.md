@@ -5,13 +5,15 @@ un contrat, un avenant ou un courrier (photo, Word, PDF), en arabe, en darja ou 
 Les livrables sont en français.
 
 ## Pour toute demande sur un contrat
-1. Charger la compétence `naftal-contrats` (directeur des 44 agents) et appliquer
+1. Charger la compétence `naftal-contrats` (directeur des 46 agents) et appliquer
    `.claude/skills/naftal-contrats/references/methode-naftal.md`.
 2. Les compétences de l'utilisateur priment (`contrat`, `lettres-direction-commercialisation`,
    `examen-contrat`, `correction-avenant`, `francais-juridique`) : formules recopiées telles
    quelles, retour d'un document en une seule phrase, « Salutations. », date et Réf laissées vides.
 3. Chercher un précédent dans `.claude/skills/naftal-contrats/prive/travaux-realises.md` et
    `prive/archives/` (index `prive/archives/README.md`) avant de rédiger.
+   Dossier lourd (contrat long, résiliation, litige, contrat international, avis approfondi) ou
+   demande « لجنة / comité / arena » : compétence `comite-juridique`.
 4. Livrer le fichier Word (Times New Roman 12, mise en page de l'utilisateur), puis trois points
    « à vérifier » au plus.
 5. Après chaque dossier traité : ajouter le précédent dans `prive/travaux-realises.md`, copier le
