@@ -12,9 +12,9 @@ Les livrables sont en français.
    quelles, retour d'un document en une seule phrase, « Salutations. », date et Réf laissées vides.
 3. Chercher un précédent dans `.claude/skills/naftal-contrats/prive/travaux-realises.md` et
    `prive/archives/` (index `prive/archives/README.md`) avant de rédiger.
-   **Toujours** faire passer le travail par la compétence `comite-juridique` avant la livraison
-   (décision de l'utilisateur) : comité léger pour une lettre simple (vérificateur des sources +
-   contradicteur), comité complet pour le reste.
+   **Toujours** faire passer le travail par le **comité complet** (`comite-juridique`) avant la
+   livraison, même pour une simple lettre « visé » (décision de l'utilisateur) : 3 spécialistes,
+   puis contradicteur et vérificateur des sources.
 4. Livrer le fichier Word (Times New Roman 12, mise en page de l'utilisateur), puis trois points
    « à vérifier » au plus.
 5. Après chaque dossier traité : ajouter le précédent dans `prive/travaux-realises.md`, copier le

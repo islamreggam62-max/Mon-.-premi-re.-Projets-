@@ -4,8 +4,7 @@ description: >-
   اللجنة القانونية (Comité juridique) — «arena» قوية للقانون والعقود: تعرض الملف على عدّة وكلاء مختصّين من
   وكلاء نفطال بالتوازي، ثم يهاجم المعترض النتيجة، ويتحقّق مدقّق المصادر من كل مادّة ورقم وأجل، ثم تُدمج في جواب
   واحد موثَّق. وضع ثانٍ «Arène» يقارن عدّة أجوبة أو مهارات على نفس الملف ويرتّبها بمعايير قانونية. استعملها عند:
-  «لجنة»، «comité»، «arena»، «راجع بعمق»، «رأي قانوني معمّق»، «أريد أقوى جواب»، «قارن المهارات في العقود»، وتعمل **دائماً على كل عمل في العقود**
-  (لجنة خفيفة للرسائل البسيطة، كاملة لما سواها). Legal panel for Naftal contracts: parallel specialists,
+  «لجنة»، «comité»، «arena»، «راجع بعمق»، «رأي قانوني معمّق»، «أريد أقوى جواب»، «قارن المهارات في العقود»، وتعمل **دائماً، كاملةً، على كل عمل في العقود**. Legal panel for Naftal contracts: parallel specialists,
   adversarial review, source check, single verified answer; or an arena that ranks answers with legal criteria.
 ---
 
@@ -15,18 +14,14 @@ description: >-
 من مراجعه. تعمل فوق المدير `naftal-contrats` ووكلائه (1 إلى 46)، وتحترم `methode-naftal.md` وكفاءات
 المستخدم (`contrat`، `examen-contrat`، `correction-avenant`، `francais-juridique`) التي لها الأولوية.
 
-## تعمل دائماً (قرار المستخدم، 31/10/2026)
-**كل عمل يرسله المستخدم في العقود يمرّ على اللجنة**، ولا يُسلَّم شيء قبل مرورها. حجمها يتبع حجم العمل:
-
-| العمل | اللجنة |
-|---|---|
-| رسالة إرجاع (visé / corrigé)، بوردورو، تحقّق من آجال، تصحيح بند واحد | **لجنة خفيفة**: المدير يُعدّ المسودّة بالكفاءة، ثم `naftal-verificateur-sources` (الأرقام، التواريخ، المراجع، الآجال، الصيغ) و`naftal-contradicteur` (الشكل، الصيغ، ما قد يُرفض) بالتوازي، ثم التصحيح والتسليم |
-| فحص عقد، تصحيح ملحق، رأي، ردّ معلّل، إعذار، فسخ، نزاع، عقد دولي | **لجنة كاملة**: الوضع 1 بخطواته الخمس |
-
-- إذا قال المستخدم «لجنة كاملة»، تُطبَّق الكاملة ولو كان العمل بسيطاً.
-- الجملة الختامية في التسليم تذكر دائماً ما مرّ عليه العمل، مثل:
-  « Revue en comité : vérification des sources et contradicteur — 0 référence à vérifier ».
-- الوكيلان 45 و46 لا يكتبان الرسالة ولا يغيّران صيغ المستخدم؛ يقترحان، والمدير يقرّر.
+## تعمل دائماً، كاملة (قرار المستخدم، 31/10/2026)
+**كل عمل يرسله المستخدم في العقود يمرّ على اللجنة الكاملة** (الوضع 1 بخطواته الخمس)، حتى رسالة «visé»
+بسيطة، ولا يُسلَّم شيء قبل مرورها.
+- الجملة الختامية في التسليم تذكر دائماً: « Revue en comité complet : [3 spécialistes], contradicteur,
+  vérification des sources — X référence(s) à vérifier ».
+- الوكلاء لا يغيّرون صيغ المستخدم المعتمدة (`contrat`، `lettres-direction-commercialisation`…):
+  يقترحون، والمدير يقرّر وفق الكفاءة.
+- يبقى للمستخدم أن يقول «بلا لجنة» لعمل بعينه.
 
 ## الوضع 1 — اللجنة (الافتراضي)
 
@@ -49,6 +44,9 @@ description: >-
 | عقد دولي أو استيراد | `naftal-international` + `naftal-change-domiciliation` + `naftal-fiscalite-contrats` |
 | صفقة، DAO، لجان | `naftal-procedure-passation` + `naftal-dao-cahiers-charges` + `naftal-commissions-marches` |
 | رأي قانوني لمديرية | `naftal-consultations-avis` + وكيل المجال + `naftal-droit-contrats-algerien` |
+| رسالة إرجاع (visé / corrigé) أو بوردورو | `naftal-lettres-visa` + `naftal-fiche-suivi` + `naftal-francais-administratif` |
+| تحقّق من آجال | `naftal-delais-penalites` + `naftal-avenants` + `naftal-droit-contrats-algerien` |
+| تصحيح بند أو مادّة | وكيل المجال + `naftal-droit-contrats-algerien` + `naftal-francais-administratif` |
 
 تعليمات كل وكيل: «اقرأ `courriers/<dossier>/brief.md` والوثائق المذكورة، أجب عن جزئك فقط، اذكر لكل
 نتيجة المادّة ومصدرها، وما لم تتحقّق منه اكتب بجانبه (à vérifier). لا تكتب الرسالة النهائية.»
