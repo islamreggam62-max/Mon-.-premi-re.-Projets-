@@ -62,6 +62,38 @@ le repli déterministe reste pleinement fonctionnel.
 
 Amélioration possible : embeddings LLM pour un RAG sémantique (au lieu de TF-IDF).
 
+## Version 0.3.0 — RAG amélioré (recherche hybride)
+
+Demande : « améliorer le RAG ». Méthode : mesurer d'abord, changer ensuite.
+
+- **Baseline** (TF-IDF v0.2) sur 20 requêtes / 3 contrats synthétiques :
+  MRR 0,825, hit@3 0,85, rappel@5 0,71. Échecs réels : `reconduction`≠`reconduit`,
+  `divulgation`≠`divulguer`, `sinistre`≠`sinistres` (flexions, pas de synonymes).
+- **Nouveau moteur** : racinisation légère FR + BM25 + 18 groupes de synonymes
+  juridiques + bonus de titre (`analysis/lexicon.py`, `analysis/retrieval.py`).
+  Résultat : MRR 0,963, hit@3 0,95, rappel@5 1,00. Limite : jeu minuscule, écrit par
+  l'auteur du lexique → optimiste ; 6 reformulations pures : seulement 4/6.
+- **Embeddings optionnels** (`llm/embeddings.py`) : endpoint /embeddings, cache SQLite
+  local, déduplication, fusion RRF, repli lexical **signalé** si panne. Testé avec un
+  fournisseur simulé uniquement : **qualité réelle non mesurée**.
+- **Branchements** : `GET /api/search` (+ carte « Recherche plein texte » dans
+  Contrats), assistant juridique (Module F) utilise le même moteur, `/api/settings`
+  expose l'état des embeddings (sans clé).
+
+Défauts trouvés PAR LES TESTS / L'EXAMEN des résultats (et corrigés) :
+1. Racinisation : une règle `-ie` séparait `résilié` de `résiliation`/`résilier`
+   (la forme la plus fréquente dans les contrats). Règle supprimée, test ajouté.
+2. Fuite de connexions SQLite (`with sqlite3.connect()` ne ferme pas) : avertissements
+   `ResourceWarning`, risque de verrouillage de fichier sous Windows. Corrigé.
+3. Survalorisation par accumulation de synonymes : une clause « Durée » (durée +
+   reconduit + tacitement) dépassait « Résiliation » pour « rupture avant terme ».
+   Corrigé (meilleur terme par famille). Compromis assumé et documenté dans le code :
+   « obligation de non-divulgation » place la clause de confidentialité au rang 4.
+   La mesure est indécise (les deux jeux de test sont trop petits) ; choix = max pur.
+
+Pistes : tester les embeddings sur un vrai corpus NAFTAL ; enrichir le lexique avec
+le vocabulaire métier ; index persistant au-delà de quelques centaines de contrats.
+
 ### Pistes d'amélioration (prochaines sessions)
 - OCR optionnel pour les PDF scannés.
 - Recherche sémantique / RAG (embeddings) pour l'assistant et la recherche.

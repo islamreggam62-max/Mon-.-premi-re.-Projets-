@@ -108,11 +108,17 @@ def analysis_to_dict(db: Session, analysis: Analysis) -> dict:
     }
 
 
-def build_retriever(db: Session, exclude_document_id: int | None = None):
-    """Construit un retriever RAG a partir du corpus (documents + references)."""
+def build_retriever(db: Session, exclude_document_id: int | None = None,
+                    semantic: bool = True):
+    """Construit un retriever RAG a partir du corpus (documents + references).
+
+    `semantic` : utilise le backend d'embeddings SI (et seulement si) il est
+    active et configure ; sinon recherche lexicale locale.
+    """
     from sqlalchemy import select
 
     from .analysis.retrieval import build_corpus_retriever
+    from .llm.embeddings import get_embedder
     from .models import Contract, Document, LegalReference
 
     docs = []
@@ -128,13 +134,13 @@ def build_retriever(db: Session, exclude_document_id: int | None = None):
                 label = f"{c.title}"
         if d.version_label:
             label = f"{label} ({d.version_label})"
-        docs.append({"label": label, "text": d.extracted_text})
+        docs.append({"label": label, "text": d.extracted_text, "id": d.id})
 
     refs = []
     for r in db.scalars(select(LegalReference)):
         txt = " — ".join(x for x in (r.number, r.title, r.article, r.note) if x)
         refs.append({"label": f"{r.number or r.title}", "text": txt})
-    return build_corpus_retriever(docs, refs)
+    return build_corpus_retriever(docs, refs, embed_fn=get_embedder() if semantic else None)
 
 
 def client_ip(request) -> str:

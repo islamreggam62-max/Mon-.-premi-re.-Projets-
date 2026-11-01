@@ -164,6 +164,156 @@ class TestRetrieval(unittest.TestCase):
         self.assertEqual(r.search("", k=3), [])
 
 
+try:  # pytest (mode « prepend ») ou python -m unittest depuis la racine
+    from tests import retrieval_gold as gold
+except ImportError:  # pragma: no cover
+    import retrieval_gold as gold  # type: ignore
+
+
+class TestLexicon(unittest.TestCase):
+    def test_all_forms_of_resilier_share_one_stem(self):
+        from naftal.analysis.lexicon import stem
+        forms = ["resiliation", "resiliations", "resilier", "resilie", "resilies", "resiliee"]
+        self.assertEqual(len({stem(f) for f in forms}), 1)
+
+    def test_plural_and_derivation(self):
+        from naftal.analysis.lexicon import stem
+        for a, b in [("sinistre", "sinistres"), ("tribunal", "tribunaux"),
+                     ("assurance", "assureur"), ("tacite", "tacitement")]:
+            self.assertEqual(stem(a), stem(b), (a, b))
+
+    def test_synonym_expansion_is_weighted_lower(self):
+        from naftal.analysis.lexicon import expand_query, stem
+        w = expand_query("rupture")
+        self.assertEqual(w[stem("rupture")], 1.0)
+        self.assertLess(w[stem("resiliation")], 1.0)   # voisin, pas exact
+        self.assertIn("resiliation", __import__("naftal.analysis.lexicon", fromlist=["x"]).triggered_groups("rupture"))
+
+    def test_stopwords_removed(self):
+        from naftal.analysis.lexicon import tokens
+        self.assertEqual(tokens("le contrat de la partie"), [])
+
+
+class TestRetrievalQuality(unittest.TestCase):
+    """Garde-fou de regression sur le jeu d'evaluation (voir retrieval_gold.py).
+
+    Mesures : ancien TF-IDF MRR 0.825 / hit@3 0.85 / rappel@5 0.71 ;
+    BM25 + lexique (max par famille) MRR 0.963 / hit@3 0.95 / rappel@5 1.00.
+    Jeu minuscule (20 requetes, ecrit par l'auteur du lexique) : indicateur et garde-fou
+    de regression, pas une preuve de performance. Seuils avec marge.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from naftal.analysis.retrieval import build_corpus_retriever
+        cls.r = build_corpus_retriever(gold.load_corpus())
+        cls.res = gold.evaluate(lambda q, k: [p.doc_id for p, _ in cls.r.search(q, k)])
+
+    def test_overall_quality(self):
+        self.assertGreaterEqual(self.res["mrr"], 0.93)
+        self.assertGreaterEqual(self.res["hit@3"], 0.90)
+        self.assertGreaterEqual(self.res["recall@5"], 0.90)
+
+    def test_inflection_misses_of_old_tfidf_are_fixed(self):
+        # L'ancien TF-IDF ne retrouvait AUCUN de ces trois passages (rang None).
+        found = dict(self.res["detail"])
+        for q in ("reconduction tacite du contrat", "sinistre"):
+            self.assertLessEqual(found[q], 3, q)
+        # « obligation » est un mot generique qui apparait aussi dans « Obligations du
+        # Client » : la clause de confidentialite est retrouvee mais au rang 4 (limite connue).
+        self.assertLessEqual(found["obligation de non-divulgation"], 5)
+
+    def test_exact_term_beats_stacked_synonyms(self):
+        # Regression du defaut « survalorisation par accumulation de synonymes » : sur les
+        # 2 contrats de demo, la clause de resiliation doit passer avant « Duree ».
+        from naftal.analysis.retrieval import build_corpus_retriever
+        ui = [d for d in gold.load_corpus() if d["label"] in ("V1", "V2")]
+        ids = [p.doc_id for p, _ in build_corpus_retriever(ui).search("rupture avant terme", 3)]
+        self.assertIn(ids[0], {"V1 — Article 8", "V2 — Article 7"})
+
+
+def _concept_embedder(calls: list):
+    """Embeddings JOUETS (axes conceptuels ecrits a la main) : testent la plomberie
+    (cache, fusion, repli), PAS la qualite d'embeddings reels."""
+    from naftal.analysis.rules import norm
+    concepts = [
+        {"arreter", "collaboration", "resilier", "resilie", "resiliation", "rupture",
+         "mettre", "fin", "motif", "raison"},
+        {"couvert", "couvrant", "police", "sinistres", "accidents", "assurance", "risques"},
+    ]
+
+    class Resp:
+        status_code = 200
+        text = ""
+
+        def __init__(self, d):
+            self._d = d
+
+        def json(self):
+            return self._d
+
+    def post(url, headers, json, timeout):
+        calls.append(list(json["input"]))
+        data = []
+        for i, t in enumerate(json["input"]):
+            toks = [w.strip(".,;:()«»") for w in norm(t).replace("'", " ").split()]
+            data.append({"index": i, "embedding": [float(sum(w in c for w in toks)) + 1e-3 for c in concepts]})
+        return Resp({"data": data})
+
+    return post
+
+
+class TestEmbeddings(unittest.TestCase):
+    def _client(self, post, name):
+        from naftal.llm.embeddings import EmbeddingClient
+        return EmbeddingClient("fake", "sk-secret-key", "http://x/v1",
+                               Path(_TMP) / f"{name}.sqlite", post=post, batch_size=8)
+
+    def test_disabled_by_default(self):
+        from naftal.llm.embeddings import embeddings_status, get_embedder
+        self.assertFalse(embeddings_status()["enabled"])
+        self.assertIsNone(get_embedder())
+
+    def test_cache_avoids_resending_texts(self):
+        calls = []
+        cl = self._client(_concept_embedder(calls), "cache")
+        cl(["premier texte", "second texte"])
+        n = cl.api_calls
+        cl(["premier texte", "second texte"])
+        self.assertEqual(cl.api_calls, n)          # 2e passage : zero appel reseau
+
+    def test_duplicate_texts_sent_once(self):
+        calls = []
+        cl = self._client(_concept_embedder(calls), "dedup")
+        out = cl(["meme texte", "meme texte", "autre"])
+        self.assertEqual(sum(len(c) for c in calls), 2)   # 2 textes uniques envoyes
+        self.assertEqual(len(out), 3)
+        self.assertEqual(out[0], out[1])
+
+    def test_hybrid_recovers_pure_paraphrase_missed_by_lexical(self):
+        from naftal.analysis.retrieval import build_corpus_retriever
+        q = "peut-on arrêter la collaboration sans donner de raison"
+        lexical = build_corpus_retriever(gold.load_corpus())
+        self.assertNotIn("V2 — Article 7", [p.doc_id for p, _ in lexical.search(q, 10)])
+        hybrid = build_corpus_retriever(
+            gold.load_corpus(), embed_fn=self._client(_concept_embedder([]), "hyb"))
+        self.assertEqual(hybrid.mode, "hybride")
+        self.assertIn("V2 — Article 7", [p.doc_id for p, _ in hybrid.search(q, 5)])
+
+    def test_failure_falls_back_to_lexical_and_says_so(self):
+        from naftal.analysis.retrieval import build_corpus_retriever
+
+        class Down:
+            status_code, text = 503, "indisponible"
+
+        r = build_corpus_retriever(
+            gold.load_corpus(), embed_fn=self._client(lambda *a, **k: Down(), "down"))
+        self.assertEqual(r.mode, "lexical (repli)")
+        self.assertIn("503", r.dense_error)
+        self.assertNotIn("sk-secret-key", r.dense_error)   # la cle ne fuit jamais
+        self.assertTrue(r.search("force majeure", 3))      # la recherche continue
+
+
 class TestAIPipeline(unittest.TestCase):
     def test_two_stage_with_self_verify(self):
         from naftal.analysis.ai_pipeline import deep_analysis
@@ -238,6 +388,47 @@ class TestAPI(unittest.TestCase):
         self._login()
         r = self.client.get("/api/reports/download/..%2f..%2fnaftal.db")
         self.assertIn(r.status_code, (400, 404))
+
+    def test_search_requires_auth(self):
+        c2 = self.__class__.client.__class__(self.__class__.client.app)
+        self.assertEqual(c2.get("/api/search", params={"query": "force majeure"}).status_code, 401)
+
+    def test_full_text_search(self):
+        self._login()
+        self.client.post("/api/documents/load-samples")
+        r = self.client.get("/api/search", params={"query": "résiliation anticipée du contrat"})
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertEqual(body["mode"], "lexical")            # embeddings desactives
+        self.assertIn("resiliation", body["groups"])
+        self.assertTrue(body["results"])
+        top = body["results"][0]
+        self.assertEqual(top["relevance"], 1.0)
+        self.assertTrue(top["label"] and top["snippet"])
+        # portee « reference » : uniquement des references juridiques (a verifier)
+        rr = self.client.get("/api/search", params={"query": "hydrocarbures", "scope": "reference"}).json()
+        self.assertTrue(rr["results"])
+        self.assertTrue(all(x["source"] == "reference" for x in rr["results"]))
+
+    def test_search_validation(self):
+        self._login()
+        self.assertEqual(self.client.get("/api/search", params={"query": "a"}).status_code, 422)
+        self.assertEqual(self.client.get("/api/search", params={"query": "force", "scope": "x"}).status_code, 422)
+
+    def test_assistant_uses_stemming_and_vocabulary(self):
+        self._login()
+        docs = self.client.post("/api/documents/load-samples").json()["documents"]
+        v1 = next(d["id"] for d in docs if d["filename"].endswith("v1.txt"))
+        r = self.client.post("/api/assistant", json={
+            "question": "que prévoit le contrat en cas de différend", "document_id": v1}).json()
+        self.assertIn("Article 9", [c["article"] for c in r["citations"]])
+
+    def test_settings_exposes_embeddings_status_without_key(self):
+        self._login()
+        s = self.client.get("/api/settings").json()
+        self.assertFalse(s["embeddings"]["enabled"])
+        self.assertTrue(s["local_only"])
+        self.assertNotIn("api_key", str(s).lower().replace("api_key_present", ""))
 
     def test_ai_status_reports_disabled(self):
         self._login()

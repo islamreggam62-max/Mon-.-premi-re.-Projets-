@@ -22,6 +22,7 @@ from .routers import (
     meta,
     reports,
     research,
+    search,
 )
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -57,7 +58,7 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok", "version": __version__}
 
-    for module in (auth, contracts, documents, intelligence, ai, research, reports, meta):
+    for module in (auth, contracts, documents, intelligence, ai, search, research, reports, meta):
         app.include_router(module.router)
 
     # Interface web (fichiers statiques + SPA).

@@ -37,12 +37,53 @@ autour le rend plus fort pour les contrats NAFTAL :
   fait pas cette auto-critique.
 - **Mémoire RAG** (`analysis/retrieval.py`) : ancre les réponses sur **vos
   propres contrats et références**, ce qu'une conversation vierge ne peut pas.
+  Voir la section « Recherche dans les clauses » ci-dessous.
 - Outils de **rédaction** : correction d'avenant (suivi des modifications),
   mémorandum, réécriture de clause.
 
 > ⚠️ Confidentialité : activer la couche LLM transmet le texte au fournisseur
 > externe. À n'utiliser que pour des documents dont l'envoi est autorisé. Par
 > défaut, tout reste local et seule l'analyse déterministe fonctionne.
+
+### Recherche dans les clauses (RAG) — `Contrats` → « Recherche plein texte »
+Cherche **dans le texte** de tous les contrats et références (pas seulement dans
+les métadonnées). Moteur local, déterministe, sans dépendance :
+
+1. **BM25** sur des jetons **racinisés** (`sinistre`/`sinistres`, `résilié`/`résiliation`) ;
+2. **vocabulaire juridique voisin** (`lexicon.py`, ~18 groupes : résiliation↔rupture,
+   indemnisation↔dédommagement, force majeure↔événement imprévisible, litige↔tribunal…).
+   Un terme exact compte pour 1, un voisin pour 0,5, et **les synonymes ne
+   s'additionnent pas** (sinon une clause « Durée » riche en mots voisins
+   dépasserait une clause « Résiliation » plus pertinente) ;
+3. **(optionnel) recherche sémantique** par embeddings, fusionnée au lexical
+   (Reciprocal Rank Fusion). **Désactivée par défaut**, voir `.env.example`.
+
+L'interface affiche le mode (`lexical` / `hybride` / `lexical (repli)`) et les
+groupes de vocabulaire utilisés, pour que le résultat reste explicable.
+
+**Mesure (honnête) sur un jeu minuscule** — 20 requêtes, 3 contrats synthétiques,
+écrit par l'auteur du lexique donc **indicatif, pas une preuve** :
+
+| | MRR | hit@1 | hit@3 | rappel@5 |
+|---|---|---|---|---|
+| Ancien TF-IDF | 0,825 | 0,80 | 0,85 | 0,71 |
+| BM25 + lexique | 0,963 | 0,95 | 0,95 | 1,00 |
+
+Sur 6 requêtes **entièrement reformulées** (sans mot commun avec le contrat ni le
+lexique), le lexical ne retrouve que **4/6** (hit@3) : il échoue sur « arrêter la
+collaboration sans donner de raison » (= résiliation sans motif) et « couvert contre
+les accidents » (= assurance). C'est le cas que les embeddings visent.
+
+> ⚠️ **Embeddings : non vérifiés sur un vrai fournisseur.** Le branchement (cache,
+> fusion, repli en cas de panne) est testé avec un fournisseur simulé et des
+> vecteurs jouets ; la **qualité sémantique réelle n'a pas été mesurée** (aucune clé
+> disponible lors du développement). À valider sur vos propres contrats.
+>
+> ⚠️ **Confidentialité.** Activer les embeddings envoie les **passages de TOUS les
+> contrats indexés** au fournisseur (une fois, puis cache local), ce qui est plus
+> large que l'analyse d'un seul document. L'interrupteur `NAFTAL_EMBED_ENABLED` est
+> **distinct** de `NAFTAL_LLM_ENABLED`. Pour un corpus qui ne peut pas sortir,
+> pointez `NAFTAL_EMBED_BASE_URL` vers un serveur d'embeddings **local**.
 
 ### Principes de rigueur
 - **Jamais d'invention.** Une provision absente est marquée *absente*, pas inventée.
@@ -141,6 +182,14 @@ RBAC, anti-traversée).
   ne le remplace pas.
 - **Procédures internes NAFTAL / SONATRACH** : non présumées ; prises en compte
   uniquement sur pièce fournie.
+- **Lexique juridique = amorce** écrite à la main : un terme absent du lexique n'est
+  pas rapproché de ses synonymes (sans embeddings). À enrichir avec le vocabulaire
+  NAFTAL (carburants, GPL, bitume, stations…).
+- **Index reconstruit à chaque requête** : correct pour quelques centaines de
+  contrats ; au-delà il faudra un index persistant. Avec les embeddings, la
+  **première** indexation d'un grand corpus peut être longue (ensuite : cache local).
+- **Mot générique** : « obligation » dans une requête remonte aussi « Obligations
+  du Client » (le mot est littéralement présent) ; formulez avec le terme précis.
 
 ## 6. Structure du code
 ```

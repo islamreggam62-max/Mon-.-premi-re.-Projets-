@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from .. import __version__, ENGINE_VERSION
 from ..config import get_settings
 from ..llm import llm_status
+from ..llm.embeddings import embeddings_status
 from ..models import User
 from ..security import get_current_user
 
@@ -22,5 +23,6 @@ def settings_info(_: User = Depends(get_current_user)):
         "max_upload_mb": s.max_upload_mb,
         "allowed_extensions": sorted(s.allowed_extensions),
         "llm": llm_status(),
-        "local_only": not s.llm_enabled,
+        "embeddings": embeddings_status(),
+        "local_only": not (s.llm_enabled or s.embed_enabled),
     }

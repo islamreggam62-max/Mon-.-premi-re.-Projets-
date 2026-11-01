@@ -195,6 +195,17 @@ async function renderContracts() {
 
     C().innerHTML = `
       <div class="card">
+        <h2>Recherche plein texte dans les clauses</h2>
+        <p class="muted" style="margin-top:-6px">Cherche DANS le texte de tous les contrats et références (formes grammaticales et vocabulaire juridique voisin pris en compte).</p>
+        <div class="toolbar">
+          <div style="flex:3"><label>Termes ou question</label><input id="ft-q" placeholder="ex. résiliation anticipée, plafond de responsabilité, force majeure…"></div>
+          <div><label>Portée</label><select id="ft-scope"><option value="tout">Tout</option><option value="contrat">Contrats</option><option value="reference">Références juridiques</option></select></div>
+          <button class="btn" id="ft-go">${h(t("search"))}</button>
+        </div>
+        <div id="ft-out"></div>
+      </div>
+      <div class="card">
+        <h2>Filtrer la liste des contrats</h2>
         <div class="toolbar">
           <div><label>${h(t("search"))}</label><input id="c-q" placeholder="titre, reference, partie…"></div>
           <div><label>Type</label><select id="c-type"><option value="">Tous</option>${filters.types.map((x) => `<option>${h(x)}</option>`).join("")}</select></div>
@@ -209,9 +220,44 @@ async function renderContracts() {
     `;
     $("#c-search").onclick = applyContractFilter;
     $("#c-q").onkeydown = (e) => { if (e.key === "Enter") applyContractFilter(); };
+    $("#ft-go").onclick = runFullTextSearch;
+    $("#ft-q").onkeydown = (e) => { if (e.key === "Enter") runFullTextSearch(); };
     bindContractRows();
     if (canWrite()) bindContractForm();
   } catch (e) { C().innerHTML = errBox(e.message); }
+}
+
+const GROUP_LABELS = {
+  resiliation: "résiliation / rupture", paiement: "paiement / règlement", penalite: "pénalités",
+  indemnisation: "indemnisation / dédommagement", responsabilite: "responsabilité", plafond: "plafond / limitation",
+  force_majeure: "force majeure", litige: "litiges / juridiction", duree: "durée / reconduction",
+  confidentialite: "confidentialité", assurance: "assurance / sinistre", prix: "prix / rémunération",
+  garantie: "garanties", livraison: "livraison / transport", modification: "modification / avenant",
+  obligation: "obligations", cession: "cession", signataire: "signataires / pouvoirs",
+};
+
+async function runFullTextSearch() {
+  const q = $("#ft-q").value.trim(); const out = $("#ft-out");
+  if (q.length < 2) { out.innerHTML = errBox("Saisissez au moins 2 caractères."); return; }
+  out.innerHTML = '<span class="spin" style="border-color:#ccc;border-top-color:var(--green)"></span> Recherche…';
+  try {
+    const qs = new URLSearchParams({ query: q, scope: $("#ft-scope").value, k: 8 });
+    const r = await api("GET", "/api/search?" + qs.toString());
+    const modeCls = r.mode.startsWith("hybride") ? "LOW" : (r.mode.includes("repli") ? "HIGH" : "INFO");
+    const groups = r.groups.length ? ` · vocabulaire voisin pris en compte : ${r.groups.map((g) => h(GROUP_LABELS[g] || g)).join(", ")}` : "";
+    const head = `<div class="muted" style="margin:6px 0 10px"><span class="pill ${modeCls}">${h(r.mode)}</span> ${r.count} résultat(s)${groups}</div>
+      ${r.dense_error ? errBox("Recherche sémantique indisponible (repli lexical) : " + r.dense_error) : ""}`;
+    const items = r.results.map((x) => `
+      <div class="finding">
+        <div class="head"><span class="cat">${h(x.label)}</span>
+          <span class="pill INFO">${Math.round(x.relevance * 100)} %</span>
+          <span class="pill ${x.source === "reference" ? "MEDIUM" : "INFO"}">${x.source === "reference" ? "référence (à vérifier)" : "contrat"}</span></div>
+        <div class="excerpt">${h(x.snippet)}</div>
+        ${x.document_id && canWrite() ? `<button class="btn ghost sm" data-an-doc="${x.document_id}">Analyser ce document</button>` : ""}
+      </div>`).join("") || '<p class="muted">Aucun passage trouvé. Reformulez avec d\'autres termes.</p>';
+    out.innerHTML = head + items;
+    out.querySelectorAll("[data-an-doc]").forEach((b) => b.onclick = () => { state.pendingDoc = parseInt(b.dataset.anDoc); navigate("analyzer"); });
+  } catch (e) { out.innerHTML = errBox(e.message); }
 }
 
 function contractForm() {
@@ -661,6 +707,7 @@ async function renderSettings() {
         <tr><th>Formats acceptes</th><td>${s.allowed_extensions.join(", ")}</td></tr>
         <tr><th>Mode local (aucun envoi externe)</th><td>${s.local_only ? "Oui ✅" : "Non ⚠ (LLM externe actif)"}</td></tr>
         <tr><th>Couche LLM</th><td>${h(s.llm.note)}</td></tr>
+        <tr><th>Recherche semantique</th><td>${h(s.embeddings.note)}</td></tr>
       </table>
       <div class="notice" style="margin-top:14px">Confidentialite : par defaut, aucun document n'est transmis a un service externe. L'activation de la couche LLM (variables d'environnement) envoie le texte analyse au fournisseur configure et doit etre autorisee pour des documents confidentiels. Cette application n'est pas approuvee pour un usage officiel NAFTAL sans validation des equipes informatique et securite.</div>
     </div>`;

@@ -56,6 +56,16 @@ class Settings:
         self.llm_api_key = os.getenv("NAFTAL_LLM_API_KEY", "")
         self.llm_base_url = os.getenv("NAFTAL_LLM_BASE_URL", "")
 
+        # --- Embeddings (recherche semantique) : DESACTIVES par defaut ---
+        # Indicateur DISTINCT de NAFTAL_LLM_ENABLED : l'indexation envoie les
+        # passages de TOUS les contrats du corpus au fournisseur (une fois, puis
+        # cache local), ce qui est plus large que l'analyse d'un seul document.
+        self.embed_enabled = _env_bool("NAFTAL_EMBED_ENABLED", False)
+        self.embed_model = os.getenv("NAFTAL_EMBED_MODEL", "")
+        self.embed_api_key = os.getenv("NAFTAL_EMBED_API_KEY", "")
+        self.embed_base_url = os.getenv("NAFTAL_EMBED_BASE_URL", "https://api.openai.com/v1")
+        self.embed_batch_size = int(os.getenv("NAFTAL_EMBED_BATCH_SIZE", "64"))
+
     def _load_or_create_secret(self) -> str:
         env_secret = os.getenv("NAFTAL_SECRET_KEY")
         if env_secret:

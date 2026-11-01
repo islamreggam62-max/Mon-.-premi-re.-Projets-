@@ -11,6 +11,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
 from ..analysis import analyze_text, compare_texts, risk_report
+from ..analysis.retrieval import build_corpus_retriever
 from ..analysis.rules import norm
 from ..extraction.segmentation import segment_clauses
 from ..db import get_session
@@ -195,18 +196,16 @@ def _answer_rule_based(doc: Document, question: str) -> dict:
     if any(k in nq for k in ("resume", "synthese", "analyse", "apercu", "global")):
         return {"answer": out.summary, "citations": [], "grounded": True, "used_llm": False}
 
-    # Par defaut : recherche par mots-cles dans les clauses.
-    terms = [t for t in re.findall(r"\w{4,}", nq) if t not in ("dans", "cette", "pour", "avec", "quel", "quelle", "contrat", "clause", "article")]
-    matches = []
-    for c in clauses:
-        nc = norm(c.text)
-        if terms and sum(1 for t in terms if t in nc) >= 1:
-            matches.append(c)
-    if matches:
+    # Par defaut : recherche dans les clauses du document (racinisation + vocabulaire
+    # juridique voisin), via le meme moteur que la recherche plein texte.
+    local = build_corpus_retriever([{"label": doc.filename, "text": text, "id": doc.id}])
+    hits = local.search(question, 4)
+    if hits:
         answer_parts = []
-        for c in matches[:4]:
-            citations.append({"document": doc.filename, "article": c.ref})
-            answer_parts.append(f"{c.ref} — {c.title or ''}\n{c.text[:500]}")
+        for p, _score in hits:
+            ref = p.meta.get("ref") or p.doc_id
+            citations.append({"document": doc.filename, "article": ref})
+            answer_parts.append(f"{ref} — {p.meta.get('title') or ''}\n{p.text[:500]}")
         return {"answer": "Clauses correspondantes :\n\n" + "\n\n".join(answer_parts), "citations": citations, "grounded": True, "used_llm": False}
 
     return {

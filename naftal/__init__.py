@@ -8,5 +8,5 @@ possible via DATABASE_URL). 100 % local : aucun document n'est transmis a un
 service externe tant que la couche LLM n'est pas activee explicitement.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 ENGINE_VERSION = "naftal-rules-1"
