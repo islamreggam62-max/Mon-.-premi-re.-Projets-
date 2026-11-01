@@ -4,7 +4,7 @@ import { useEffect, type RefObject } from "react";
 
 /** Calls `onDismiss` on a pointer press outside `ref`, or on Escape, while `active`. */
 export function useDismiss(
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   active: boolean,
   onDismiss: () => void,
 ): void {

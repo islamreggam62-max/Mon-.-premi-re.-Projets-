@@ -35,7 +35,7 @@ export function Topbar({
   notifications,
 }: {
   onOpenMenu: () => void;
-  menuButtonRef: RefObject<HTMLButtonElement>;
+  menuButtonRef: RefObject<HTMLButtonElement | null>;
   currentUser: Person;
   workspaces: Workspace[];
   notifications: AppNotification[];
