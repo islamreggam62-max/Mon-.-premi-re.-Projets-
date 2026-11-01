@@ -1,19 +1,32 @@
-import { cn } from "@/lib/utils";
+import { FlaskConical } from "lucide-react";
+import {
+  APPROVAL_STATUS_LABEL,
+  HEALTH_LABEL,
+  PRESENCE_LABEL,
+  PRIORITY_LABEL,
+  SEVERITY_LABEL,
+  TASK_STATUS_LABEL,
+  URGENCY_LABEL,
+} from "@/lib/labels";
 import type {
   ApprovalStatus,
+  ApprovalUrgency,
   Health,
+  PresenceStatus,
   Priority,
+  Severity,
   TaskStatus,
 } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
-type Tone = "emerald" | "amber" | "rose" | "violet" | "sky" | "slate";
+export type Tone = "emerald" | "amber" | "rose" | "violet" | "sky" | "slate";
 
 const TONE: Record<Tone, string> = {
-  emerald: "bg-status-emerald/12 text-status-emerald ring-status-emerald/25",
-  amber: "bg-status-amber/12 text-status-amber ring-status-amber/25",
-  rose: "bg-status-rose/12 text-status-rose ring-status-rose/25",
-  violet: "bg-violet/15 text-violet-soft ring-violet/30",
-  sky: "bg-status-sky/12 text-status-sky ring-status-sky/25",
+  emerald: "bg-status-emerald/10 text-emerald-300 ring-status-emerald/25",
+  amber: "bg-status-amber/10 text-amber-300 ring-status-amber/25",
+  rose: "bg-status-rose/10 text-rose-300 ring-status-rose/25",
+  violet: "bg-violet/15 text-violet-200 ring-violet/30",
+  sky: "bg-status-sky/10 text-sky-300 ring-status-sky/25",
   slate: "bg-white/5 text-slate-300 ring-white/10",
 };
 
@@ -31,26 +44,31 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
+        "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
         TONE[tone],
         className,
       )}
     >
-      {dot && <span className="h-1.5 w-1.5 rounded-full bg-current" />}
+      {dot && <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />}
       {children}
     </span>
   );
 }
 
-const HEALTH_TONE: Record<Health, Tone> = {
+/** Marks content as static demonstration material. */
+export function DemoBadge({ label = "Static demo preview" }: { label?: string }) {
+  return (
+    <Badge tone="violet">
+      <FlaskConical className="h-3 w-3" aria-hidden="true" />
+      {label}
+    </Badge>
+  );
+}
+
+export const HEALTH_TONE: Record<Health, Tone> = {
   "on-track": "emerald",
   "at-risk": "amber",
-  "off-track": "rose",
-};
-const HEALTH_LABEL: Record<Health, string> = {
-  "on-track": "On track",
-  "at-risk": "At risk",
-  "off-track": "Off track",
+  delayed: "rose",
 };
 
 export function HealthBadge({ health }: { health: Health }) {
@@ -69,42 +87,76 @@ const PRIORITY_TONE: Record<Priority, Tone> = {
 };
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
-  return (
-    <Badge tone={PRIORITY_TONE[priority]} className="capitalize">
-      {priority}
-    </Badge>
-  );
+  return <Badge tone={PRIORITY_TONE[priority]}>{PRIORITY_LABEL[priority]}</Badge>;
+}
+
+const SEVERITY_TONE: Record<Severity, Tone> = { high: "rose", medium: "amber", low: "slate" };
+
+export function SeverityBadge({ severity }: { severity: Severity }) {
+  return <Badge tone={SEVERITY_TONE[severity]}>{SEVERITY_LABEL[severity]}</Badge>;
+}
+
+const TASK_TONE: Record<TaskStatus, Tone> = {
+  todo: "slate",
+  "in-progress": "violet",
+  "in-review": "sky",
+  blocked: "rose",
+  done: "emerald",
+};
+
+export function TaskStatusBadge({ status }: { status: TaskStatus }) {
+  return <Badge tone={TASK_TONE[status]}>{TASK_STATUS_LABEL[status]}</Badge>;
 }
 
 const APPROVAL_TONE: Record<ApprovalStatus, Tone> = {
   pending: "amber",
+  "in-review": "sky",
+  "changes-requested": "violet",
   approved: "emerald",
   rejected: "rose",
 };
 
 export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
   return (
-    <Badge tone={APPROVAL_TONE[status]} dot className="capitalize">
-      {status}
+    <Badge tone={APPROVAL_TONE[status]} dot>
+      {APPROVAL_STATUS_LABEL[status]}
     </Badge>
   );
 }
 
-const TASK_TONE: Record<TaskStatus, Tone> = {
-  backlog: "slate",
-  todo: "sky",
-  "in-progress": "violet",
-  review: "amber",
-  done: "emerald",
-};
-const TASK_LABEL: Record<TaskStatus, string> = {
-  backlog: "Backlog",
-  todo: "To do",
-  "in-progress": "In progress",
-  review: "Review",
-  done: "Done",
+const URGENCY_TONE: Record<ApprovalUrgency, Tone> = {
+  overdue: "rose",
+  "due-today": "rose",
+  "due-soon": "amber",
+  "on-schedule": "slate",
 };
 
-export function TaskStatusBadge({ status }: { status: TaskStatus }) {
-  return <Badge tone={TASK_TONE[status]}>{TASK_LABEL[status]}</Badge>;
+export function UrgencyBadge({ urgency }: { urgency: ApprovalUrgency }) {
+  return (
+    <Badge tone={URGENCY_TONE[urgency]} dot={urgency !== "on-schedule"}>
+      {URGENCY_LABEL[urgency]}
+    </Badge>
+  );
 }
+
+const PRESENCE_TONE: Record<PresenceStatus, Tone> = {
+  active: "emerald",
+  away: "amber",
+  offline: "slate",
+  "on-leave": "sky",
+};
+
+export function PresenceBadge({ status }: { status: PresenceStatus }) {
+  return (
+    <Badge tone={PRESENCE_TONE[status]} dot>
+      {PRESENCE_LABEL[status]}
+    </Badge>
+  );
+}
+
+export const PRESENCE_DOT: Record<PresenceStatus, string> = {
+  active: "bg-status-emerald",
+  away: "bg-status-amber",
+  offline: "bg-slate-500",
+  "on-leave": "bg-status-sky",
+};

@@ -1,4 +1,5 @@
-import type { ActivityEntry, Alert, Kpi } from "@/lib/types";
+/** STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts. */
+import type { AppNotification, Kpi } from "@/lib/types";
 
 export const KPIS: Kpi[] = [
   {
@@ -8,6 +9,7 @@ export const KPIS: Kpi[] = [
     delta: "+8.2%",
     trend: "up",
     positiveWhenUp: true,
+    hint: "vs. September",
   },
   {
     id: "k-nrr",
@@ -16,6 +18,7 @@ export const KPIS: Kpi[] = [
     delta: "+3 pts",
     trend: "up",
     positiveWhenUp: true,
+    hint: "trailing 12 months",
   },
   {
     id: "k-burn",
@@ -24,86 +27,50 @@ export const KPIS: Kpi[] = [
     delta: "+6.1%",
     trend: "up",
     positiveWhenUp: false,
+    hint: "vs. September",
   },
   {
-    id: "k-velocity",
-    label: "Delivery Velocity",
-    value: "92 pts",
-    delta: "-4.0%",
+    id: "k-ontime",
+    label: "On-time Milestones",
+    value: "82%",
+    delta: "-4 pts",
     trend: "down",
     positiveWhenUp: true,
+    hint: "quarter to date",
   },
 ];
 
-export const ALERTS: Alert[] = [
+export const NOTIFICATIONS: AppNotification[] = [
   {
-    id: "al-1",
-    severity: "critical",
-    title: "Atlas at risk of Q4 slip",
-    detail: "Billing extraction and failover both depend on one engineer at 94%.",
-    source: "AI Intelligence",
-    timestamp: "2026-10-31T16:40:00Z",
+    id: "n-1",
+    tone: "critical",
+    title: "Approval overdue",
+    detail: "Atlas infrastructure budget ($85K) passed its due date.",
+    time: "2026-10-30T08:05:00Z",
+    href: "/approvals",
   },
   {
-    id: "al-2",
-    severity: "warning",
-    title: "Forge off-track (29%)",
-    detail: "Design system blocking the Summit GA logo set.",
-    source: "Projects",
-    timestamp: "2026-10-31T14:10:00Z",
+    id: "n-2",
+    tone: "warning",
+    title: "Forge marked Delayed",
+    detail: "The core primitives milestone was missed on Oct 26.",
+    time: "2026-10-30T07:40:00Z",
+    href: "/projects#p-forge",
   },
   {
-    id: "al-3",
-    severity: "warning",
-    title: "3 approvals due within 5 days",
-    detail: "Infra budget, ML backfill, and a Forge deadline exception are pending.",
-    source: "Approvals",
-    timestamp: "2026-10-31T09:05:00Z",
+    id: "n-3",
+    tone: "warning",
+    title: "3 daily reports missing",
+    detail: "Yuki Tanaka, Nadia Benali, and Devon Carter haven't submitted today.",
+    time: "2026-10-30T19:30:00Z",
+    href: "/daily-reports",
   },
   {
-    id: "al-4",
-    severity: "info",
-    title: "Ledger nearing completion",
-    detail: "Only audit sign-off remains before close.",
-    source: "Projects",
-    timestamp: "2026-10-30T18:30:00Z",
-  },
-];
-
-export const ACTIVITY: ActivityEntry[] = [
-  {
-    id: "ac-1",
-    actorId: "u-mateo",
-    action: "completed task",
-    target: "Auth service load testing",
-    timestamp: "2026-10-31T17:02:00Z",
-  },
-  {
-    id: "ac-2",
-    actorId: "u-nadia",
-    action: "submitted approval",
-    target: "Enterprise discount exception — pilot #3",
-    timestamp: "2026-10-31T15:20:00Z",
-  },
-  {
-    id: "ac-3",
-    actorId: "u-hana",
-    action: "moved to review",
-    target: "Signal ingestion event schema",
-    timestamp: "2026-10-31T13:48:00Z",
-  },
-  {
-    id: "ac-4",
-    actorId: "u-eli",
-    action: "filed daily report",
-    target: "Oct 31 check-in",
-    timestamp: "2026-10-31T11:15:00Z",
-  },
-  {
-    id: "ac-5",
-    actorId: "u-tomas",
-    action: "approved procurement",
-    target: "Enterprise observability platform",
-    timestamp: "2026-10-30T19:00:00Z",
+    id: "n-4",
+    tone: "info",
+    title: "Launch kit in review",
+    detail: "The Summit GA launch kit is waiting for your sign-off.",
+    time: "2026-10-29T16:12:00Z",
+    href: "/approvals",
   },
 ];

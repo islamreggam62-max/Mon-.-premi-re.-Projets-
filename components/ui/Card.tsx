@@ -4,13 +4,15 @@ export function Card({
   children,
   className,
   strong = false,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
   strong?: boolean;
+  id?: string;
 }) {
   return (
-    <div className={cn(strong ? "glass-strong" : "glass", "animate-fade-in", className)}>
+    <div id={id} className={cn(strong ? "glass-strong" : "glass", "motion-safe:animate-fade-in", className)}>
       {children}
     </div>
   );
@@ -34,8 +36,8 @@ export function CardHeader({
         className,
       )}
     >
-      <div>
-        <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
+      <div className="min-w-0">
+        <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
         {subtitle && <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

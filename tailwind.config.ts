@@ -9,13 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep dark navy backgrounds
+        // Deep dark navy surfaces
         base: {
           900: "#070B14",
           800: "#0F172A",
           700: "#1E293B",
         },
-        // Royal violet accents
+        // Royal violet accents (merged with Tailwind's default violet scale)
         violet: {
           DEFAULT: "#7C3AED",
           soft: "#8B5CF6",
@@ -28,9 +28,25 @@ const config: Config = {
           sky: "#38BDF8",
         },
       },
+      // System font stack: no network font download, no layout shift.
       fontFamily: {
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        sans: [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
+      },
+      // Tailwind's default scale has no 8 or 12; these back the /8 and /12 modifiers.
+      opacity: {
+        8: "0.08",
+        12: "0.12",
       },
       boxShadow: {
         glass: "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 8px 30px -12px rgba(0,0,0,0.6)",
@@ -40,19 +56,16 @@ const config: Config = {
         hairline: "rgba(255,255,255,0.08)",
       },
       backgroundColor: {
-        hairline: "rgba(255,255,255,0.04)",
+        hairline: "rgba(255,255,255,0.08)",
       },
       keyframes: {
         "fade-in": {
           from: { opacity: "0", transform: "translateY(4px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
-        shimmer: {
-          "100%": { transform: "translateX(100%)" },
-        },
       },
       animation: {
-        "fade-in": "fade-in 0.4s ease-out both",
+        "fade-in": "fade-in 0.35s ease-out both",
       },
     },
   },

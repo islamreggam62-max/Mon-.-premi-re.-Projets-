@@ -16,3 +16,7 @@ next-env.d.ts
 *.tsbuildinfo
 .vercel
 npm-debug.log*
+
+# Local environment files — never commit secrets or API keys
+.env
+.env*.local

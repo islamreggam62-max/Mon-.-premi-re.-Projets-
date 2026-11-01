@@ -1,152 +1,95 @@
 import type { Metadata } from "next";
-import {
-  Lightbulb,
-  ShieldAlert,
-  Sparkles,
-  TrendingUp,
-  Wand2,
-} from "lucide-react";
+import { Ban, FlaskConical, ShieldCheck, UserCheck } from "lucide-react";
+import { BottleneckRow, InsightCard, SummaryCard } from "@/components/ai/PreviewCards";
+import { DemoBadge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card, CardBody } from "@/components/ui/Card";
-import { Badge, PriorityBadge } from "@/components/ui/Badge";
-import { ProgressBar } from "@/components/ui/ProgressBar";
-import { AI_INSIGHTS } from "@/lib/data/aiInsights";
-import type { InsightKind } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { TabbedPanels } from "@/components/ui/Tabs";
+import { AI_INSIGHTS, BOTTLENECKS, REPORT_SUMMARIES } from "@/lib/data/aiPreview";
+import { DAILY_REPORTS } from "@/lib/data/dailyReports";
+import { TEAM } from "@/lib/data/team";
+import { computePulse, indexById } from "@/lib/metrics";
 
 export const metadata: Metadata = { title: "AI Intelligence" };
 
-const KIND_META: Record<
-  InsightKind,
-  { label: string; icon: typeof ShieldAlert; tone: string; ring: string }
-> = {
-  risk: {
-    label: "Risk",
-    icon: ShieldAlert,
-    tone: "text-status-rose",
-    ring: "bg-status-rose/10 ring-status-rose/25",
-  },
-  opportunity: {
-    label: "Opportunity",
-    icon: TrendingUp,
-    tone: "text-status-emerald",
-    ring: "bg-status-emerald/10 ring-status-emerald/25",
-  },
-  synthesis: {
-    label: "Synthesis",
-    icon: Wand2,
-    tone: "text-status-sky",
-    ring: "bg-status-sky/10 ring-status-sky/25",
-  },
-  recommendation: {
-    label: "Recommendation",
-    icon: Lightbulb,
-    tone: "text-violet-soft",
-    ring: "bg-violet/10 ring-violet/25",
-  },
-};
-
 export default function AiIntelligencePage() {
-  const risks = AI_INSIGHTS.filter((i) => i.kind === "risk").length;
-  const avgConfidence = Math.round(
-    AI_INSIGHTS.reduce((s, i) => s + i.confidence, 0) / AI_INSIGHTS.length,
+  const people = indexById(TEAM);
+
+  const insights = (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {AI_INSIGHTS.map((insight) => (
+        <InsightCard key={insight.id} insight={insight} />
+      ))}
+    </div>
+  );
+
+  const summaries = (
+    <div className="space-y-4">
+      {REPORT_SUMMARIES.map((summary) => (
+        <SummaryCard
+          key={summary.id}
+          summary={summary}
+          pulse={computePulse(DAILY_REPORTS, TEAM, summary.date)}
+        />
+      ))}
+    </div>
+  );
+
+  const bottlenecks = (
+    <ul className="space-y-4">
+      {BOTTLENECKS.map((item) => (
+        <BottleneckRow
+          key={item.id}
+          item={item}
+          people={item.affectedIds.map((id) => people[id]).filter(Boolean)}
+        />
+      ))}
+    </ul>
   );
 
   return (
     <div>
       <PageHeader
         title="AI Operational Intelligence"
-        subtitle="Executive synthesis and risk analysis across every module."
-        action={
-          <Badge tone="violet" dot>
-            Demo mode · Phase 1
-          </Badge>
-        }
+        subtitle="How NEXORA will present executive insights, daily report summaries, and bottleneck detection."
+        action={<DemoBadge label="Demo / Preview UI" />}
       />
 
-      <Card className="mb-6 border-violet/20 bg-violet/[0.05]">
-        <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet to-violet-soft shadow-glow">
-              <Sparkles className="h-5 w-5 text-white" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-slate-100">
-                Synthesis is illustrative in Phase 1
-              </p>
-              <p className="mt-0.5 max-w-xl text-sm text-slate-400">
-                These insights are static examples of the executive briefing NEXORA
-                will generate from live project, task, and team signal. No model is
-                invoked in this build.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-6 sm:gap-8">
-            <div>
-              <p className="text-2xl font-semibold tabular-nums text-slate-50">
-                {AI_INSIGHTS.length}
-              </p>
-              <p className="text-xs text-slate-400">Insights</p>
-            </div>
-            <div>
-              <p className="text-2xl font-semibold tabular-nums text-status-rose">
-                {risks}
-              </p>
-              <p className="text-xs text-slate-400">Risks</p>
-            </div>
-            <div>
-              <p className="text-2xl font-semibold tabular-nums text-slate-50">
-                {avgConfidence}%
-              </p>
-              <p className="text-xs text-slate-400">Avg confidence</p>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {AI_INSIGHTS.map((insight) => {
-          const meta = KIND_META[insight.kind];
-          const Icon = meta.icon;
-          return (
-            <Card key={insight.id} className="flex flex-col">
-              <CardBody className="flex flex-1 flex-col">
-                <div className="flex items-start justify-between gap-3">
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
-                      meta.ring,
-                      meta.tone,
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    {meta.label}
-                  </span>
-                  <PriorityBadge priority={insight.impact} />
-                </div>
-
-                <h3 className="mt-3 text-sm font-semibold text-slate-50">
-                  {insight.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-300">
-                  {insight.body}
-                </p>
-
-                <div className="mt-4 border-t border-hairline pt-3">
-                  <div className="mb-1.5 flex items-center justify-between text-xs text-slate-400">
-                    <span>Model confidence</span>
-                    <span className="tabular-nums">{insight.confidence}%</span>
-                  </div>
-                  <ProgressBar value={insight.confidence} tone="violet" />
-                  <p className="mt-2 text-xs text-slate-500">
-                    Related module · {insight.relatedModule}
-                  </p>
-                </div>
-              </CardBody>
-            </Card>
-          );
-        })}
+      <div
+        role="note"
+        className="mb-6 flex flex-col gap-4 rounded-2xl border border-violet/30 bg-violet/[0.07] p-5 sm:flex-row sm:items-start"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet to-violet-soft shadow-glow">
+          <FlaskConical className="h-5 w-5 text-white" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-50">Preview only — no AI model is connected</p>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-300">
+            Everything on this page is static, hand-written demonstration content. It shows the layout and tone of
+            future AI output. No API is called, nothing is generated, and counts come straight from the demo data.
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-slate-400">
+            <li className="flex items-center gap-1.5">
+              <Ban className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> No model calls
+            </li>
+            <li className="flex items-center gap-1.5">
+              <UserCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> Insights are advisory; executives decide
+            </li>
+            <li className="flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> No keys or credentials in this build
+            </li>
+          </ul>
+        </div>
       </div>
+
+      <TabbedPanels
+        ariaLabel="AI Intelligence previews"
+        idPrefix="ai"
+        tabs={[
+          { id: "insights", label: "Executive insights", count: AI_INSIGHTS.length, content: insights },
+          { id: "summaries", label: "Daily report summaries", count: REPORT_SUMMARIES.length, content: summaries },
+          { id: "bottlenecks", label: "Bottleneck detection", count: BOTTLENECKS.length, content: bottlenecks },
+        ]}
+      />
     </div>
   );
 }

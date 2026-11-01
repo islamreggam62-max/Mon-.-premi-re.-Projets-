@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { ApprovalQueue } from "@/components/approvals/ApprovalQueue";
+import { DemoBadge } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { APPROVALS } from "@/lib/data/approvals";
+import { DEMO_AS_OF } from "@/lib/data/meta";
+import { PROJECTS } from "@/lib/data/projects";
+import { TEAM } from "@/lib/data/team";
 
 export const metadata: Metadata = { title: "Approvals" };
 
@@ -10,9 +14,10 @@ export default function ApprovalsPage() {
     <div>
       <PageHeader
         title="Executive Approvals"
-        subtitle="Sign-off workflow for budget, hiring, procurement, and policy exceptions."
+        subtitle="Decision queue for budget, hiring, and deliverable sign-offs, ordered by urgency."
+        action={<DemoBadge label="Static demo data" />}
       />
-      <ApprovalQueue initial={APPROVALS} />
+      <ApprovalQueue approvals={APPROVALS} people={TEAM} projects={PROJECTS} asOf={DEMO_AS_OF} />
     </div>
   );
 }
