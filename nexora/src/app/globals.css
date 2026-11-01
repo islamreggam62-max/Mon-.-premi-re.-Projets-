@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/*
+ * NEXORA design tokens — premium dark enterprise theme.
+ * Exact hex values from the brand spec. Text and status pairs were checked for
+ * WCAG contrast on the card surface (#0F172A): ink 16:1, muted 7:1, subtle
+ * 5.6:1, status inks ≥ 8:1 on their tinted badges, chart marks ≥ 3:1.
+ */
+@theme {
+  /* Surfaces */
+  --color-canvas: #070b14;
+  --color-surface: #0f172a;
+  --color-raised: #1e293b;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.14);
+
+  /* Ink */
+  --color-ink: #f1f5f9;
+  --color-ink-muted: #94a3b8;
+  --color-ink-subtle: #8291a7;
+  /* De-emphasis mark color for charts (3.75:1 on surface). */
+  --color-mark-muted: #64748b;
+
+  /* Royal violet */
+  --color-brand: #7c3aed;
+  --color-brand-hover: #6d28d9;
+  --color-brand-soft: #8b5cf6;
+  --color-brand-ink: #a78bfa;
+  --color-brand-ink-strong: #c4b5fd;
+
+  /* Status: emerald / amber / rose (+ sky for neutral information) */
+  --color-good: #34d399;
+  --color-good-base: #10b981;
+  --color-good-ink: #6ee7b7;
+  --color-warn: #fbbf24;
+  --color-warn-base: #f59e0b;
+  --color-warn-ink: #fcd34d;
+  --color-bad: #fb7185;
+  --color-bad-base: #f43f5e;
+  --color-bad-ink: #fda4af;
+  --color-info: #38bdf8;
+  --color-info-base: #0ea5e9;
+  --color-info-ink: #7dd3fc;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    background-color: var(--color-canvas);
+    scrollbar-color: #334155 transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgb(124 58 237 / 0.45);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-soft);
+    outline-offset: 2px;
+  }
+
+  /* Lock page scroll while the navigation drawer is open. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  /* Native <dialog> drawer: dim and blur the page behind it. */
+  dialog::backdrop {
+    background-color: rgb(7 11 20 / 0.7);
+    backdrop-filter: blur(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
