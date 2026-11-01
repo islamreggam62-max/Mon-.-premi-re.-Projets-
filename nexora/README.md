@@ -36,6 +36,22 @@ npm run dev        # http://localhost:3000  (demo mode until .env.local is set)
 
 Scripts: `npm run dev` · `npm run build` · `npm run start` · `npm run lint`.
 
+## Deploy — get a live link (no terminal needed)
+
+The app runs in demo mode with **no setup**, so you can host it and open it on
+any device before touching Supabase. Easiest path (free):
+
+1. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
+2. **Add New → Project**, import this repository.
+3. Set **Root Directory** to `nexora` (important — the app lives in a
+   subfolder). Framework preset auto-detects as Next.js.
+4. Click **Deploy**. In ~1 minute you get a public URL.
+
+Opening that URL lands directly on the dashboard (demo mode) — **no login
+required**. To switch it to real data later, add the two
+`NEXT_PUBLIC_SUPABASE_*` values in Vercel → Project → Settings → Environment
+Variables and redeploy.
+
 ## Connecting Supabase (going live)
 
 1. **Create a project** at [supabase.com](https://supabase.com).

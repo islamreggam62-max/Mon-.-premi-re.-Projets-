@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Check, X, Clock, Info } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
@@ -8,8 +8,8 @@ import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { type Approval, type TaskPriority } from "@/lib/demo-data";
-
-type Decision = "pending" | "approved" | "rejected";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { decideApproval, type Decision } from "./actions";
 
 const priorityTone: Record<TaskPriority, BadgeTone> = {
   Low: "neutral",
@@ -34,8 +34,22 @@ export function ApprovalsClient({ approvals }: { approvals: Approval[] }) {
     [decisions]
   );
 
+  const live = isSupabaseConfigured();
+  const [, startTransition] = useTransition();
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   function decide(id: string, decision: Decision) {
+    const previous = decisions[id] ?? "pending";
+    setSaveError(null);
+    // Optimistic update, then persist (a no-op in demo mode).
     setDecisions((prev) => ({ ...prev, [id]: decision }));
+    startTransition(async () => {
+      const res = await decideApproval(id, decision);
+      if (!res.ok) {
+        setDecisions((prev) => ({ ...prev, [id]: previous }));
+        setSaveError(res.error ?? "Could not save the decision.");
+      }
+    });
   }
 
   return (
@@ -48,12 +62,17 @@ export function ApprovalsClient({ approvals }: { approvals: Approval[] }) {
       <div className="flex items-start gap-2.5 rounded-xl border border-info/25 bg-info/5 px-4 py-3 text-sm text-info">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
         <p>
-          Approve / Reject update this screen only — decisions are held in
-          memory and reset on reload. Persisting them to the database is a
-          planned follow-up (a Server Action writing to{" "}
-          <code className="text-xs">approvals.decision</code>).
+          {live
+            ? "Decisions are saved to your workspace; approved or rejected items leave the queue after a refresh."
+            : "Demo mode — Approve / Reject update this screen only and reset on reload. Connect Supabase to persist decisions."}
         </p>
       </div>
+
+      {saveError ? (
+        <p className="rounded-xl border border-danger/25 bg-danger/5 px-4 py-2.5 text-sm text-danger">
+          {saveError}
+        </p>
+      ) : null}
 
       <Card sheen>
         <CardHeader
