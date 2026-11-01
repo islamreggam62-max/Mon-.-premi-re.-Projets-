@@ -24,6 +24,26 @@ Département Contrats** (secteur pétrolier / distribution de carburants).
 | **F — Assistant juridique** | Répond **à partir du document sélectionné** et cite les articles (« Explique l'article 5 », « Quels risques ? », « Quelles protections manquent ? »). |
 | **G — Générateur** | Rapports professionnels en **DOCX, PDF, XLSX** (analyse, risques, comparaison). |
 
+### Mode IA spécialisé (optionnel) — plus fort qu'un chat générique sur les contrats
+En activant la couche LLM (voir `.env.example`), l'outil passe en **analyse
+approfondie par IA**. Le modèle reste le même qu'un chat, mais le **système**
+autour le rend plus fort pour les contrats NAFTAL :
+- **Cerveau juridique spécialisé** (`llm/legal_brain.py`) : persona experte +
+  vos règles de rigueur + checklist contrats pétroliers algériens, appliqués à
+  chaque analyse.
+- **Pipeline multi-étapes avec auto-vérification** (`analysis/ai_pipeline.py`) :
+  règles (filet de sécurité) → analyse IA → **seconde passe d'audit** qui
+  corrige inventions et références non confirmées. Un chat en un seul coup ne
+  fait pas cette auto-critique.
+- **Mémoire RAG** (`analysis/retrieval.py`) : ancre les réponses sur **vos
+  propres contrats et références**, ce qu'une conversation vierge ne peut pas.
+- Outils de **rédaction** : correction d'avenant (suivi des modifications),
+  mémorandum, réécriture de clause.
+
+> ⚠️ Confidentialité : activer la couche LLM transmet le texte au fournisseur
+> externe. À n'utiliser que pour des documents dont l'envoi est autorisé. Par
+> défaut, tout reste local et seule l'analyse déterministe fonctionne.
+
 ### Principes de rigueur
 - **Jamais d'invention.** Une provision absente est marquée *absente*, pas inventée.
 - **Déterministe par défaut.** Le moteur d'analyse repose sur des règles ; il est

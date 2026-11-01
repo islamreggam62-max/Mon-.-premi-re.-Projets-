@@ -150,6 +150,53 @@ class TestReports(unittest.TestCase):
         self.assertTrue(p.exists() and p.stat().st_size > 500)
 
 
+class TestRetrieval(unittest.TestCase):
+    def test_retrieves_relevant_clause(self):
+        from naftal.analysis.retrieval import build_corpus_retriever
+        r = build_corpus_retriever([{"label": "V2", "text": V2}])
+        hits = r.search("responsabilite illimitee du client", k=2)
+        self.assertTrue(hits)
+        self.assertIn("5", hits[0][0].doc_id)  # Article 5
+
+    def test_empty_query(self):
+        from naftal.analysis.retrieval import build_corpus_retriever
+        r = build_corpus_retriever([{"label": "V1", "text": V1}])
+        self.assertEqual(r.search("", k=3), [])
+
+
+class TestAIPipeline(unittest.TestCase):
+    def test_two_stage_with_self_verify(self):
+        from naftal.analysis.ai_pipeline import deep_analysis
+        from naftal.llm.provider import LLMResult
+        calls = []
+
+        def fake(system, prompt, max_tokens):
+            self.assertIn("NAFTAL LEGAL INTELLIGENCE", system)
+            is_crit = "auditeur" in prompt.lower()
+            calls.append("crit" if is_crit else "ana")
+            return LLMResult(ok=True, text=("AUDITÉ" if is_crit else "ANALYSE"), model="fake", provider="test")
+
+        out = deep_analysis(V2, llm_fn=fake)
+        self.assertTrue(out["ok"])
+        self.assertTrue(out["self_verified"])
+        self.assertEqual(calls, ["ana", "crit"])
+        self.assertEqual(out["analysis"], "AUDITÉ")
+        self.assertGreaterEqual(out["rule_score"], 60)
+
+    def test_fallback_when_llm_unavailable(self):
+        from naftal.analysis.ai_pipeline import deep_analysis
+        from naftal.llm.provider import LLMResult
+
+        def dead(system, prompt, max_tokens):
+            return LLMResult(ok=False, error="desactivee")
+
+        out = deep_analysis(V2, llm_fn=dead)
+        self.assertFalse(out["ok"])
+        self.assertTrue(out["fallback"])
+        self.assertFalse(out["used_llm"])
+        self.assertIn("rule_summary", out)
+
+
 class TestAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -191,6 +238,23 @@ class TestAPI(unittest.TestCase):
         self._login()
         r = self.client.get("/api/reports/download/..%2f..%2fnaftal.db")
         self.assertIn(r.status_code, (400, 404))
+
+    def test_ai_status_reports_disabled(self):
+        self._login()
+        r = self.client.get("/api/ai/status")
+        self.assertEqual(r.status_code, 200)
+        self.assertFalse(r.json()["enabled"])  # LLM off in tests -> no external calls
+
+    def test_ai_analyze_fallback_without_llm(self):
+        self._login()
+        docs = self.client.post("/api/documents/load-samples").json()["documents"]
+        did = docs[0]["id"]
+        r = self.client.post("/api/ai/analyze", json={"document_id": did})
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertFalse(body["ok"])          # LLM disabled -> graceful fallback
+        self.assertTrue(body["fallback"])
+        self.assertIn("rule_summary", body)   # deterministic result still provided
 
 
 if __name__ == "__main__":

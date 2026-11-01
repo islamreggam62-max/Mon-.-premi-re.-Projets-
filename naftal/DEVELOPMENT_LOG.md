@@ -37,6 +37,31 @@ Objectif : assurer la continuité entre les sessions de développement.
   détectée en CRITIQUE ; exonération en clause de force majeure **non** signalée
   comme abusive (faux positif corrigé).
 
+## Version 0.2.0 — mode IA spécialisé (plus fort qu'un chat générique)
+
+Objectif demandé : rendre l'outil, dans le domaine des contrats, plus fort
+qu'une conversation Claude générique. Le modèle reste le même ; la force vient
+de la **spécialisation + l'orchestration + l'ancrage**, pas d'un « cerveau »
+plus intelligent (clarifié honnêtement avec l'utilisateur).
+
+Ajouté et testé (29 tests au vert, dont 6 nouveaux) :
+- `llm/legal_brain.py` : système-prompt expert (persona NAFTAL/Algérie, règles
+  de rigueur de l'utilisateur, checklist contrats pétroliers) + gabarits de
+  tâches (analyse, auto-critique, avenant, mémo, réécriture).
+- `analysis/retrieval.py` : RAG local TF-IDF **sans dépendance** (confidentiel),
+  ancrage sur le corpus de l'utilisateur.
+- `analysis/ai_pipeline.py` : pipeline règles → IA → **auto-vérification**
+  (second appel d'audit), avec repli déterministe propre si LLM indisponible.
+- `routers/ai.py` : `/api/ai/analyze|amendment|memo|rewrite|status` (writer).
+- Interface : bouton « Analyse approfondie (IA) » dans l'analyseur + nouvelle
+  section « Rédaction IA » (avenant, mémo, réécriture).
+- LLM factice injectable (`llm_fn`) pour tester sans clé ni réseau.
+
+Confidentialité préservée : rien ne sort tant que `NAFTAL_LLM_ENABLED` est à 0 ;
+le repli déterministe reste pleinement fonctionnel.
+
+Amélioration possible : embeddings LLM pour un RAG sémantique (au lieu de TF-IDF).
+
 ### Pistes d'amélioration (prochaines sessions)
 - OCR optionnel pour les PDF scannés.
 - Recherche sémantique / RAG (embeddings) pour l'assistant et la recherche.

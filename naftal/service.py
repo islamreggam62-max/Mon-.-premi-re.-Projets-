@@ -108,6 +108,35 @@ def analysis_to_dict(db: Session, analysis: Analysis) -> dict:
     }
 
 
+def build_retriever(db: Session, exclude_document_id: int | None = None):
+    """Construit un retriever RAG a partir du corpus (documents + references)."""
+    from sqlalchemy import select
+
+    from .analysis.retrieval import build_corpus_retriever
+    from .models import Contract, Document, LegalReference
+
+    docs = []
+    for d in db.scalars(select(Document)):
+        if exclude_document_id is not None and d.id == exclude_document_id:
+            continue
+        if not (d.extracted_text or "").strip():
+            continue
+        label = d.filename
+        if d.contract_id:
+            c = db.get(Contract, d.contract_id)
+            if c:
+                label = f"{c.title}"
+        if d.version_label:
+            label = f"{label} ({d.version_label})"
+        docs.append({"label": label, "text": d.extracted_text})
+
+    refs = []
+    for r in db.scalars(select(LegalReference)):
+        txt = " — ".join(x for x in (r.number, r.title, r.article, r.note) if x)
+        refs.append({"label": f"{r.number or r.title}", "text": txt})
+    return build_corpus_retriever(docs, refs)
+
+
 def client_ip(request) -> str:
     fwd = request.headers.get("x-forwarded-for")
     if fwd:

@@ -14,6 +14,7 @@ from .config import get_settings
 from .db import create_all, session_scope
 from .legal import seed_references
 from .routers import (
+    ai,
     auth,
     contracts,
     documents,
@@ -56,7 +57,7 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok", "version": __version__}
 
-    for module in (auth, contracts, documents, intelligence, research, reports, meta):
+    for module in (auth, contracts, documents, intelligence, ai, research, reports, meta):
         app.include_router(module.router)
 
     # Interface web (fichiers statiques + SPA).

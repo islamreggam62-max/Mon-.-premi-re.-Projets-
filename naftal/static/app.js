@@ -6,7 +6,8 @@ const I18N = {
     overview: "Vue d'ensemble", contracts: "Contrats", analyzer: "Analyseur IA",
     comparison: "Comparaison", risk: "Risques", research: "Recherche juridique",
     assistant: "Assistant juridique", generator: "Generateur de documents",
-    settings: "Parametres", admin: "Administration",
+    ai: "Redaction IA", settings: "Parametres", admin: "Administration",
+    deepAnalyze: "Analyse approfondie (IA)",
     logout: "Deconnexion", run: "Lancer l'analyse", compare: "Comparer",
     newContract: "Nouveau contrat", upload: "Televerser", search: "Rechercher",
     send: "Envoyer", generate: "Generer", loadSamples: "Charger les contrats de demonstration",
@@ -17,7 +18,8 @@ const I18N = {
     overview: "نظرة عامة", contracts: "العقود", analyzer: "محلّل الذكاء الاصطناعي",
     comparison: "المقارنة", risk: "المخاطر", research: "البحث القانوني",
     assistant: "المساعد القانوني", generator: "مولّد الوثائق",
-    settings: "الإعدادات", admin: "الإدارة",
+    ai: "الصياغة بالذكاء الاصطناعي", settings: "الإعدادات", admin: "الإدارة",
+    deepAnalyze: "تحليل معمّق (ذكاء اصطناعي)",
     logout: "تسجيل الخروج", run: "بدء التحليل", compare: "قارن",
     newContract: "عقد جديد", upload: "رفع", search: "بحث",
     send: "إرسال", generate: "توليد", loadSamples: "تحميل عقود تجريبية",
@@ -81,7 +83,7 @@ async function doLogout() {
 /* ----------------------------- shell ----------------------------- */
 const NAV = [
   ["overview", "▣"], ["contracts", "▤"], ["analyzer", "⚖"], ["comparison", "⇄"],
-  ["risk", "⚠"], ["research", "§"], ["assistant", "💬"], ["generator", "⬇"], ["settings", "⚙"],
+  ["risk", "⚠"], ["research", "§"], ["assistant", "💬"], ["ai", "✦"], ["generator", "⬇"], ["settings", "⚙"],
 ];
 
 function renderNav() {
@@ -308,9 +310,19 @@ async function renderAnalyzer() {
   C().innerHTML = `<div class="card"><h2>${h(t("analyzer"))}</h2>
     <p class="muted">Analyse deterministe : chaque constat renvoie a un article et a un extrait reels ; les provisions absentes sont signalees comme telles.</p>
     <div class="toolbar"><div>${sel}</div>${canWrite() ? `<button class="btn" id="an-run">${h(t("run"))}</button>` : ""}
+    ${canWrite() ? `<button class="btn" id="an-ai" style="background:#6b2fb3">✦ ${h(t("deepAnalyze"))}</button>` : ""}
     <button class="btn ghost" id="an-latest">Derniere analyse</button></div>
     <div id="an-result"></div></div>`;
   if (state.pendingDoc) { $("#an-doc").value = state.pendingDoc; state.pendingDoc = null; }
+  const ai = $("#an-ai");
+  if (ai) ai.onclick = async () => {
+    const id = $("#an-doc").value; if (!id) return;
+    ai.disabled = true;
+    $("#an-result").innerHTML = '<span class="spin" style="border-color:#ccc;border-top-color:var(--green)"></span> Analyse approfondie (IA) en cours — règles → IA → auto-vérification…';
+    try { const r = await api("POST", "/api/ai/analyze", { document_id: parseInt(id) }); $("#an-result").innerHTML = renderAIResult(r); }
+    catch (e) { $("#an-result").innerHTML = errBox(e.message); }
+    ai.disabled = false;
+  };
   const run = $("#an-run");
   if (run) run.onclick = async () => {
     const id = $("#an-doc").value; if (!id) return;
@@ -381,6 +393,70 @@ function bindReportButtons() {
       msg.innerHTML = ` <a href="${r.url}" target="_blank">Telecharger ${h(r.filename)}</a>`;
     } catch (e) { msg.innerHTML = errBox(e.message); }
   });
+}
+
+/* ---- AI result rendering ---- */
+function aiText(s) { return h(s).replace(/\n/g, "<br>"); }
+function renderAIResult(r) {
+  if (!r.ok) {
+    return `<div class="notice"><b>Couche IA indisponible.</b><br>${h(r.note || r.error || "")}<br><br>
+      Pour activer l'analyse approfondie par IA, définissez les variables d'environnement
+      <code>NAFTAL_LLM_ENABLED=1</code>, <code>NAFTAL_LLM_PROVIDER</code>, <code>NAFTAL_LLM_MODEL</code>
+      et <code>NAFTAL_LLM_API_KEY</code> (voir <code>naftal/.env.example</code>).
+      ${r.rule_summary ? `<hr><b>Analyse déterministe (règles) — score ${r.rule_score}/100 :</b><br><div style="font-size:13px">${aiText(r.rule_summary)}</div>` : ""}</div>`;
+  }
+  const badges = [
+    r.self_verified ? '<span class="pill LOW">auto-vérifié ✓</span>' : "",
+    r.grounded_on_corpus ? '<span class="pill INFO">ancré sur le corpus</span>' : "",
+    r.model ? `<span class="pill INFO">${h(r.provider || "")} ${h(r.model)}</span>` : "",
+  ].join(" ");
+  return `<div class="ok-box">Analyse approfondie (IA) — ${badges} · pré-analyse règles : ${r.rule_score}/100</div>
+    <div class="notice" style="font-size:12px">⚠ Aide à la revue, pas un avis définitif. L'IA externe a traité le texte (couche activée). Vérifiez chaque référence « à vérifier ».</div>
+    <div class="finding"><div style="white-space:normal;line-height:1.6">${aiText(r.analysis)}</div></div>`;
+}
+
+/* ---- Rédaction IA (section) ---- */
+async function renderAI() {
+  loading();
+  await refreshDocs();
+  let status = "";
+  try { const s = await api("GET", "/api/ai/status"); status = s.note || ""; } catch (e) {}
+  const sel1 = await docSelector("ai-av-doc", "Avenant à corriger");
+  const sel2 = await docSelector("ai-av-base", "Contrat de base (optionnel)");
+  C().innerHTML = `
+    <div class="notice">${h(status)} Ces outils utilisent le moteur IA spécialisé (persona juridique NAFTAL + droit algérien + auto-vérification). Ils n'envoient du texte à l'extérieur que si la couche LLM est activée.</div>
+    <div class="card"><h2>Correction d'avenant (suivi des modifications)</h2>
+      <div class="grid cols-2"><div>${sel1}</div><div>${sel2}</div></div>
+      <button class="btn" id="ai-av-run" style="margin-top:10px;background:#6b2fb3">✦ Corriger l'avenant</button>
+      <div id="ai-av-out"></div></div>
+    <div class="card"><h2>Mémorandum juridique</h2>
+      <label>Question / sujet</label><textarea id="ai-memo-q" placeholder="Ex. Risques d'une clause de révision unilatérale du prix dans un contrat de fourniture…"></textarea>
+      <button class="btn" id="ai-memo-run" style="margin-top:8px;background:#6b2fb3">✦ Rédiger le mémo</button>
+      <div id="ai-memo-out"></div></div>
+    <div class="card"><h2>Réécriture d'une clause</h2>
+      <label>Clause à réécrire</label><textarea id="ai-rw-clause"></textarea>
+      <label>Objectif (optionnel)</label><input id="ai-rw-obj" placeholder="Ex. plafonner la responsabilité, équilibrer les obligations…">
+      <button class="btn" id="ai-rw-run" style="margin-top:8px;background:#6b2fb3">✦ Réécrire</button>
+      <div id="ai-rw-out"></div></div>`;
+  const simpleOut = (r) => r.ok
+    ? `<div class="ok-box">${h(r.provider || "")} ${h(r.model || "")}</div><div class="finding"><div style="white-space:normal;line-height:1.6">${aiText(r.result)}</div></div>`
+    : `<div class="notice"><b>Couche IA indisponible.</b><br>${h(r.note || r.error || "")}</div>`;
+  $("#ai-av-run").onclick = async () => {
+    const id = $("#ai-av-doc").value; if (!id) { $("#ai-av-out").innerHTML = errBox("Choisissez l'avenant."); return; }
+    $("#ai-av-out").innerHTML = '<span class="spin" style="border-color:#ccc;border-top-color:var(--green)"></span>';
+    const base = $("#ai-av-base").value; const body = { document_id: parseInt(id) }; if (base) body.base_document_id = parseInt(base);
+    try { $("#ai-av-out").innerHTML = simpleOut(await api("POST", "/api/ai/amendment", body)); } catch (e) { $("#ai-av-out").innerHTML = errBox(e.message); }
+  };
+  $("#ai-memo-run").onclick = async () => {
+    const q = $("#ai-memo-q").value.trim(); if (!q) return;
+    $("#ai-memo-out").innerHTML = '<span class="spin" style="border-color:#ccc;border-top-color:var(--green)"></span>';
+    try { $("#ai-memo-out").innerHTML = simpleOut(await api("POST", "/api/ai/memo", { question: q })); } catch (e) { $("#ai-memo-out").innerHTML = errBox(e.message); }
+  };
+  $("#ai-rw-run").onclick = async () => {
+    const cl = $("#ai-rw-clause").value.trim(); if (!cl) return;
+    $("#ai-rw-out").innerHTML = '<span class="spin" style="border-color:#ccc;border-top-color:var(--green)"></span>';
+    try { $("#ai-rw-out").innerHTML = simpleOut(await api("POST", "/api/ai/rewrite", { clause_text: cl, objective: $("#ai-rw-obj").value.trim() })); } catch (e) { $("#ai-rw-out").innerHTML = errBox(e.message); }
+  };
 }
 
 /* ---- Comparison ---- */
@@ -617,7 +693,7 @@ async function renderAdmin() {
 const RENDERERS = {
   overview: renderOverview, contracts: renderContracts, analyzer: renderAnalyzer,
   comparison: renderComparison, risk: renderRisk, research: renderResearch,
-  assistant: renderAssistant, generator: renderGenerator, settings: renderSettings, admin: renderAdmin,
+  assistant: renderAssistant, ai: renderAI, generator: renderGenerator, settings: renderSettings, admin: renderAdmin,
 };
 
 /* ----------------------------- init ----------------------------- */
