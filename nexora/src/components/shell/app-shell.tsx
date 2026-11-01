@@ -6,8 +6,15 @@ import { cn } from "@/lib/utils";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { DemoBanner } from "@/components/ui/demo-banner";
+import type { UserProfile } from "@/lib/auth";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  profile,
+}: {
+  children: ReactNode;
+  profile: UserProfile | null;
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -58,7 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main column */}
       <div className="lg:pl-64">
-        <Topbar onMenu={() => setMobileOpen(true)} />
+        <Topbar onMenu={() => setMobileOpen(true)} profile={profile} />
         <DemoBanner />
         <main className="mx-auto w-full max-w-[1400px] animate-fade-in px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {children}

@@ -6,7 +6,8 @@ import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { team, type MemberStatus } from "@/lib/demo-data";
+import { type MemberStatus } from "@/lib/demo-data";
+import { getTeam } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Team" };
 
@@ -22,11 +23,15 @@ const statusLabel: Record<MemberStatus, string> = {
   offline: "Offline",
 };
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  const team = await getTeam();
   const active = team.filter((m) => m.status === "active").length;
-  const avgUtil = Math.round(
-    team.reduce((acc, m) => acc + m.utilization, 0) / team.length
-  );
+  const avgUtil = team.length
+    ? Math.round(
+        team.reduce((acc, m) => acc + m.utilization, 0) / team.length
+      )
+    : 0;
+  const departments = new Set(team.map((m) => m.department)).size;
 
   return (
     <div className="space-y-6">
@@ -45,7 +50,7 @@ export default function TeamPage() {
         <MiniStat label="Members" value={String(team.length)} />
         <MiniStat label="Active now" value={String(active)} />
         <MiniStat label="Avg. utilization" value={`${avgUtil}%`} />
-        <MiniStat label="Departments" value="7" />
+        <MiniStat label="Departments" value={String(departments)} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

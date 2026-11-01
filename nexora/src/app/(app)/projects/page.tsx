@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AvatarStack } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/utils";
-import { projects, type ProjectStatus } from "@/lib/demo-data";
+import { type ProjectStatus } from "@/lib/demo-data";
+import { getProjects } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Projects" };
 
@@ -18,7 +19,8 @@ const statusTone: Record<ProjectStatus, BadgeTone> = {
   Completed: "info",
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getProjects();
   return (
     <div className="space-y-6">
       <PageHeader
@@ -111,9 +113,9 @@ export default function ProjectsPage() {
   );
 }
 
-function formatDate(iso: string) {
-  return new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  const d = new Date(iso.length <= 10 ? iso + "T00:00:00" : iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }

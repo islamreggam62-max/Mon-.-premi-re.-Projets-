@@ -5,7 +5,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import { dailyReports, type DailyReport } from "@/lib/demo-data";
+import { type DailyReport } from "@/lib/demo-data";
+import { getDailyReports } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Daily Reports" };
 
@@ -16,7 +17,8 @@ const moodTone: Record<DailyReport["mood"], BadgeTone> = {
   Blocked: "danger",
 };
 
-export default function DailyReportsPage() {
+export default async function DailyReportsPage() {
+  const dailyReports = await getDailyReports();
   return (
     <div className="space-y-6">
       <PageHeader

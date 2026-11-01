@@ -9,13 +9,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { revenueSeries } from "@/lib/demo-data";
+import type { RevenuePoint } from "@/lib/demo-data";
 
-export function RevenueChart() {
+export function RevenueChart({ data }: { data: RevenuePoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <AreaChart
-        data={revenueSeries}
+        data={data}
         margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
       >
         <defs>

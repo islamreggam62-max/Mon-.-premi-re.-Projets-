@@ -10,13 +10,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { activitySeries } from "@/lib/demo-data";
+import type { ActivityPoint } from "@/lib/demo-data";
 
-export function ActivityChart() {
+export function ActivityChart({ data }: { data: ActivityPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart
-        data={activitySeries}
+        data={data}
         margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
         barGap={4}
       >

@@ -15,14 +15,27 @@ import { Progress } from "@/components/ui/progress";
 import { RevenueChart } from "@/components/charts/revenue-chart";
 import { ActivityChart } from "@/components/charts/activity-chart";
 import {
-  kpis,
-  recentActivity,
-  projects,
-  approvals,
-  aiInsights,
-} from "@/lib/demo-data";
+  getKpis,
+  getRevenueSeries,
+  getActivitySeries,
+  getRecentActivity,
+  getProjects,
+  getApprovals,
+  getAiInsights,
+} from "@/lib/data";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [kpis, revenueSeries, activitySeries, recentActivity, projects, approvals, aiInsights] =
+    await Promise.all([
+      getKpis(),
+      getRevenueSeries(),
+      getActivitySeries(),
+      getRecentActivity(),
+      getProjects(),
+      getApprovals(),
+      getAiInsights(),
+    ]);
+
   const topProjects = projects
     .filter((p) => p.status !== "Completed")
     .slice(0, 4);
@@ -32,7 +45,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <PageHeader
         title="Executive Dashboard"
-        description="A single pane of glass across revenue, delivery, people and decisions. Phase 1 preview populated with sample data."
+        description="A single pane of glass across revenue, delivery, people and decisions."
         actions={
           <>
             <Button variant="outline" size="md">
@@ -73,7 +86,7 @@ export default function DashboardPage() {
             }
           />
           <CardBody>
-            <RevenueChart />
+            <RevenueChart data={revenueSeries} />
           </CardBody>
         </Card>
 
@@ -89,23 +102,35 @@ export default function DashboardPage() {
             action={<Badge tone="brand">Preview</Badge>}
           />
           <CardBody className="flex flex-1 flex-col">
-            <Badge tone="danger" dot className="w-fit">
-              {signal.category}
-            </Badge>
-            <p className="mt-3 text-sm font-semibold leading-snug text-foreground">
-              {signal.title}
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              {signal.detail}
-            </p>
+            {signal ? (
+              <>
+                <Badge tone="danger" dot className="w-fit">
+                  {signal.category}
+                </Badge>
+                <p className="mt-3 text-sm font-semibold leading-snug text-foreground">
+                  {signal.title}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {signal.detail}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted">
+                No insights for this workspace yet.
+              </p>
+            )}
             <div className="mt-auto pt-4">
-              <div className="flex items-center justify-between text-xs text-subtle">
-                <span>Model confidence (illustrative)</span>
-                <span className="font-medium text-muted">
-                  {signal.confidence}%
-                </span>
-              </div>
-              <Progress value={signal.confidence} className="mt-2" />
+              {signal ? (
+                <>
+                  <div className="flex items-center justify-between text-xs text-subtle">
+                    <span>Model confidence (illustrative)</span>
+                    <span className="font-medium text-muted">
+                      {signal.confidence}%
+                    </span>
+                  </div>
+                  <Progress value={signal.confidence} className="mt-2" />
+                </>
+              ) : null}
               <Link
                 href="/ai-intelligence"
                 className="nx-focus mt-4 inline-flex items-center gap-1.5 rounded-lg text-xs font-medium text-violet-300 hover:text-violet-200"
@@ -132,7 +157,7 @@ export default function DashboardPage() {
             }
           />
           <CardBody>
-            <ActivityChart />
+            <ActivityChart data={activitySeries} />
           </CardBody>
         </Card>
 

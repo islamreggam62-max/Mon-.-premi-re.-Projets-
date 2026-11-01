@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { navSections } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -14,6 +15,7 @@ function isActive(pathname: string, href: string) {
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const configured = isSupabaseConfigured();
 
   return (
     <div className="flex h-full flex-col bg-surface/95 backdrop-blur-xl">
@@ -105,12 +107,22 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      {/* Footer / plan card */}
+      {/* Footer / status card */}
       <div className="border-t border-border/70 p-3">
         <div className="nx-panel nx-sheen rounded-xl p-3">
-          <p className="text-xs font-semibold text-foreground">Phase 1 build</p>
+          <p className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                configured ? "bg-success" : "bg-warning"
+              )}
+            />
+            {configured ? "Live workspace" : "Demo mode"}
+          </p>
           <p className="mt-1 text-[11px] leading-snug text-subtle">
-            UI foundation only. Data, auth and AI arrive in later phases.
+            {configured
+              ? "Connected to Supabase — showing your real data."
+              : "Connect Supabase to replace demo data with your workspace."}
           </p>
         </div>
       </div>

@@ -4,17 +4,19 @@ import { useState } from "react";
 import { Database, Plug, Bell, Palette, UserCog, Info } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export default function SettingsPage() {
+  const supabaseConnected = isSupabaseConfigured();
   return (
     <div className="space-y-6">
       <PageHeader
         title="Settings"
-        description="Workspace and account configuration. Saving is disabled in Phase 1 — these controls are for layout and interaction only."
+        description="Workspace and account configuration. Saving isn't wired up yet — these controls are for layout and interaction."
         showDemoTag
       />
 
@@ -102,13 +104,18 @@ export default function SettingsPage() {
           <IntegrationRow
             icon={<Database className="h-4 w-4" />}
             name="Supabase"
-            desc="Database, auth & storage — planned for Phase 2"
-            status="Not connected"
+            desc={
+              supabaseConnected
+                ? "Database, auth & storage — connected"
+                : "Database, auth & storage — add your keys to .env.local"
+            }
+            status={supabaseConnected ? "Connected" : "Not connected"}
+            tone={supabaseConnected ? "success" : "neutral"}
           />
           <IntegrationRow
             icon={<Plug className="h-4 w-4" />}
             name="Billing (Stripe)"
-            desc="Deferred — not configured in Phase 1"
+            desc="Deferred — not configured yet"
             status="Not connected"
           />
         </CardBody>
@@ -137,11 +144,13 @@ function IntegrationRow({
   name,
   desc,
   status,
+  tone = "neutral",
 }: {
   icon: React.ReactNode;
   name: string;
   desc: string;
   status: string;
+  tone?: BadgeTone;
 }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-surface-2/40 p-4">
@@ -152,7 +161,7 @@ function IntegrationRow({
         <p className="text-sm font-medium text-foreground">{name}</p>
         <p className="truncate text-xs text-subtle">{desc}</p>
       </div>
-      <Badge tone="neutral" dot>
+      <Badge tone={tone} dot>
         {status}
       </Badge>
     </div>

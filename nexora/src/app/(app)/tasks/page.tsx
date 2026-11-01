@@ -5,11 +5,11 @@ import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import {
-  tasks,
   taskStates,
   type TaskPriority,
   type TaskState,
 } from "@/lib/demo-data";
+import { getTasks } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Tasks" };
 
@@ -27,7 +27,8 @@ const columnAccent: Record<TaskState, string> = {
   Done: "bg-success",
 };
 
-export default function TasksPage() {
+export default async function TasksPage() {
+  const tasks = await getTasks();
   return (
     <div className="space-y-6">
       <PageHeader

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { AppShell } from "@/components/shell/app-shell";
 
 export const metadata: Metadata = {
   title: {
@@ -8,7 +7,7 @@ export const metadata: Metadata = {
     template: "%s · NEXORA",
   },
   description:
-    "NEXORA is an AI-powered Executive Business Operating System. Phase 1 preview with demo data only.",
+    "NEXORA is an AI-powered Executive Business Operating System. Connect Supabase to replace demo data with your workspace.",
   applicationName: "NEXORA",
 };
 
@@ -25,9 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
-        <AppShell>{children}</AppShell>
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

@@ -1,107 +1,113 @@
 # NEXORA — Executive Business Operating System
 
-**Phase 1 — UI foundation.** A premium, responsive enterprise-SaaS interface
-built with Next.js (App Router), TypeScript and Tailwind CSS. This phase is the
-front-end shell only: every figure, person and activity you see is clearly
-labeled **demo data**. There is **no backend, no database, no AI inference and
-no billing** wired up yet — those arrive in later phases.
+A premium, responsive enterprise-SaaS application built with Next.js (App
+Router), TypeScript and Tailwind CSS.
+
+NEXORA runs in two modes, decided automatically at runtime:
+
+- **Demo mode** (default) — no database connected. Every figure, person and
+  activity is clearly-labeled fictional sample data from `src/lib/demo-data.ts`.
+  All routes are open; a persistent "Demo mode" banner is shown.
+- **Live mode** — once Supabase env vars are present, the same screens read
+  **real workspace data** through Row-Level Security, authentication is required
+  (login/sign-up), and the demo banner disappears.
+
+The switch is a single check (`isSupabaseConfigured()`); no code changes are
+needed to go from demo to live — only environment variables.
 
 ## Stack
 
 | Concern        | Choice                                   |
 | -------------- | ---------------------------------------- |
-| Framework      | Next.js 14.2 (App Router, static export) |
+| Framework      | Next.js 14.2 (App Router)                |
 | Language       | TypeScript (strict)                      |
 | Styling        | Tailwind CSS v3 + CSS design tokens      |
-| Icons          | lucide-react                             |
-| Charts         | recharts                                 |
-| Visual identity| Dark navy canvas · violet brand accent   |
+| Backend        | Supabase (Postgres + Auth + RLS)         |
+| Icons / charts | lucide-react · recharts                  |
+| Identity       | Dark navy canvas · violet brand accent   |
 
 ## Getting started
 
 ```bash
 cd nexora
 npm install
-npm run dev     # http://localhost:3000
+npm run dev        # http://localhost:3000  (demo mode until .env.local is set)
 ```
 
-Other scripts:
+Scripts: `npm run dev` · `npm run build` · `npm run start` · `npm run lint`.
 
-```bash
-npm run build   # production build (type-checks + lints)
-npm run start   # serve the production build
-npm run lint    # eslint (next/core-web-vitals)
-```
+## Connecting Supabase (going live)
 
-## What's in Phase 1
+1. **Create a project** at [supabase.com](https://supabase.com).
+2. **Add env vars** — copy `.env.example` to `.env.local` and fill in, from
+   *Project Settings → API*:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   ```
+   `.env.local` is git-ignored. The anon key is safe in the browser — it is
+   protected by Row-Level Security. Never commit the service-role key.
+3. **Apply the schema** — run `supabase/migrations/0001_init.sql` via the
+   Supabase CLI (`supabase db push`) or paste it into the SQL editor. It creates
+   the tables, Row-Level Security policies, and a trigger that provisions a
+   workspace + profile for each new user.
+4. **(Optional) seed sample data** — run `supabase/seed.sql`, then point your
+   user at the demo workspace (instructions are in that file).
+5. **Enable auth** — in *Authentication → Providers*, enable Email (and set a
+   password policy / confirm-email preference). Restart `npm run dev`.
 
-A responsive app shell (fixed sidebar on desktop, slide-over drawer on mobile,
-sticky top bar) wrapping eight functional, navigable pages:
+On restart, the app requires sign-in and reads live data. Any query that fails
+(e.g. tables not migrated yet) falls back to demo data so the UI never crashes.
 
-- **Dashboard** — KPI tiles, revenue-vs-target chart, AI signal, weekly
-  activity, recent activity feed, project health and approvals preview.
-- **AI Intelligence** — insight cards behind a prominent "no model connected"
-  disclosure; the prompt box is intentionally disabled.
-- **Team** — member directory with status, department and utilization.
-- **Projects** — portfolio cards with progress, budget burn and team.
-- **Tasks** — Kanban board grouped by stage (Backlog → Done).
-- **Daily Reports** — end-of-day updates with completed items and blockers.
-- **Approvals** — decision queue with ephemeral, in-memory approve/reject
-  (resets on reload — nothing is persisted).
-- **Settings** — profile, appearance, notification toggles (local only) and an
-  integrations panel showing Supabase/Billing as **Not connected**.
+## What's included
 
-### Deliberately NOT included (per Phase 1 scope)
+**App shell** — fixed desktop sidebar, mobile slide-over drawer, sticky top bar,
+account menu with sign-out (live mode), demo/live status indicator.
 
-- No backend API or database calls.
-- No real or simulated AI functionality.
-- No Stripe / billing configuration.
-- No API keys or secrets anywhere in the codebase.
+**Eight pages** — Dashboard, AI Intelligence, Team, Projects, Tasks, Daily
+Reports, Approvals, Settings. All read through the data layer.
+
+**Auth** — `/login` (password + magic link), `/auth/callback`, `/auth/signout`,
+and middleware that refreshes sessions and gates app routes (live mode only).
+
+**Database** — `supabase/migrations/0001_init.sql`: workspace-scoped tables with
+uniform RLS policies, a `handle_new_user` trigger, and Realtime publication for
+the activity feed and approvals.
+
+### Not yet implemented
+
+- Persisting approval decisions, task edits and settings (reads are live; writes
+  are the next step — Server Actions over the same tables).
+- Any real/simulated **AI** — the AI Intelligence page is placeholder content
+  behind a "no model connected" disclosure.
+- **Stripe / billing.**
 
 ## Project structure
 
 ```
 nexora/
 ├── src/
-│   ├── app/                 # routes (one folder per page) + layout + globals.css
-│   ├── components/
-│   │   ├── shell/           # app-shell, sidebar, topbar
-│   │   ├── ui/              # card, badge, button, avatar, progress, stat-card…
-│   │   └── charts/          # recharts wrappers (revenue, activity)
-│   └── lib/
-│       ├── nav.ts           # single source of truth for navigation
-│       ├── demo-data.ts     # ALL sample data (replaced by the data layer later)
-│       └── utils.ts         # cn(), formatters
-├── tailwind.config.ts       # color tokens, shadows, gradients
-└── ...
+│   ├── app/
+│   │   ├── (app)/           # shelled, authenticated pages (dashboard, team, …)
+│   │   ├── login/           # auth entry (outside the shell)
+│   │   ├── auth/            # callback + signout route handlers
+│   │   └── layout.tsx       # root (html/body); (app)/layout.tsx adds the shell
+│   ├── components/          # shell, ui primitives, charts
+│   ├── lib/
+│   │   ├── data.ts          # data-access layer (Supabase ↔ demo fallback)
+│   │   ├── auth.ts          # current-profile helper
+│   │   ├── demo-data.ts     # labeled sample data + shared UI types
+│   │   └── supabase/        # client, server, middleware, config, types
+│   └── middleware.ts        # session refresh + route gating
+└── supabase/
+    ├── migrations/0001_init.sql
+    └── seed.sql
 ```
 
 ## Design system
 
-Semantic color tokens are defined as RGB triplets on `:root` in
-`src/app/globals.css` (so Tailwind's `/<alpha>` opacity works) and mapped to
-Tailwind utilities in `tailwind.config.ts`. Key tokens: `bg`, `surface`,
-`surface-2`, `card`, `border`, `foreground`, `muted`, `subtle`, `brand`
-(violet), plus `success` / `warning` / `danger` / `info`.
-
-## Next phase — Supabase integration (not yet implemented)
-
-Planned, in order:
-
-1. **Project & env** — create a Supabase project; put `NEXT_PUBLIC_SUPABASE_URL`
-   and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local` (git-ignored). Keep the
-   service-role key server-side only — never in client code.
-2. **Client** — add `@supabase/supabase-js` (+ `@supabase/ssr` for App Router
-   session handling); create a typed server client and a browser client.
-3. **Schema** — tables for `profiles`, `team_members`, `projects`, `tasks`,
-   `daily_reports`, `approvals`; enable Row-Level Security with per-workspace
-   policies from day one.
-4. **Auth** — Supabase Auth (email/OAuth); gate the app shell behind a session;
-   wire the top-bar account menu to the real user.
-5. **Data layer** — replace the exports in `src/lib/demo-data.ts` with queries
-   (Server Components / server actions). The UI already reads from that single
-   module, so the swap is localized.
-6. **Realtime** — subscribe the activity feed and approvals queue to Supabase
-   Realtime channels.
-
-Everything in `demo-data.ts` is the contract the real data layer will fulfill.
+Semantic color tokens are RGB triplets on `:root` in `src/app/globals.css`
+(so Tailwind `/<alpha>` opacity works) and mapped to utilities in
+`tailwind.config.ts`: `bg`, `surface`, `surface-2`, `card`, `border`,
+`foreground`, `muted`, `subtle`, `brand` (violet), and
+`success`/`warning`/`danger`/`info`.

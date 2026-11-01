@@ -11,7 +11,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { aiInsights, type AiInsight } from "@/lib/demo-data";
+import { type AiInsight } from "@/lib/demo-data";
+import { getAiInsights } from "@/lib/data";
 import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = { title: "AI Intelligence" };
@@ -26,7 +27,8 @@ const categoryMeta: Record<
   Forecast: { tone: "brand", icon: TrendingUp },
 };
 
-export default function AiIntelligencePage() {
+export default async function AiIntelligencePage() {
+  const aiInsights = await getAiInsights();
   return (
     <div className="space-y-6">
       <PageHeader
