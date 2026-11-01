@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NAFTAL LEGAL INTELLIGENCE</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <!-- Vue connexion -->
+  <div id="login" class="login-wrap">
+    <form class="login-card" id="login-form">
+      <h1>NAFTAL LEGAL INTELLIGENCE</h1>
+      <div class="sub">Direction Juridique — Departement Contrats</div>
+      <label for="login-email">Adresse e-mail</label>
+      <input id="login-email" type="email" autocomplete="username" required />
+      <label for="login-password">Mot de passe</label>
+      <input id="login-password" type="password" autocomplete="current-password" required />
+      <div id="login-error" class="error-box hidden"></div>
+      <button class="btn" type="submit" style="width:100%;margin-top:16px;">Se connecter</button>
+    </form>
+  </div>
+
+  <!-- Application -->
+  <div id="app" class="shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">NAFTAL</div>
+        <div class="tag">LEGAL INTELLIGENCE</div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <div class="title" id="page-title">Vue d'ensemble</div>
+        <div class="spacer"></div>
+        <span class="badge-llm off" id="llm-badge">LLM : local</span>
+        <select id="lang" style="width:auto;padding:6px 10px;">
+          <option value="fr">Francais</option>
+          <option value="ar">العربية</option>
+        </select>
+        <span class="muted" id="user-label"></span>
+        <button class="btn ghost sm" id="logout-btn">Deconnexion</button>
+      </div>
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

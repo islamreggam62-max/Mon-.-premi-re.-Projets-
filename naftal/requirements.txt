@@ -1,0 +1,23 @@
+# NAFTAL LEGAL INTELLIGENCE — dependances Python
+# Installation :  pip install -r naftal/requirements.txt
+
+fastapi>=0.110
+uvicorn>=0.27
+SQLAlchemy>=2.0
+python-multipart>=0.0.9
+itsdangerous>=2.1
+
+# Extraction de documents
+pdfplumber>=0.11
+pypdf>=4.0
+python-docx>=1.1
+
+# Generation de rapports
+reportlab>=4.0
+openpyxl>=3.1
+
+# Couche LLM optionnelle (desactivee par defaut ; utilisee seulement si activee)
+requests>=2.31
+
+# pydantic est tire par fastapi, epingle ici pour la v2
+pydantic>=2.5

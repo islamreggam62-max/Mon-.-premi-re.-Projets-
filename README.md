@@ -1,3 +1,13 @@
+# Ce dépôt contient deux projets
+
+1. **NAFTAL LEGAL INTELLIGENCE** — plateforme d'analyse et de gestion des
+   contrats pour la Direction Juridique. Voir **[`naftal/README.md`](naftal/README.md)**
+   (documentation complète en français) et **[`naftal/GUIDE_INSTALLATION_AR.md`](naftal/GUIDE_INSTALLATION_AR.md)**
+   (دليل التثبيت بالعربية).
+2. **cyber-orchestrator** — منسّق استطلاع تعليمي (ci-dessous).
+
+---
+
 # cyber-orchestrator — منسّق استطلاع
 
 <div dir="rtl">

@@ -2,6 +2,11 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+# Donnees d'execution NAFTAL (base SQLite, televersements, exports, cle de session)
+naftal_data/
+.env
+*.sqlite
+*.db
 # Never commit a real authorization file or reports containing findings.
 authorization.yaml
 reports/
