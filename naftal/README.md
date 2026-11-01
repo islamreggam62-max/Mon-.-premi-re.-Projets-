@@ -45,6 +45,24 @@ autour le rend plus fort pour les contrats NAFTAL :
 > externe. À n'utiliser que pour des documents dont l'envoi est autorisé. Par
 > défaut, tout reste local et seule l'analyse déterministe fonctionne.
 
+#### Activer l'IA (sans éditer de fichier)
+```bash
+python -m naftal --setup-llm    # consentement explicite, modèle, clé saisie en MODE MASQUÉ
+python -m naftal --check-llm    # teste la connexion avec un message anodin (aucun contrat envoyé)
+```
+- La clé est écrite dans `.env` (droits 0600, exclu de git), **jamais affichée** ;
+  les messages d'erreur la masquent. Une vraie variable d'environnement l'emporte
+  sur `.env`. Au démarrage, un bandeau indique si des textes peuvent sortir.
+- `--check-llm` traduit les erreurs en conseils (clé refusée, modèle introuvable,
+  crédit insuffisant — l'API est facturée **à part** de l'abonnement claude.ai, etc.).
+- Vérifié : l'assistant dans un vrai terminal (la saisie de la clé n'apparaît pas à
+  l'écran) et l'appel réseau réel avec une clé **volontairement fausse** (réponse
+  `401`, correctement traduite). **Non vérifié : un appel réussi avec une vraie clé**
+  (aucune disponible lors du développement) — `--check-llm` le fera sur votre poste.
+- Modèle par défaut : `claude-opus-5-5` (les noms exacts sont à confirmer dans votre
+  console Anthropic). L'analyse approfondie fait **deux appels** (analyse + audit) :
+  attention au coût sur de longs contrats.
+
 ### Recherche dans les clauses (RAG) — `Contrats` → « Recherche plein texte »
 Cherche **dans le texte** de tous les contrats et références (pas seulement dans
 les métadonnées). Moteur local, déterministe, sans dépendance :

@@ -15,6 +15,9 @@ from dataclasses import dataclass
 from ..config import get_settings
 
 
+DEFAULT_ANTHROPIC_MODEL = "claude-opus-5-5"
+
+
 @dataclass
 class LLMResult:
     ok: bool
@@ -45,7 +48,9 @@ def llm_status() -> dict:
 def _call_anthropic(s, system: str, prompt: str, max_tokens: int) -> LLMResult:
     import requests
 
-    model = s.llm_model or "claude-3-5-sonnet-latest"
+    # Defaut = modele Claude recent (l'ancien « claude-3-5-sonnet-latest » n'est plus
+    # un bon choix par defaut). A confirmer dans votre console Anthropic.
+    model = s.llm_model or DEFAULT_ANTHROPIC_MODEL
     url = (s.llm_base_url or "https://api.anthropic.com") + "/v1/messages"
     headers = {
         "x-api-key": s.llm_api_key,

@@ -9,6 +9,8 @@ import os
 import secrets
 from pathlib import Path
 
+from .envfile import default_env_path, load_env_file
+
 
 def _env_bool(name: str, default: bool = False) -> bool:
     val = os.getenv(name)
@@ -21,6 +23,11 @@ class Settings:
     """Parametres de l'application, charges depuis l'environnement."""
 
     def __init__(self) -> None:
+        # --- Fichier .env (optionnel) : charge AVANT toute lecture de variable ---
+        # L'environnement reel prime ; seuls les NOMS des cles chargees sont gardes.
+        self.env_file = default_env_path()
+        self.env_loaded = load_env_file(self.env_file)
+
         # --- Repertoires de donnees (tout reste local) ---
         base = os.getenv("NAFTAL_DATA_DIR", str(Path.cwd() / "naftal_data"))
         self.data_dir = Path(base)
@@ -95,3 +102,9 @@ def get_settings() -> Settings:
     if _settings is None:
         _settings = Settings()
     return _settings
+
+
+def reset_settings() -> None:
+    """Oublie les reglages mis en cache (apres modification de l'environnement)."""
+    global _settings
+    _settings = None

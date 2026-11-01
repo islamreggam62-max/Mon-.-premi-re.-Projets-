@@ -14,6 +14,9 @@ os.environ["NAFTAL_DATA_DIR"] = _TMP
 os.environ["NAFTAL_ADMIN_EMAIL"] = "admin@test.local"
 os.environ["NAFTAL_ADMIN_PASSWORD"] = "AdminTest123"
 os.environ["NAFTAL_LLM_ENABLED"] = "0"
+os.environ["NAFTAL_EMBED_ENABLED"] = "0"
+# Un vrai fichier .env du developpeur ne doit jamais influencer les tests.
+os.environ["NAFTAL_ENV_FILE"] = str(Path(_TMP) / "absent.env")
 
 from naftal.analysis import analyze_text, compare_texts, risk_report  # noqa: E402
 from naftal.extraction import extract_text, segment_clauses  # noqa: E402
@@ -312,6 +315,161 @@ class TestEmbeddings(unittest.TestCase):
         self.assertIn("503", r.dense_error)
         self.assertNotIn("sk-secret-key", r.dense_error)   # la cle ne fuit jamais
         self.assertTrue(r.search("force majeure", 3))      # la recherche continue
+
+
+class TestEnvFile(unittest.TestCase):
+    def test_windows_encodings_and_syntax(self):
+        from naftal.envfile import _decode, parse_env_text
+        for raw in (b"\xef\xbb\xbfNAFTAL_LLM_MODEL=m1\r\n",            # Bloc-notes (BOM)
+                    "NAFTAL_LLM_MODEL=m1\r\n".encode("utf-16"),          # PowerShell 5 « > »
+                    b"export NAFTAL_LLM_MODEL = m1   # commentaire\n",
+                    b'NAFTAL_LLM_MODEL="m1"  # commentaire\n'):
+            self.assertEqual(parse_env_text(_decode(raw)), {"NAFTAL_LLM_MODEL": "m1"}, raw)
+
+    def test_example_file_lines_survive_uncommenting(self):
+        # Un non-programmeur retire « # » devant la ligne : le commentaire de fin ne doit
+        # PAS devenir une partie de la valeur (provider != « anthropic » = mauvais chemin).
+        from naftal.envfile import parse_env_text
+        got = parse_env_text('NAFTAL_LLM_PROVIDER=anthropic          # "anthropic" ou compatible OpenAI')
+        self.assertEqual(got["NAFTAL_LLM_PROVIDER"], "anthropic")
+
+    def test_real_environment_wins_and_foreign_keys_ignored(self):
+        from naftal.envfile import load_env_file
+        f = Path(_TMP) / "t1.env"
+        f.write_text("NAFTAL_LLM_MODEL=fichier\nNAFTAL_LLM_PROVIDER=anthropic\nPATH=/evil\n"
+                     "NAFTAL_EMBED_BASE_URL=\n")
+        env = {"NAFTAL_LLM_MODEL": "reel"}
+        loaded = load_env_file(f, env)
+        self.assertEqual(loaded, ["NAFTAL_LLM_PROVIDER"])     # noms seulement, pas les valeurs
+        self.assertEqual(env["NAFTAL_LLM_MODEL"], "reel")      # l'environnement reel prime
+        self.assertNotIn("PATH", env)                          # cle etrangere ignoree
+        self.assertNotIn("NAFTAL_EMBED_BASE_URL", env)         # valeur vide ignoree
+
+    def test_missing_file_is_not_an_error(self):
+        from naftal.envfile import load_env_file
+        self.assertEqual(load_env_file(Path(_TMP) / "nexiste-pas.env", {}), [])
+
+    def test_write_preserves_other_lines_and_is_private(self):
+        from naftal.envfile import parse_env_text, write_env_values
+        f = Path(_TMP) / "t2.env"
+        f.write_text("# mon commentaire\nNAFTAL_ADMIN_EMAIL=moi@x.dz\nNAFTAL_LLM_MODEL=ancien\n")
+        write_env_values(f, {"NAFTAL_LLM_MODEL": "nouveau", "NAFTAL_LLM_ENABLED": "1"})
+        text = f.read_text()
+        self.assertIn("# mon commentaire", text)
+        self.assertEqual(parse_env_text(text), {
+            "NAFTAL_ADMIN_EMAIL": "moi@x.dz", "NAFTAL_LLM_MODEL": "nouveau", "NAFTAL_LLM_ENABLED": "1"})
+        self.assertEqual(text.count("NAFTAL_LLM_MODEL="), 1)    # remplace, ne duplique pas
+        if os.name == "posix":
+            self.assertEqual(f.stat().st_mode & 0o777, 0o600)
+
+    def test_write_rejects_newline_injection(self):
+        from naftal.envfile import write_env_values
+        with self.assertRaises(ValueError):
+            write_env_values(Path(_TMP) / "t3.env", {"NAFTAL_LLM_API_KEY": "abc\nNAFTAL_ADMIN_PASSWORD=pwned"})
+
+    def test_default_model_is_not_the_stale_one(self):
+        from naftal.llm.provider import DEFAULT_ANTHROPIC_MODEL
+        self.assertNotIn("3-5", DEFAULT_ANTHROPIC_MODEL)
+
+
+class TestSetupCli(unittest.TestCase):
+    KEY = "sk-ant-SECRETKEY123456"
+
+    def _settings(self, **kw):
+        import types
+        base = dict(llm_enabled=True, llm_api_key=self.KEY, llm_provider="anthropic",
+                    llm_model="m", env_file=Path(_TMP) / "absent.env")
+        base.update(kw)
+        return types.SimpleNamespace(**base)
+
+    def test_check_disabled_explains_how_to_fix(self):
+        from naftal.setup_cli import check_llm
+        ok, msg = check_llm(settings=self._settings(llm_enabled=False))
+        self.assertFalse(ok)
+        self.assertIn("--setup-llm", msg)
+        self.assertIn("INTROUVABLE", msg)
+
+    def test_check_success(self):
+        from naftal.llm.provider import LLMResult
+        from naftal.setup_cli import check_llm
+        ok, msg = check_llm(run=lambda *a: LLMResult(ok=True, text="OK", provider="anthropic",
+                                                     model="m", tokens_in=9, tokens_out=1),
+                            settings=self._settings())
+        self.assertTrue(ok)
+        self.assertIn("Connexion reussie", msg)
+
+    def test_check_failures_give_actionable_hints_and_never_leak_the_key(self):
+        from naftal.llm.provider import LLMResult
+        from naftal.setup_cli import check_llm
+        cases = {
+            401: "refusee", 403: "Acces refuse", 404: "Modele introuvable", 429: "limite",
+            503: "indisponible",
+        }
+        for status, expected in cases.items():
+            # le serveur « renvoie » la cle dans son message : elle doit etre masquee
+            err = f"HTTP {status}: erreur avec {self.KEY} dedans"
+            ok, msg = check_llm(run=lambda *a, e=err: LLMResult(ok=False, error=e),
+                                settings=self._settings())
+            self.assertFalse(ok)
+            self.assertIn(expected, msg, status)
+            self.assertNotIn(self.KEY, msg)
+        ok, msg = check_llm(run=lambda *a: LLMResult(
+            ok=False, error='HTTP 400: {"message":"Your credit balance is too low"}'),
+            settings=self._settings())
+        self.assertIn("Credit insuffisant", msg)
+
+    def _run_wizard(self, answers, key, check=(True, "ok")):
+        import io
+        from contextlib import redirect_stdout
+        from naftal.setup_cli import setup_llm
+        path = Path(_TMP) / f"wiz-{abs(hash(tuple(answers))) % 10**6}.env"
+        if path.exists():
+            path.unlink()
+        buf, env, it = io.StringIO(), {}, iter(answers)
+        with redirect_stdout(buf):
+            ok = setup_llm(path, input_fn=lambda _p: next(it), getpass_fn=lambda _p: key,
+                           out=print, check_fn=lambda: check, environ=env)
+        return ok, buf.getvalue(), path, env
+
+    def test_wizard_writes_config_and_never_prints_the_key(self):
+        from naftal.envfile import parse_env_text
+        ok, out, path, env = self._run_wizard(["oui", ""], self.KEY)
+        self.assertTrue(ok)
+        cfg = parse_env_text(path.read_text())
+        self.assertEqual(cfg["NAFTAL_LLM_ENABLED"], "1")
+        self.assertEqual(cfg["NAFTAL_LLM_PROVIDER"], "anthropic")
+        self.assertEqual(cfg["NAFTAL_LLM_API_KEY"], self.KEY)
+        self.assertEqual(cfg["NAFTAL_LLM_MODEL"], "claude-opus-5-5")        # Entree = defaut
+        self.assertEqual(env["NAFTAL_LLM_API_KEY"], self.KEY)               # actif sans redemarrer
+        self.assertNotIn(self.KEY, out)                                     # jamais affichee
+        self.assertIn("ne le partagez pas", out)
+
+    def test_wizard_model_by_number_or_name(self):
+        from naftal.envfile import parse_env_text
+        _, _, p1, _ = self._run_wizard(["oui", "2"], self.KEY)
+        self.assertEqual(parse_env_text(p1.read_text())["NAFTAL_LLM_MODEL"], "claude-sonnet-5-5")
+        _, _, p2, _ = self._run_wizard(["oui", "un-autre-modele"], self.KEY)
+        self.assertEqual(parse_env_text(p2.read_text())["NAFTAL_LLM_MODEL"], "un-autre-modele")
+
+    def test_wizard_requires_explicit_consent(self):
+        for answer in ("", "non", "peut-etre"):
+            ok, out, path, env = self._run_wizard([answer], self.KEY)
+            self.assertFalse(ok)
+            self.assertFalse(path.exists())            # rien n'est ecrit sans consentement
+            self.assertEqual(env, {})
+
+    def test_wizard_rejects_blank_or_spaced_key(self):
+        for bad in ("", "   ", "sk-ant-avec un espace"):
+            ok, _out, path, env = self._run_wizard(["oui", ""], bad)
+            self.assertFalse(ok)
+            self.assertFalse(path.exists())
+            self.assertEqual(env, {})
+
+    def test_wizard_keeps_config_when_check_fails(self):
+        ok, out, path, _env = self._run_wizard(["oui", ""], self.KEY, check=(False, "Echec: 401"))
+        self.assertFalse(ok)
+        self.assertTrue(path.exists())                 # on garde la config pour corriger
+        self.assertIn("--check-llm", out)
 
 
 class TestAIPipeline(unittest.TestCase):

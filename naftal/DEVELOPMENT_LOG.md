@@ -94,6 +94,27 @@ Défauts trouvés PAR LES TESTS / L'EXAMEN des résultats (et corrigés) :
 Pistes : tester les embeddings sur un vrai corpus NAFTAL ; enrichir le lexique avec
 le vocabulaire métier ; index persistant au-delà de quelques centaines de contrats.
 
+## Version 0.3.1 — activation simple et sûre de l'IA
+
+Constat avant d'aider l'utilisateur à activer l'IA : (1) le modèle par défaut
+`claude-3-5-sonnet-latest` était obsolète ; (2) le `.env` n'était pas lu (réglages à
+ressaisir à chaque terminal) ; (3) `.env.example` contenait des commentaires de fin de
+ligne qui, une fois la ligne décommentée, devenaient une partie de la valeur
+(`provider` ≠ `anthropic` → mauvais chemin d'appel).
+
+- `envfile.py` : lecture/écriture `.env` sans dépendance ; BOM UTF-8, UTF-16
+  (PowerShell 5), guillemets, `export`, commentaires ; l'environnement réel prime ;
+  seules `NAFTAL_*`/`DATABASE_URL` lues ; valeurs vides ignorées ; écriture 0600 ;
+  refus des sauts de ligne (injection de variables).
+- `setup_cli.py` + `python -m naftal --setup-llm | --check-llm` : consentement
+  explicite, clé en saisie masquée, test de connexion, indices d'erreur, clé masquée
+  dans tout message. Bandeau d'état au démarrage (IA externe / recherche sémantique).
+- `DEFAULT_ANTHROPIC_MODEL = "claude-opus-5-5"`.
+
+Vérifié (61 tests) + assistant lancé dans un pseudo-terminal réel + appel réseau
+réel avec clé fausse (401). **Non vérifié** : appel réussi avec une vraie clé, et le
+format exact de la requête pour un modèle donné au-delà de l'authentification.
+
 ### Pistes d'amélioration (prochaines sessions)
 - OCR optionnel pour les PDF scannés.
 - Recherche sémantique / RAG (embeddings) pour l'assistant et la recherche.
