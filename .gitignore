@@ -7,3 +7,12 @@ authorization.yaml
 reports/
 *.report.json
 *.report.txt
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+npm-debug.log*
