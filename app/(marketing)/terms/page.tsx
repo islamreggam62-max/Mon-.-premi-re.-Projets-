@@ -40,6 +40,12 @@ export default function TermsPage() {
           purchased on this site yet. When checkout opens, subscriptions will be governed by terms of sale published at
           that time, which you will be able to read before paying.
         </p>
+        {CONTACT_EMAIL && (
+          <p>
+            You can already request a plan by email at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. A request
+            is not a purchase: no payment is due until you have received and accepted the terms of sale.
+          </p>
+        )}
       </LegalSection>
 
       <LegalSection title="4. Acceptable use">

@@ -21,10 +21,28 @@ export function absoluteUrl(path: string): string {
 export const LEGAL_UPDATED = "2026-11-02";
 
 /**
- * Public contact address. Empty until the owner chooses one; pages only show a
- * contact line when it is set.
+ * Public sales and contact address. Empty until the owner chooses one: while
+ * empty, no page shows a contact line and the plans point to the live demo.
+ * Once set, the plans become "Request this plan" emails and the privacy policy
+ * says what happens to those emails.
  */
 export const CONTACT_EMAIL = "";
+
+/** mailto: link that opens a pre-filled subscription request. */
+export function salesMailto(planName?: string): string {
+  const subject = planName ? `NEXORA subscription: ${planName} plan` : "NEXORA subscription";
+  const body = [
+    "Hello,",
+    "",
+    `I would like to subscribe to NEXORA${planName ? ` (${planName} plan)` : ""}.`,
+    "",
+    "Company:",
+    "Country:",
+    "Number of users:",
+    "",
+  ].join("\n");
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 /** Public pages, for the sitemap. */
 export const PUBLIC_PAGES = [

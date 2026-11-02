@@ -21,9 +21,16 @@ export default function PrivacyPage() {
     >
       <LegalSection title="1. What we collect">
         <p>
-          Nothing. The site has no sign-up, no contact form, no analytics, and no advertising trackers, and it sets no
-          cookies.
+          The site itself collects nothing. It has no sign-up, no contact form, no analytics, and no advertising
+          trackers, and it sets no cookies.
         </p>
+        {CONTACT_EMAIL && (
+          <p>
+            If you write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, for example to request a plan, we
+            receive your email address and what you write. We use them only to reply to you and handle your request,
+            and we do not sell or share them.
+          </p>
+        )}
       </LegalSection>
 
       <LegalSection title="2. What stays on your device">

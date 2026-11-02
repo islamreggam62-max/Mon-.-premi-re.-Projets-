@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ClipboardList,
   FlaskConical,
+  Mail,
   FolderKanban,
   LayoutDashboard,
   ListChecks,
@@ -20,7 +21,7 @@ import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { APP_HOME } from "@/lib/basePath";
 import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
-import { SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl, salesMailto } from "@/lib/site";
 import { cn, formatCurrency, percent } from "@/lib/utils";
 import productShot from "@/public/screenshots/wide.png";
 
@@ -62,7 +63,9 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How do I subscribe?",
-    a: "Online payment is being set up. Until checkout opens, explore the live demo — the plans and prices below are the ones that will apply.",
+    a: CONTACT_EMAIL
+      ? `Email ${CONTACT_EMAIL} with the plan you want, Monthly or Annual, and we will reply with the next steps. Online checkout will come later.`
+      : "Online payment is being set up. Until checkout opens, explore the live demo — the plans and prices below are the ones that will apply.",
   },
 ];
 
@@ -234,20 +237,49 @@ export default function LandingPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href={APP_HOME}
-                      className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
-                    >
-                      Start with the live demo
-                    </Link>
+                    {CONTACT_EMAIL ? (
+                      <div className="mt-8 flex flex-col items-center gap-3">
+                        <a
+                          href={salesMailto(plan.name)}
+                          className={cn("btn w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
+                          data-testid={`request-${plan.id}`}
+                        >
+                          <Mail className="h-4 w-4" aria-hidden="true" />
+                          Request the {plan.name} plan
+                        </a>
+                        <Link href={APP_HOME} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
+                          or try the live demo first
+                        </Link>
+                      </div>
+                    ) : (
+                      <Link
+                        href={APP_HOME}
+                        className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
+                      >
+                        Start with the live demo
+                      </Link>
+                    )}
                   </article>
                 );
               })}
             </div>
 
             <p className="mx-auto mt-8 max-w-2xl text-center text-xs leading-relaxed text-slate-400" data-testid="pricing-note">
-              Prices in US dollars. Online payment is not open yet — subscriptions start when checkout launches. NEXORA is
-              in early access and currently runs on sample data.
+              {CONTACT_EMAIL ? (
+                <>
+                  Prices in US dollars. Online payment is not open yet: to subscribe, email{" "}
+                  <a href={salesMailto()} className="font-medium text-violet-200 underline underline-offset-2">
+                    {CONTACT_EMAIL}
+                  </a>{" "}
+                  with the plan you want and we will reply with the next steps. NEXORA is in early access and currently
+                  runs on sample data.
+                </>
+              ) : (
+                <>
+                  Prices in US dollars. Online payment is not open yet — subscriptions start when checkout launches.
+                  NEXORA is in early access and currently runs on sample data.
+                </>
+              )}
             </p>
           </div>
         </section>
