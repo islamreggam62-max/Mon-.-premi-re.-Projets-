@@ -1,6 +1,42 @@
 # NEXORA — Phase 2 plan: Supabase integration
 
-> Planning document only. Nothing in this file is implemented in Phase 1.
+> **Status (step 1 done):** the core schema, row-level security, and the
+> multi-step functions are implemented in `supabase/migrations/20261102000000_core.sql`
+> and covered by `supabase/tests/10_tenancy.test.sql` (54 checks: tenant isolation,
+> roles, invites, approvals and their audit trail). Run them with
+> `DATABASE_URL=… scripts/test-db.sh`; CI runs them in `.github/workflows/database.yml`.
+> The app does not use the database yet (next steps below).
+
+## Architecture decision: static site + database security
+
+The site is a static export on GitHub Pages, so there is no Node server for Server
+Actions or middleware. The browser uses the Supabase client with the public anon key,
+and **Row-Level Security is the security boundary**: every table is protected in the
+database, and multi-step changes run in `security definer` functions that check the
+caller themselves (`create_workspace`, `accept_invite`, `decide_approval`,
+`set_member_role`). Work that needs a secret (AI calls, Google/Microsoft
+integrations, payment webhooks) goes in Supabase Edge Functions, never in the browser.
+
+Implemented in step 1 (a leaner cut of the schema below): `profiles`, `workspaces`
+(one company = one workspace), `departments`, `workspace_members`,
+`workspace_invites`, `projects`, `tasks`, `daily_reports` (completed work and
+priorities as arrays), `report_blockers`, `approvals`, `approval_events`. Composite
+foreign keys stop a row from pointing at another company's project or at a
+non-member.
+
+## Next steps
+
+1. Supabase project (owner): create it, run the migration in the SQL editor, add
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as repository
+   variables, set the Auth site URL and redirect URLs to the site.
+2. Sign-up / sign-in, company creation and onboarding, team invites, roles.
+3. Projects, tasks, daily reports, and approvals on real data (the demo stays as is).
+4. Dashboard computed from real records.
+5. Then: AI brief (Edge Function, usage tracking), data import, payments.
+
+---
+
+Original plan (kept for reference):
 
 ## Goal
 

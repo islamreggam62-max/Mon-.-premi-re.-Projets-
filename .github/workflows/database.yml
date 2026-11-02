@@ -1,0 +1,36 @@
+# Applies the Supabase migrations to a throwaway Postgres and runs the
+# tenant-isolation tests (supabase/tests). A failing check means a company
+# could see or change another company's data, or a role could exceed its rights.
+name: Database security tests
+
+on:
+  pull_request:
+    paths: ["supabase/**", "scripts/test-db.sh", ".github/workflows/database.yml"]
+  push:
+    branches: ["main", "claude/orchestrater-cyber-offensive-4do8x6"]
+    paths: ["supabase/**", "scripts/test-db.sh", ".github/workflows/database.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tenancy:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Migrate and run tenancy tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: scripts/test-db.sh
