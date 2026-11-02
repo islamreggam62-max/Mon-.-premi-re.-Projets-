@@ -1,6 +1,7 @@
-import { FlaskConical } from "lucide-react";
+import { Eye, FlaskConical, OctagonAlert, ShieldCheck, type LucideIcon } from "lucide-react";
 import {
   APPROVAL_STATUS_LABEL,
+  DEPARTMENT_HEALTH_LABEL,
   HEALTH_LABEL,
   PRESENCE_LABEL,
   PRIORITY_LABEL,
@@ -11,6 +12,7 @@ import {
 import type {
   ApprovalStatus,
   ApprovalUrgency,
+  DepartmentHealthStatus,
   Health,
   PresenceStatus,
   Priority,
@@ -150,6 +152,23 @@ export function PresenceBadge({ status }: { status: PresenceStatus }) {
   return (
     <Badge tone={PRESENCE_TONE[status]} dot>
       {PRESENCE_LABEL[status]}
+    </Badge>
+  );
+}
+
+const DEPT_HEALTH: Record<DepartmentHealthStatus, { tone: Tone; icon: LucideIcon }> = {
+  healthy: { tone: "emerald", icon: ShieldCheck },
+  watch: { tone: "amber", icon: Eye },
+  critical: { tone: "rose", icon: OctagonAlert },
+};
+
+/** Status color always ships with an icon and a label, never color alone. */
+export function DepartmentHealthBadge({ status }: { status: DepartmentHealthStatus }) {
+  const { tone, icon: Icon } = DEPT_HEALTH[status];
+  return (
+    <Badge tone={tone}>
+      <Icon className="h-3 w-3" aria-hidden="true" />
+      {DEPARTMENT_HEALTH_LABEL[status]}
     </Badge>
   );
 }

@@ -9,13 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep dark navy surfaces
+        // Dark navy surfaces
         base: {
-          900: "#070B14",
-          800: "#0F172A",
-          700: "#1E293B",
+          900: "#060913",
+          800: "#0B1120",
+          700: "#111827",
         },
-        // Royal violet accents (merged with Tailwind's default violet scale)
+        // Electric violet accents (merged with Tailwind's default violet scale)
         violet: {
           DEFAULT: "#7C3AED",
           soft: "#8B5CF6",
@@ -53,10 +53,10 @@ const config: Config = {
         glow: "0 0 0 1px rgba(124,58,237,0.35), 0 8px 30px -8px rgba(124,58,237,0.45)",
       },
       borderColor: {
-        hairline: "rgba(255,255,255,0.08)",
+        hairline: "rgba(255,255,255,0.10)",
       },
       backgroundColor: {
-        hairline: "rgba(255,255,255,0.08)",
+        hairline: "rgba(255,255,255,0.10)",
       },
       keyframes: {
         "fade-in": {

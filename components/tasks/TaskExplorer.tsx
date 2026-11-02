@@ -143,14 +143,14 @@ export function TaskExplorer({
             value={sort}
             onChange={setSort}
             options={[
-              { value: "due", label: "Due date" },
+              { value: "due", label: "Deadline (soonest)" },
               { value: "priority", label: "Priority" },
               { value: "status", label: "Status" },
             ]}
           />
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium text-slate-500" id="priority-filter-label">
+          <span className="mr-1 text-xs font-medium text-slate-400" id="priority-filter-label">
             Priority
           </span>
           <div role="group" aria-labelledby="priority-filter-label" className="flex flex-wrap gap-2">
@@ -177,7 +177,7 @@ export function TaskExplorer({
         {view === "list" ? (
           <Tabs items={statusTabs} value={status} onChange={setStatus} ariaLabel="Filter by status" className="md:flex-1" />
         ) : (
-          <p className="text-sm text-slate-400">Board grouped by status</p>
+          <p className="text-sm text-slate-300">Board grouped by status</p>
         )}
         <Tabs<View>
           variant="pill"
@@ -191,7 +191,7 @@ export function TaskExplorer({
         />
       </div>
 
-      <p className="mt-4 text-xs text-slate-500" aria-live="polite">
+      <p className="mt-4 text-xs text-slate-400" aria-live="polite">
         Showing {visibleCount} of {tasks.length} tasks
       </p>
 
@@ -211,7 +211,7 @@ export function TaskExplorer({
       ) : view === "list" ? (
         <div className="glass mt-4 overflow-hidden">
           <div
-            className="hidden border-b border-hairline px-5 py-3 text-xs font-medium uppercase tracking-wide text-slate-500 md:grid md:grid-cols-[minmax(0,2.4fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_6.5rem_8rem_7.5rem] md:gap-4"
+            className="hidden border-b border-hairline px-5 py-3 text-xs font-medium uppercase tracking-wide text-slate-400 md:grid md:grid-cols-[minmax(0,2.4fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_6.5rem_8rem_7.5rem] md:gap-4"
             aria-hidden="true"
           >
             <span>Task</span>
@@ -219,7 +219,7 @@ export function TaskExplorer({
             <span>Assignee</span>
             <span>Priority</span>
             <span>Status</span>
-            <span>Due</span>
+            <span>Deadline</span>
           </div>
           <ul className="divide-y divide-white/5">
             {listItems.map((t) => {
@@ -232,8 +232,8 @@ export function TaskExplorer({
                   className="px-4 py-4 hover:bg-white/[0.02] md:grid md:grid-cols-[minmax(0,2.4fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_6.5rem_8rem_7.5rem] md:items-center md:gap-4 md:px-5 md:py-3"
                 >
                   <div className="min-w-0">
-                    <p className="font-mono text-[11px] text-slate-500">{t.key}</p>
-                    <p className={cn("text-sm font-medium", t.status === "done" ? "text-slate-500 line-through" : "text-slate-100")}>
+                    <p className="font-mono text-[11px] text-slate-400">{t.key}</p>
+                    <p className={cn("text-sm font-medium", t.status === "done" ? "text-slate-400 line-through" : "text-slate-100")}>
                       {t.title}
                     </p>
                   </div>
@@ -258,7 +258,7 @@ export function TaskExplorer({
                     <div>
                       <TaskStatusBadge status={t.status} />
                     </div>
-                    <div className={cn("text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-400")}>
+                    <div className={cn("text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-300")}>
                       <span className="text-slate-200">{formatShortDate(t.due)}</span>
                       <span className="block">{t.status === "done" ? "Completed" : dueLabel(t.due, asOf)}</span>
                     </div>
@@ -279,12 +279,12 @@ export function TaskExplorer({
                     <h2 id={`col-${col}`} className="text-sm font-semibold text-slate-200">
                       {TASK_STATUS_LABEL[col]}
                     </h2>
-                    <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-xs tabular-nums text-slate-400">
+                    <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-xs tabular-nums text-slate-300">
                       {items.length}
                     </span>
                   </div>
                   <div className="flex flex-1 flex-col gap-3 rounded-2xl border border-hairline bg-white/[0.015] p-2">
-                    {items.length === 0 && <p className="py-8 text-center text-xs text-slate-600">No tasks</p>}
+                    {items.length === 0 && <p className="py-8 text-center text-xs text-slate-400">No tasks</p>}
                     {items.map((t) => {
                       const project = projectsById[t.projectId];
                       const assignee = peopleById[t.assigneeId];
@@ -297,7 +297,7 @@ export function TaskExplorer({
                             PRIORITY_ACCENT[t.priority],
                           )}
                         >
-                          <p className="font-mono text-[11px] text-slate-500">{t.key}</p>
+                          <p className="font-mono text-[11px] text-slate-400">{t.key}</p>
                           <p className="mt-0.5 text-sm font-medium leading-snug text-slate-100">{t.title}</p>
                           {project && (
                             <Link
@@ -309,7 +309,7 @@ export function TaskExplorer({
                           )}
                           <div className="mt-3 flex items-center justify-between gap-2">
                             <PriorityBadge priority={t.priority} />
-                            <span className={cn("inline-flex items-center gap-1 text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-400")}>
+                            <span className={cn("inline-flex items-center gap-1 text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-300")}>
                               <Clock className="h-3 w-3" aria-hidden="true" />
                               {t.status === "done" ? formatShortDate(t.due) : dueLabel(t.due, asOf)}
                             </span>
@@ -317,9 +317,9 @@ export function TaskExplorer({
                           <div className="mt-3 flex items-center justify-between border-t border-hairline pt-3">
                             <span className="flex min-w-0 items-center gap-2">
                               {assignee && <Avatar person={assignee} size="xs" />}
-                              <span className="truncate text-xs text-slate-400">{assignee?.name}</span>
+                              <span className="truncate text-xs text-slate-300">{assignee?.name}</span>
                             </span>
-                            <span className="text-xs text-slate-500">{t.estimateHours}h</span>
+                            <span className="text-xs text-slate-400">{t.estimateHours}h</span>
                           </div>
                         </article>
                       );

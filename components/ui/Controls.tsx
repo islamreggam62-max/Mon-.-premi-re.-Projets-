@@ -29,7 +29,7 @@ export function SearchInput({
         {label}
       </label>
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         aria-hidden="true"
       />
       <input
@@ -46,7 +46,7 @@ export function SearchInput({
           type="button"
           onClick={() => onChange("")}
           aria-label="Clear search"
-          className="focus-ring absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:text-slate-200"
+          className="focus-ring absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-slate-200"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
@@ -81,7 +81,7 @@ export function Select<T extends string>({
     <div className={cn("flex min-w-0 flex-col gap-1", className)}>
       <label
         htmlFor={id}
-        className={cn("text-xs font-medium text-slate-400", hideLabel && "sr-only")}
+        className={cn("text-xs font-medium text-slate-300", hideLabel && "sr-only")}
       >
         {label}
       </label>
@@ -100,7 +100,7 @@ export function Select<T extends string>({
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
           aria-hidden="true"
         />
       </div>
@@ -130,7 +130,7 @@ export function ToggleChip({
         "focus-ring inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium transition-colors",
         pressed
           ? "border-violet/50 bg-violet/20 text-violet-100"
-          : "border-hairline bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-slate-200",
+          : "border-hairline bg-white/[0.03] text-slate-300 hover:border-white/20 hover:text-slate-200",
       )}
     >
       {children}

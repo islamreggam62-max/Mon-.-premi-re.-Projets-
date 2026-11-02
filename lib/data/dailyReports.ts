@@ -1,6 +1,7 @@
 /** STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts. */
-import type { DailyReport } from "@/lib/types";
+import type { DailyReport, ISODate } from "@/lib/types";
 
+/** Full report content for the two most recent business days. */
 export const DAILY_REPORTS: DailyReport[] = [
   /* ---- Friday, Oct 30 (demo "today") ---------------------------------- */
   {
@@ -12,7 +13,11 @@ export const DAILY_REPORTS: DailyReport[] = [
       "Closed the auth load test — p99 under 180 ms at 3× peak",
       "Paired with Hana on billing extraction seams",
     ],
-    inProgress: ["Billing service data-access layer (NEX-101)"],
+    priorities: [
+      "Billing service data-access layer (NEX-101)",
+      "Finish billing repository interfaces",
+      "Review the failover runbook draft",
+    ],
     blockers: [
       {
         id: "b-1030-mateo-1",
@@ -21,7 +26,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "high",
       },
     ],
-    tomorrow: ["Finish billing repository interfaces", "Review the failover runbook draft"],
     energy: 3,
   },
   {
@@ -30,7 +34,11 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-30",
     submittedAt: "2026-10-30T18:05:00Z",
     completed: ["Signal ingestion schema submitted for review (NEX-104)"],
-    inProgress: ["Health score data pipeline (NEX-115)", "Failover runbook (NEX-102)"],
+    priorities: [
+      "Health score data pipeline (NEX-115)",
+      "Backfill 12 months of usage data",
+      "Address schema review comments",
+    ],
     blockers: [
       {
         id: "b-1030-hana-1",
@@ -39,7 +47,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "medium",
       },
     ],
-    tomorrow: ["Address schema review comments", "Backfill 12 months of usage data"],
     energy: 2,
   },
   {
@@ -48,7 +55,10 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-30",
     submittedAt: "2026-10-30T16:30:00Z",
     completed: ["Token audit reconciled against live surfaces"],
-    inProgress: ["Core button and badge primitives (NEX-110)"],
+    priorities: [
+      "Core button and badge primitives (NEX-110)",
+      "Prepare naming options for a decision",
+    ],
     blockers: [
       {
         id: "b-1030-mei-1",
@@ -57,7 +67,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "high",
       },
     ],
-    tomorrow: ["Finish button variants", "Prepare naming options for a decision"],
     energy: 2,
   },
   {
@@ -69,9 +78,8 @@ export const DAILY_REPORTS: DailyReport[] = [
       "Dunning retry policy sent for review (NEX-114)",
       "Customer success capacity model finalized",
     ],
-    inProgress: ["Beacon outreach sequencing"],
+    priorities: ["Beacon outreach sequencing", "Walk Tomás through the audit evidence checklist"],
     blockers: [],
-    tomorrow: ["Walk Tomás through the audit evidence checklist"],
     energy: 4,
   },
   {
@@ -83,9 +91,8 @@ export const DAILY_REPORTS: DailyReport[] = [
       "Approved revised service boundaries for billing",
       "Weekly engineering staffing review",
     ],
-    inProgress: ["Atlas infrastructure budget request (awaiting approval)"],
+    priorities: ["Rebalance failover work off Mateo", "Raise the staging quota for Hana"],
     blockers: [],
-    tomorrow: ["Rebalance failover work off Mateo", "Raise the staging quota for Hana"],
     energy: 3,
   },
   {
@@ -94,7 +101,11 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-30",
     submittedAt: "2026-10-30T17:20:00Z",
     completed: ["Horizon preview UI scope agreed with Design"],
-    inProgress: ["Ranking model evaluation plan", "Insight card copy (NEX-106)"],
+    priorities: [
+      "Ranking model evaluation plan",
+      "Draft the evaluation rubric with Mateo",
+      "Insight card copy (NEX-106)",
+    ],
     blockers: [
       {
         id: "b-1030-sana-1",
@@ -103,7 +114,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "medium",
       },
     ],
-    tomorrow: ["Draft the evaluation rubric with Mateo"],
     energy: 4,
   },
   {
@@ -112,9 +122,11 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-30",
     submittedAt: "2026-10-30T16:48:00Z",
     completed: ["Q3 close package shared with the board"],
-    inProgress: ["Audit sign-off evidence checklist (NEX-113)"],
+    priorities: [
+      "Audit sign-off evidence checklist (NEX-113)",
+      "Send the historical invoice export to Engineering",
+    ],
     blockers: [],
-    tomorrow: ["Send the historical invoice export to Engineering"],
     energy: 4,
   },
 
@@ -125,9 +137,8 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T18:12:00Z",
     completed: ["Billing service boundary diagram updated"],
-    inProgress: ["Auth service load test (NEX-103)"],
+    priorities: ["Wrap up the auth load test (NEX-103)", "Start the billing data-access layer"],
     blockers: [],
-    tomorrow: ["Wrap up load tests", "Start the billing data-access layer"],
     energy: 4,
   },
   {
@@ -136,9 +147,8 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T17:36:00Z",
     completed: ["Health score pipeline schema drafted"],
-    inProgress: ["Signal ingestion schema (NEX-104)"],
+    priorities: ["Submit the signal ingestion schema for review (NEX-104)"],
     blockers: [],
-    tomorrow: ["Submit the schema for review"],
     energy: 3,
   },
   {
@@ -147,7 +157,7 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T16:50:00Z",
     completed: ["Third pilot contract countersigned"],
-    inProgress: ["Pilot customer onboarding flows (NEX-108)"],
+    priorities: ["Pilot customer onboarding flows (NEX-108)", "Kick off onboarding with pilot #3"],
     blockers: [
       {
         id: "b-1029-nadia-1",
@@ -156,7 +166,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "medium",
       },
     ],
-    tomorrow: ["Kick off onboarding with pilot #3"],
     energy: 5,
   },
   {
@@ -165,7 +174,7 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T15:20:00Z",
     completed: ["Launch landing page wireframe"],
-    inProgress: ["GA announcement narrative (NEX-107)"],
+    priorities: ["GA announcement narrative (NEX-107)", "Draft the customer launch email"],
     blockers: [
       {
         id: "b-1029-devon-1",
@@ -174,7 +183,6 @@ export const DAILY_REPORTS: DailyReport[] = [
         severity: "low",
       },
     ],
-    tomorrow: ["Draft the customer launch email"],
     energy: 4,
   },
   {
@@ -183,9 +191,8 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T14:05:00Z",
     completed: ["Forge recovery plan drafted"],
-    inProgress: ["Token naming options"],
+    priorities: ["Token naming options", "Out of office Friday — back Monday"],
     blockers: [],
-    tomorrow: ["Out of office — back Monday"],
     energy: 3,
   },
   {
@@ -194,9 +201,25 @@ export const DAILY_REPORTS: DailyReport[] = [
     date: "2026-10-29",
     submittedAt: "2026-10-29T16:10:00Z",
     completed: ["Beacon health score definition signed off"],
-    inProgress: ["Customer success capacity model (NEX-117)"],
+    priorities: ["Finalize the customer success capacity model (NEX-117)"],
     blockers: [],
-    tomorrow: ["Finalize the capacity model"],
     energy: 4,
   },
 ];
+
+/**
+ * Earlier submission dates (Oct 19–28) per person, used for compliance streaks.
+ * Content for these days is not part of the demo; Oct 29–30 come from DAILY_REPORTS.
+ */
+export const REPORT_HISTORY: Record<string, ISODate[]> = {
+  "u-mateo": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-hana": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-mei": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-28"],
+  "u-priya": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-liam": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-sana": ["2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-tomas": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-yuki": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-nadia": ["2026-10-19", "2026-10-21", "2026-10-22", "2026-10-26", "2026-10-27", "2026-10-28"],
+  "u-devon": ["2026-10-20", "2026-10-23", "2026-10-27"],
+};

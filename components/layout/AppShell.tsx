@@ -104,6 +104,7 @@ export function AppShell({
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
           badges={navBadges}
+          workspaces={workspaces}
         />
       </aside>
 
@@ -133,7 +134,12 @@ export function AppShell({
             mobileOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <Sidebar variant="mobile" onClose={() => setMobileOpen(false)} badges={navBadges} />
+          <Sidebar
+            variant="mobile"
+            onClose={() => setMobileOpen(false)}
+            badges={navBadges}
+            workspaces={workspaces}
+          />
         </div>
       </div>
 

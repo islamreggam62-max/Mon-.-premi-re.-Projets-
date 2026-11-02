@@ -14,7 +14,7 @@ export default function ApprovalsPage() {
     <div>
       <PageHeader
         title="Executive Approvals"
-        subtitle="Decision queue for budget, hiring, and deliverable sign-offs, ordered by urgency."
+        subtitle="Decision queue for budget sign-offs, contracts, hiring requests, and operational exceptions — most urgent first."
         action={<DemoBadge label="Static demo data" />}
       />
       <ApprovalQueue approvals={APPROVALS} people={TEAM} projects={PROJECTS} asOf={DEMO_AS_OF} />

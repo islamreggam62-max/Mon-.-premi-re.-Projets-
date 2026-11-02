@@ -79,9 +79,23 @@ export interface Kpi {
   trend: Trend;
   /** Whether an upward movement is good for this metric. */
   positiveWhenUp: boolean;
-  /** Comparison basis, e.g. "vs. September". */
+  /** Comparison basis, e.g. "vs. yesterday". */
   hint: string;
+  /** Module that explains the number. */
+  href?: string;
 }
+
+/** Prior-period values used to compute KPI deltas where history is not modeled. */
+export interface KpiBaselines {
+  /** Operational velocity (share of open tasks on schedule) one week earlier, 0–100. */
+  velocityLastWeek: number;
+  /** Active project count at the start of the quarter. */
+  activeProjectsQuarterStart: number;
+  /** Open approvals one week earlier. */
+  openApprovalsLastWeek: number;
+}
+
+export type DepartmentHealthStatus = "healthy" | "watch" | "critical";
 
 export type NotificationTone = "critical" | "warning" | "info";
 
@@ -164,19 +178,24 @@ export interface DailyReport {
   authorId: string;
   date: ISODate;
   submittedAt: ISODateTime;
+  /** Completed Work. */
   completed: string[];
-  inProgress: string[];
+  /** Priorities: what the author is driving next. */
+  priorities: string[];
+  /** Blockers. */
   blockers: ReportBlocker[];
-  tomorrow: string[];
   /** Self-reported energy, 1–5. */
   energy: EnergyLevel;
 }
+
+/** Submission status of one expected reporter on one day. */
+export type SubmissionStatus = "submitted" | "missing" | "excused";
 
 /* ----------------------------------------------------------------------------
  * Approvals
  * ------------------------------------------------------------------------- */
 
-export type ApprovalKind = "budget" | "hiring" | "deliverable";
+export type ApprovalKind = "budget" | "contract" | "hiring" | "exception";
 
 export type ApprovalStatus =
   | "pending"
@@ -195,8 +214,10 @@ export interface Approval {
   requestedById: string;
   approverId: string;
   status: ApprovalStatus;
-  /** Budget requests: amount in USD. */
+  /** Budget, contract value, or exception exposure, in USD. */
   amount?: number;
+  /** Contracts: counterparty name. */
+  counterparty?: string;
   /** Hiring requests: number of roles. */
   headcount?: number;
   projectId?: string;
@@ -231,6 +252,24 @@ export interface ReportSummaryPreview {
   headline: string;
   highlights: string[];
   watchItems: string[];
+}
+
+/** One axis of the organizational risk radar (static preview). */
+export interface RiskDimension {
+  id: string;
+  label: string;
+  /** Exposure, 0 (none) – 100 (severe). */
+  score: number;
+  /** Same measure one week earlier. */
+  previous: number;
+  drivers: string[];
+}
+
+export interface ExecutiveBriefPreview {
+  headline: string;
+  points: string[];
+  /** Suggested decisions, phrased for an executive. */
+  decisions: string[];
 }
 
 export interface BottleneckPreview {
@@ -272,6 +311,14 @@ export interface OrganizationProfile {
   timezone: string;
   locale: string;
   currency: string;
+}
+
+export interface GovernancePolicy {
+  id: string;
+  area: "Approvals" | "Daily reports" | "Escalation" | "Data";
+  title: string;
+  rule: string;
+  owner: string;
 }
 
 export interface SecurityControl {

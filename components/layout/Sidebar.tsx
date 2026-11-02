@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { NAV_ITEMS, isActivePath } from "@/lib/nav";
-import type { NavIcon } from "@/lib/types";
+import type { NavIcon, Workspace } from "@/lib/types";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { cn, formatDate } from "@/lib/utils";
 
 const ICONS: Record<NavIcon, LucideIcon> = {
@@ -53,6 +54,7 @@ export function Sidebar({
   onToggleCollapse,
   onClose,
   badges = {},
+  workspaces,
 }: {
   variant: "desktop" | "mobile";
   collapsed?: boolean;
@@ -60,6 +62,7 @@ export function Sidebar({
   onClose?: () => void;
   /** Count pills keyed by nav href, e.g. { "/approvals": 6 }. */
   badges?: Record<string, number>;
+  workspaces: Workspace[];
 }) {
   const pathname = usePathname();
 
@@ -87,7 +90,7 @@ export function Sidebar({
             type="button"
             onClick={onClose}
             data-autofocus
-            className="focus-ring rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-200"
+            className="focus-ring rounded-lg p-1.5 text-slate-300 hover:bg-white/5 hover:text-slate-200"
             aria-label="Close navigation menu"
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -95,9 +98,13 @@ export function Sidebar({
         )}
       </div>
 
+      <div className={cn("shrink-0 border-b border-hairline", collapsed ? "flex justify-center px-2 py-3" : "p-3")}>
+        <WorkspaceSwitcher workspaces={workspaces} collapsed={collapsed} />
+      </div>
+
       <nav aria-label="Primary" className="flex-1 overflow-y-auto px-3 py-4">
         {!collapsed && (
-          <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+          <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-wider text-slate-400">
             Modules
           </p>
         )}
@@ -118,7 +125,7 @@ export function Sidebar({
                     collapsed ? "justify-center px-0" : "px-3",
                     active
                       ? "bg-violet/15 text-slate-50 ring-1 ring-inset ring-violet/30"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-100",
+                      : "text-slate-300 hover:bg-white/5 hover:text-slate-100",
                   )}
                 >
                   {active && !collapsed && (
@@ -130,7 +137,7 @@ export function Sidebar({
                   <Icon
                     className={cn(
                       "h-[18px] w-[18px] shrink-0",
-                      active ? "text-violet-300" : "text-slate-500 group-hover:text-slate-300",
+                      active ? "text-violet-300" : "text-slate-400 group-hover:text-slate-300",
                     )}
                     aria-hidden="true"
                   />
@@ -165,7 +172,7 @@ export function Sidebar({
               <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
               Demo mode
             </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
               Static demonstration data as of {formatDate(DEMO_AS_OF)}. Nothing is saved.
             </p>
           </div>
@@ -177,7 +184,7 @@ export function Sidebar({
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className={cn(
-              "focus-ring flex w-full items-center gap-2 rounded-xl py-2 text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200",
+              "focus-ring flex w-full items-center gap-2 rounded-xl py-2 text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-slate-200",
               collapsed ? "justify-center" : "px-3",
             )}
           >

@@ -5,11 +5,13 @@ import type {
   ApprovalStatus,
   ApprovalUrgency,
   Department,
+  DepartmentHealthStatus,
   Health,
   PermissionLevel,
   PresenceStatus,
   Priority,
   Severity,
+  SubmissionStatus,
   TaskStatus,
 } from "@/lib/types";
 
@@ -58,8 +60,22 @@ export const APPROVAL_STATUS_ORDER: ApprovalStatus[] = [
 
 export const APPROVAL_KIND_LABEL: Record<ApprovalKind, string> = {
   budget: "Budget",
+  contract: "Contract",
   hiring: "Hiring",
-  deliverable: "Deliverable",
+  exception: "Exception",
+};
+export const APPROVAL_KIND_ORDER: ApprovalKind[] = ["budget", "contract", "hiring", "exception"];
+
+export const DEPARTMENT_HEALTH_LABEL: Record<DepartmentHealthStatus, string> = {
+  healthy: "Healthy",
+  watch: "Watch",
+  critical: "Critical",
+};
+
+export const SUBMISSION_STATUS_LABEL: Record<SubmissionStatus, string> = {
+  submitted: "Submitted",
+  missing: "Missing",
+  excused: "Excused",
 };
 
 export const URGENCY_LABEL: Record<ApprovalUrgency, string> = {

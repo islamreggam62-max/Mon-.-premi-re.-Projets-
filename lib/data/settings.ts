@@ -1,10 +1,64 @@
 /** STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts. */
 import type {
+  GovernancePolicy,
   OrganizationProfile,
   PermissionRow,
   RoleDefinition,
   SecurityControl,
 } from "@/lib/types";
+
+/** Workspace governance rules (read-only preview; enforced in Phase 2). */
+export const GOVERNANCE_POLICIES: GovernancePolicy[] = [
+  {
+    id: "gov-budget",
+    area: "Approvals",
+    title: "Budget sign-off thresholds",
+    rule: "Up to $25K: department head. $25K–$100K: CEO. Above $100K: CEO and CFO.",
+    owner: "Tomás Varga · CFO",
+  },
+  {
+    id: "gov-contract",
+    area: "Approvals",
+    title: "Contract review",
+    rule: "Every contract above $50K needs legal review before executive sign-off.",
+    owner: "Amara Okonkwo · CEO",
+  },
+  {
+    id: "gov-hiring",
+    area: "Approvals",
+    title: "Hiring requests",
+    rule: "New roles need the department head and CEO; backfills need the department head only.",
+    owner: "Priya Nair · Operations",
+  },
+  {
+    id: "gov-exception",
+    area: "Approvals",
+    title: "Operational exceptions",
+    rule: "Discounts above 20% and deadline changes over two weeks need CEO approval.",
+    owner: "Amara Okonkwo · CEO",
+  },
+  {
+    id: "gov-reports",
+    area: "Daily reports",
+    title: "Submission window",
+    rule: "Reports are due by 7:00 PM local time on business days; people on leave are excused.",
+    owner: "Priya Nair · Operations",
+  },
+  {
+    id: "gov-escalation",
+    area: "Escalation",
+    title: "Overdue approvals",
+    rule: "Approvals escalate to the approver's manager 24 hours after the due date.",
+    owner: "Priya Nair · Operations",
+  },
+  {
+    id: "gov-retention",
+    area: "Data",
+    title: "Report retention",
+    rule: "Daily reports are retained for 24 months, then archived.",
+    owner: "Tomás Varga · CFO",
+  },
+];
 
 export const ORGANIZATION: OrganizationProfile = {
   legalName: "Nexora Technologies, Inc. (demo)",

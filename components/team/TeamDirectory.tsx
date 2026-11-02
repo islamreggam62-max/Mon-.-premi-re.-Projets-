@@ -9,13 +9,14 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressBar, type ProgressTone } from "@/components/ui/ProgressBar";
 import { Tabs } from "@/components/ui/Tabs";
 import { ACCESS_ROLE_LABEL, DEPARTMENT_ORDER, PRESENCE_LABEL } from "@/lib/labels";
-import { WORKLOAD_BAND_LABEL, workloadBand, type WorkloadBand } from "@/lib/metrics";
+import { ComplianceStrip } from "@/components/reports/ComplianceStrip";
+import { WORKLOAD_BAND_LABEL, workloadBand, type Compliance, type WorkloadBand } from "@/lib/metrics";
 import type { Department, Person, PresenceStatus } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 
 type DepartmentFilter = "all" | Department;
 type StatusFilter = "all" | PresenceStatus;
-type SortKey = "name" | "workload-desc" | "workload-asc";
+type SortKey = "name" | "workload-desc" | "workload-asc" | "streak-desc";
 
 const BAND_TONE: Record<WorkloadBand, ProgressTone> = {
   healthy: "emerald",
@@ -27,7 +28,7 @@ const BAND_TEXT: Record<WorkloadBand, string> = {
   healthy: "text-emerald-300",
   stretched: "text-amber-300",
   overloaded: "text-rose-300",
-  unavailable: "text-slate-400",
+  unavailable: "text-slate-300",
 };
 
 function matches(person: Person, query: string): boolean {
@@ -38,7 +39,15 @@ function matches(person: Person, query: string): boolean {
   );
 }
 
-export function TeamDirectory({ people }: { people: Person[] }) {
+export function TeamDirectory({
+  people,
+  compliance,
+  asOf,
+}: {
+  people: Person[];
+  compliance: Record<string, Compliance>;
+  asOf: string;
+}) {
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState<DepartmentFilter>("all");
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -67,9 +76,14 @@ export function TeamDirectory({ people }: { people: Person[] }) {
     return [...list].sort((a, b) => {
       if (sort === "workload-desc") return b.workload - a.workload;
       if (sort === "workload-asc") return a.workload - b.workload;
+      if (sort === "streak-desc") {
+        const sa = compliance[a.id]?.expected ? compliance[a.id].streak : -1;
+        const sb = compliance[b.id]?.expected ? compliance[b.id].streak : -1;
+        return sb - sa || a.name.localeCompare(b.name);
+      }
       return a.name.localeCompare(b.name);
     });
-  }, [base, department, sort]);
+  }, [base, department, sort, compliance]);
 
   const filtersActive = query !== "" || status !== "all" || department !== "all";
 
@@ -111,6 +125,7 @@ export function TeamDirectory({ people }: { people: Person[] }) {
               { value: "name", label: "Name (A–Z)" },
               { value: "workload-desc", label: "Workload (high → low)" },
               { value: "workload-asc", label: "Workload (low → high)" },
+              { value: "streak-desc", label: "Report streak (longest)" },
             ]}
             className="md:w-52"
           />
@@ -125,7 +140,7 @@ export function TeamDirectory({ people }: { people: Person[] }) {
         className="mt-5"
       />
 
-      <p className="mt-4 text-xs text-slate-500" aria-live="polite">
+      <p className="mt-4 text-xs text-slate-400" aria-live="polite">
         Showing {visible.length} of {people.length} people
       </p>
 
@@ -161,19 +176,19 @@ export function TeamDirectory({ people }: { people: Person[] }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-slate-50">{p.name}</p>
-                    <p className="truncate text-sm text-slate-400">{p.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{p.department}</p>
+                    <p className="truncate text-sm text-slate-300">{p.title}</p>
+                    <p className="mt-0.5 text-xs text-slate-400">{p.department}</p>
                   </div>
                   <PresenceBadge status={p.status} />
                 </div>
 
-                <div className="mt-4 space-y-1.5 text-xs text-slate-400">
+                <div className="mt-4 space-y-1.5 text-xs text-slate-300">
                   <p className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+                    <MapPin className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
                     {p.location}
                   </p>
                   <p className="flex min-w-0 items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden="true" />
+                    <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
                     <a href={`mailto:${p.email}`} className="focus-ring truncate rounded text-violet-300 hover:underline">
                       {p.email}
                     </a>
@@ -182,15 +197,24 @@ export function TeamDirectory({ people }: { people: Person[] }) {
 
                 <div className="mt-4 border-t border-hairline pt-4">
                   <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Workload</span>
+                    <span className="text-slate-300">Workload</span>
                     <span className={cn("font-medium tabular-nums", BAND_TEXT[band])}>
                       {band === "unavailable" ? "On leave" : `${p.workload}% · ${WORKLOAD_BAND_LABEL[band]}`}
                     </span>
                   </div>
                   <ProgressBar value={p.workload} tone={BAND_TONE[band]} label={`${p.name} workload`} />
+                  {band !== "unavailable" && (
+                    <p className="mt-1.5 text-[11px] text-slate-400">
+                      Capacity left: <span className="font-semibold tabular-nums text-slate-200">{Math.max(0, 100 - p.workload)}%</span>
+                    </p>
+                  )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-4 border-t border-hairline pt-4">
+                  <ReportCompliance person={p} compliance={compliance[p.id]} asOf={asOf} />
+                </div>
+
+                <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Joined {formatDate(p.joined)}</span>
                   <span className="rounded-md bg-white/[0.05] px-1.5 py-0.5 font-medium text-slate-300">
                     {ACCESS_ROLE_LABEL[p.accessRole]}
@@ -210,5 +234,43 @@ export function TeamDirectory({ people }: { people: Person[] }) {
         </div>
       )}
     </div>
+  );
+}
+
+function ReportCompliance({
+  person,
+  compliance,
+  asOf,
+}: {
+  person: Person;
+  compliance: Compliance | undefined;
+  asOf: string;
+}) {
+  if (!compliance || !compliance.expected) {
+    return (
+      <p className="text-xs text-slate-400">
+        Daily reports: {person.status === "on-leave" ? "excused while on leave" : "not required for this role"}
+      </p>
+    );
+  }
+  const submittedDays = compliance.days.filter((d) => d.status === "submitted").length;
+  return (
+    <>
+      <div className="mb-2 flex items-center justify-between gap-2 text-xs">
+        <span className="text-slate-300">Report streak</span>
+        <span className="font-semibold tabular-nums text-slate-50" data-testid={`streak-${person.id}`}>
+          {compliance.streak} {compliance.streak === 1 ? "day" : "days"}
+          {!compliance.submittedToday && <span className="ml-1.5 font-medium text-amber-300">· due today</span>}
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <ComplianceStrip
+          days={compliance.days}
+          asOf={asOf}
+          label={`${person.name}: submitted ${submittedDays} of the last ${compliance.days.length} business days`}
+        />
+        <span className="text-[11px] tabular-nums text-slate-400">{compliance.rate}% / 10 days</span>
+      </div>
+    </>
   );
 }

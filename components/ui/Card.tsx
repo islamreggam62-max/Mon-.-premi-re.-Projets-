@@ -38,7 +38,7 @@ export function CardHeader({
     >
       <div className="min-w-0">
         <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>}
+        {subtitle && <p className="mt-0.5 text-xs text-slate-300">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

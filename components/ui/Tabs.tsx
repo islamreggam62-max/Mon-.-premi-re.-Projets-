@@ -84,13 +84,13 @@ export function Tabs<T extends string>({
                     "rounded-t-lg px-3 py-2.5 after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full",
                     selected
                       ? "text-slate-50 after:bg-violet-soft"
-                      : "text-slate-400 after:bg-transparent hover:text-slate-200",
+                      : "text-slate-300 after:bg-transparent hover:text-slate-200",
                   )
                 : cn(
                     "rounded-lg px-3 py-1.5",
                     selected
                       ? "bg-violet/20 text-slate-50 ring-1 ring-inset ring-violet/40"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200",
+                      : "text-slate-300 hover:bg-white/5 hover:text-slate-200",
                   ),
             )}
           >
@@ -100,7 +100,7 @@ export function Tabs<T extends string>({
               <span
                 className={cn(
                   "rounded-full px-1.5 py-px text-[11px] tabular-nums",
-                  selected ? "bg-violet/25 text-violet-100" : "bg-white/[0.06] text-slate-400",
+                  selected ? "bg-violet/25 text-violet-100" : "bg-white/[0.06] text-slate-300",
                 )}
               >
                 {item.count}

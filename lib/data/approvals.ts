@@ -1,4 +1,7 @@
-/** STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts. */
+/**
+ * STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts.
+ * Counterparties are fictional.
+ */
 import type { Approval } from "@/lib/types";
 
 export const APPROVALS: Approval[] = [
@@ -28,32 +31,34 @@ export const APPROVALS: Approval[] = [
     submitted: "2026-10-27",
     dueBy: "2026-10-30",
     summary:
-      "Ranking-model work depends on one engineer at 96% utilization; this hire removes a key-person risk.",
+      "Ranking-model work depends on one engineer at 96% workload; this hire removes a key-person risk.",
   },
   {
     id: "ap-503",
-    title: "Summit GA launch kit sign-off",
-    kind: "deliverable",
+    title: "Enterprise reseller agreement",
+    kind: "contract",
     requestedById: "u-nadia",
     approverId: "u-amara",
     status: "in-review",
+    amount: 240_000,
+    counterparty: "Helix Partners (fictional)",
     projectId: "p-summit",
     submitted: "2026-10-28",
     dueBy: "2026-11-02",
     summary:
-      "Pricing sheet, sales deck, and launch announcement ready for executive approval ahead of the Nov 27 GA.",
+      "Two-year reseller agreement with a 20% margin and a committed first-year value; legal has redlined liability caps.",
   },
   {
     id: "ap-504",
-    title: "Forge revised delivery plan",
-    kind: "deliverable",
+    title: "Exception: three-week extension for Forge",
+    kind: "exception",
     requestedById: "u-yuki",
     approverId: "u-amara",
     status: "changes-requested",
     projectId: "p-forge",
     submitted: "2026-10-24",
     dueBy: "2026-11-04",
-    summary: "Three-week reset of the design-system timeline with a reduced v1 scope.",
+    summary: "Reset the design-system deadline from Dec 4 to Dec 25 with a reduced v1 scope.",
     decisionNote: "Clarify the impact on the Summit GA logo set before resubmitting.",
   },
   {
@@ -80,22 +85,36 @@ export const APPROVALS: Approval[] = [
     projectId: "p-beacon",
     submitted: "2026-10-27",
     dueBy: "2026-11-01",
-    summary:
-      "The capacity model shows coverage gaps for 18 of the top-50 accounts from January.",
+    summary: "The capacity model shows coverage gaps for 18 of the top-50 accounts from January.",
+  },
+  {
+    id: "ap-510",
+    title: "Exception: pilot #4 discount above policy limit",
+    kind: "exception",
+    requestedById: "u-nadia",
+    approverId: "u-amara",
+    status: "pending",
+    amount: 28_000,
+    projectId: "p-summit",
+    submitted: "2026-10-29",
+    dueBy: "2026-11-02",
+    summary: "A 26% first-year discount (policy limit 20%) to close a lighthouse account before GA.",
   },
   {
     id: "ap-507",
-    title: "Ledger audit evidence pack",
-    kind: "deliverable",
+    title: "External audit engagement letter",
+    kind: "contract",
     requestedById: "u-tomas",
     approverId: "u-amara",
     status: "approved",
+    amount: 68_000,
+    counterparty: "Marlow & Finch LLP (fictional)",
     projectId: "p-ledger",
     submitted: "2026-10-20",
     dueBy: "2026-10-27",
     decidedAt: "2026-10-26",
-    summary: "Reconciliation evidence and control descriptions for the external audit.",
-    decisionNote: "Approved — ready for the auditors.",
+    summary: "Fixed-fee engagement for the FY2026 external audit.",
+    decisionNote: "Approved — fee within the audit budget.",
   },
   {
     id: "ap-508",
@@ -125,6 +144,6 @@ export const APPROVALS: Approval[] = [
     dueBy: "2026-10-22",
     decidedAt: "2026-10-21",
     summary: "Six-month contractor to accelerate delivery of the core primitives.",
-    decisionNote: "Declined — revisit once the revised delivery plan is approved.",
+    decisionNote: "Declined — revisit once the revised Forge plan is approved.",
   },
 ];

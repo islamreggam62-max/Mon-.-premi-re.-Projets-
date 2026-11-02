@@ -1,44 +1,16 @@
 /** STATIC DEMONSTRATION DATA — not connected to any backend. See lib/data/meta.ts. */
-import type { AppNotification, Kpi } from "@/lib/types";
+import type { AppNotification, KpiBaselines } from "@/lib/types";
 
-export const KPIS: Kpi[] = [
-  {
-    id: "k-arr",
-    label: "Annual Recurring Revenue",
-    value: "$12.4M",
-    delta: "+8.2%",
-    trend: "up",
-    positiveWhenUp: true,
-    hint: "vs. September",
-  },
-  {
-    id: "k-nrr",
-    label: "Net Revenue Retention",
-    value: "114%",
-    delta: "+3 pts",
-    trend: "up",
-    positiveWhenUp: true,
-    hint: "trailing 12 months",
-  },
-  {
-    id: "k-burn",
-    label: "Monthly Net Burn",
-    value: "$540K",
-    delta: "+6.1%",
-    trend: "up",
-    positiveWhenUp: false,
-    hint: "vs. September",
-  },
-  {
-    id: "k-ontime",
-    label: "On-time Milestones",
-    value: "82%",
-    delta: "-4 pts",
-    trend: "down",
-    positiveWhenUp: true,
-    hint: "quarter to date",
-  },
-];
+/**
+ * Prior-period values for KPI deltas. Current values are computed from the
+ * demo records (tasks, projects, reports, approvals); only these baselines
+ * are hand-written, because the demo does not model weekly history.
+ */
+export const KPI_BASELINES: KpiBaselines = {
+  velocityLastWeek: 85,
+  activeProjectsQuarterStart: 5,
+  openApprovalsLastWeek: 4,
+};
 
 export const NOTIFICATIONS: AppNotification[] = [
   {
@@ -68,8 +40,8 @@ export const NOTIFICATIONS: AppNotification[] = [
   {
     id: "n-4",
     tone: "info",
-    title: "Launch kit in review",
-    detail: "The Summit GA launch kit is waiting for your sign-off.",
+    title: "Reseller agreement in review",
+    detail: "The Helix Partners agreement ($240K) is waiting for your sign-off.",
     time: "2026-10-29T16:12:00Z",
     href: "/approvals",
   },

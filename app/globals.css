@@ -4,10 +4,10 @@
 
 :root {
   color-scheme: dark;
-  --bg-900: #070b14;
-  --bg-800: #0f172a;
-  --bg-700: #1e293b;
-  --hairline: rgba(255, 255, 255, 0.08);
+  --bg-900: #060913;
+  --bg-800: #0b1120;
+  --bg-700: #111827;
+  --hairline: rgba(255, 255, 255, 0.1);
   --violet: #7c3aed;
   --violet-soft: #8b5cf6;
 }
@@ -54,7 +54,7 @@ input[type="search"]::-webkit-search-decoration {
   }
 
   .field {
-    @apply w-full rounded-xl border border-hairline bg-white/[0.03] px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet/50 focus:outline-none focus:ring-2 focus:ring-violet/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply w-full rounded-xl border border-hairline bg-white/[0.03] px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:border-violet/50 focus:outline-none focus:ring-2 focus:ring-violet/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn {

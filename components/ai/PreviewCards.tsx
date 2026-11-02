@@ -62,10 +62,10 @@ export function InsightCard({ insight }: { insight: AiInsightPreview }) {
       <h3 className="mt-3 text-sm font-semibold text-slate-50">{insight.title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-slate-300">{insight.body}</p>
       <div className="mt-4 flex-1 rounded-xl border border-hairline bg-base-900/40 p-3">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Based on demo data</p>
+        <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Based on demo data</p>
         <ul className="mt-2 space-y-1">
           {insight.evidence.map((e) => (
-            <li key={e} className="flex gap-2 text-xs text-slate-400">
+            <li key={e} className="flex gap-2 text-xs text-slate-300">
               <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-500" aria-hidden="true" />
               {e}
             </li>
@@ -86,14 +86,14 @@ export function SummaryCard({ summary, pulse }: { summary: ReportSummaryPreview;
   return (
     <article className="glass p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{formatLongDate(summary.date)}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-300">{formatLongDate(summary.date)}</p>
         <DemoBadge label="Sample summary format" />
       </div>
       <h3 className="mt-3 flex items-start gap-2 text-base font-semibold text-slate-50">
         <Wand2 className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
         {summary.headline}
       </h3>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-slate-400">
         Source coverage (counted from demo data): {pulse.submitted.length} of {pulse.expected.length} expected reports ·{" "}
         {pluralize(pulse.blockerCount, "blocker")}
       </p>
@@ -138,10 +138,10 @@ export function BottleneckRow({ item, people }: { item: BottleneckPreview; peopl
           </div>
           <h3 className="mt-2 text-sm font-semibold text-slate-50">{item.title}</h3>
           <p className="mt-1 text-sm font-medium text-slate-200">{item.signal}</p>
-          <p className="mt-1 text-sm text-slate-400">{item.detail}</p>
+          <p className="mt-1 text-sm text-slate-300">{item.detail}</p>
         </div>
         <div className="flex flex-col gap-3 lg:w-80">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-slate-400">
             <span>Affected</span>
             <AvatarStack people={people} />
           </div>

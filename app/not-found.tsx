@@ -8,7 +8,7 @@ export default function NotFound() {
         <Compass className="h-6 w-6 text-violet-300" aria-hidden="true" />
       </span>
       <h1 className="mt-5 text-xl font-semibold text-slate-50">Page not found</h1>
-      <p className="mt-2 max-w-sm text-sm text-slate-400">
+      <p className="mt-2 max-w-sm text-sm text-slate-300">
         This page isn&apos;t part of NEXORA Phase 1. Use the navigation to reach one of the eight modules.
       </p>
       <Link href="/" className="btn btn-primary mt-6">

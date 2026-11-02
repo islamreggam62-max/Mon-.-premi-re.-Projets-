@@ -49,7 +49,7 @@ export function PreferenceToggles() {
         <li key={p.id} className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
           <div className="min-w-0">
             <p className="text-sm font-medium text-slate-100">{p.label}</p>
-            <p className="mt-0.5 text-xs text-slate-400">{p.description}</p>
+            <p className="mt-0.5 text-xs text-slate-300">{p.description}</p>
           </div>
           <Switch
             label={p.label}

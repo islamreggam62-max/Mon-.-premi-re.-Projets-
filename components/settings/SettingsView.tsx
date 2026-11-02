@@ -9,6 +9,7 @@ import {
   Lock,
   Palette,
   RotateCcw,
+  Scale,
   ShieldCheck,
   SlidersHorizontal,
   UserPlus,
@@ -27,6 +28,7 @@ import type {
   AccessRole,
   OrganizationProfile,
   PermissionLevel,
+  GovernancePolicy,
   PermissionRow,
   Person,
   RoleDefinition,
@@ -35,7 +37,7 @@ import type {
 } from "@/lib/types";
 import { percent } from "@/lib/utils";
 
-type SettingsTab = "general" | "organization" | "roles" | "security" | "billing";
+type SettingsTab = "governance" | "organization" | "roles" | "preferences" | "security" | "billing";
 
 const PERMISSION_TONE: Record<PermissionLevel, Tone> = {
   full: "violet",
@@ -45,6 +47,7 @@ const PERMISSION_TONE: Record<PermissionLevel, Tone> = {
 };
 
 export function SettingsView({
+  governance,
   organization,
   roles,
   permissions,
@@ -53,6 +56,7 @@ export function SettingsView({
   workspace,
   seatsIncluded,
 }: {
+  governance: GovernancePolicy[];
   organization: OrganizationProfile;
   roles: RoleDefinition[];
   permissions: PermissionRow[];
@@ -61,7 +65,7 @@ export function SettingsView({
   workspace: Workspace;
   seatsIncluded: number;
 }) {
-  const [tab, setTab] = useState<SettingsTab>("general");
+  const [tab, setTab] = useState<SettingsTab>("governance");
 
   return (
     <div>
@@ -71,9 +75,10 @@ export function SettingsView({
         value={tab}
         onChange={setTab}
         items={[
-          { id: "general", label: "General", icon: SlidersHorizontal },
+          { id: "governance", label: "Governance", icon: Scale },
           { id: "organization", label: "Organization", icon: Building2 },
           { id: "roles", label: "Roles & Access", icon: Users },
+          { id: "preferences", label: "Preferences", icon: SlidersHorizontal },
           { id: "security", label: "Security", icon: ShieldCheck },
           { id: "billing", label: "Billing", icon: CreditCard },
         ]}
@@ -86,7 +91,8 @@ export function SettingsView({
         tabIndex={0}
         className="pt-6 focus:outline-none"
       >
-        {tab === "general" && <GeneralPanel workspace={workspace} organization={organization} />}
+        {tab === "governance" && <GovernancePanel policies={governance} />}
+        {tab === "preferences" && <PreferencesPanel workspace={workspace} organization={organization} />}
         {tab === "organization" && <OrganizationPanel organization={organization} people={people} />}
         {tab === "roles" && <RolesPanel roles={roles} permissions={permissions} people={people} />}
         {tab === "security" && <SecurityPanel controls={securityControls} />}
@@ -97,34 +103,74 @@ export function SettingsView({
 }
 
 /* ----------------------------------------------------------------------------
- * General
+ * Governance (read-only preview)
+ * ------------------------------------------------------------------------- */
+
+function GovernancePanel({ policies }: { policies: GovernancePolicy[] }) {
+  const areas = [...new Set(policies.map((p) => p.area))];
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start gap-3 rounded-2xl border border-hairline bg-white/[0.02] p-4 text-sm text-slate-200">
+        <Scale className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
+        <p>
+          Workspace governance rules are shown read-only. Editing them, and enforcing them on approvals and reports,
+          arrives with Supabase in Phase 2.
+        </p>
+      </div>
+      {areas.map((area) => (
+        <Card key={area}>
+          <CardHeader title={area} subtitle={`${policies.filter((p) => p.area === area).length} rules`} />
+          <ul className="divide-y divide-white/10">
+            {policies
+              .filter((p) => p.area === area)
+              .map((policy) => (
+                <li key={policy.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-50">{policy.title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-300">{policy.rule}</p>
+                  </div>
+                  <div className="shrink-0 sm:text-right">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-400">Policy owner</p>
+                    <p className="text-xs font-medium text-slate-200">{policy.owner}</p>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------------------
+ * Preferences
  * ------------------------------------------------------------------------- */
 
 function PhaseNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="flex items-center gap-2 text-xs text-slate-500">
+    <p className="flex items-center gap-2 text-xs text-slate-400">
       <Lock className="h-3.5 w-3.5" aria-hidden="true" />
       {children}
     </p>
   );
 }
 
-function GeneralPanel({ workspace, organization }: { workspace: Workspace; organization: OrganizationProfile }) {
+function PreferencesPanel({ workspace, organization }: { workspace: Workspace; organization: OrganizationProfile }) {
   return (
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
       <Card className="xl:col-span-2">
         <CardHeader title="Workspace preferences" subtitle="Applies to everyone in this workspace" />
         <CardBody>
           <form className="grid grid-cols-1 gap-4 sm:grid-cols-2" onSubmit={(event) => event.preventDefault()}>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Workspace name
               <input className="field" defaultValue={workspace.name} />
             </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Workspace URL
               <input className="field" defaultValue="app.nexora.example/hq" readOnly aria-readonly="true" />
             </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Default time zone
               <select className="field appearance-none" defaultValue="America/New_York">
                 <option className="bg-base-800" value="America/New_York">America/New_York (UTC−05:00)</option>
@@ -133,7 +179,7 @@ function GeneralPanel({ workspace, organization }: { workspace: Workspace; organ
                 <option className="bg-base-800" value="Asia/Singapore">Asia/Singapore (UTC+08:00)</option>
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Language
               <select className="field appearance-none" defaultValue="en-US">
                 <option className="bg-base-800" value="en-US">English (United States)</option>
@@ -141,7 +187,7 @@ function GeneralPanel({ workspace, organization }: { workspace: Workspace; organ
                 <option className="bg-base-800" value="ar">العربية</option>
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Date format
               <select className="field appearance-none" defaultValue="mdy">
                 <option className="bg-base-800" value="mdy">Oct 30, 2026</option>
@@ -149,7 +195,7 @@ function GeneralPanel({ workspace, organization }: { workspace: Workspace; organ
                 <option className="bg-base-800" value="iso">2026-10-30</option>
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-slate-400">
+            <label className="flex flex-col gap-1 text-xs font-medium text-slate-300">
               Fiscal year starts
               <input className="field" defaultValue={organization.fiscalYearStart} />
             </label>
@@ -178,7 +224,7 @@ function GeneralPanel({ workspace, organization }: { workspace: Workspace; organ
                 <Palette className="h-4 w-4 text-violet-300" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-medium text-slate-100">Dark · Enterprise</p>
-                  <p className="text-xs text-slate-400">Deep navy with royal violet</p>
+                  <p className="text-xs text-slate-300">Deep navy with royal violet</p>
                 </div>
               </div>
               <span className="flex items-center gap-1.5" aria-hidden="true">
@@ -231,7 +277,7 @@ function OrganizationPanel({ organization, people }: { organization: Organizatio
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1">
             {fields.map(([label, value]) => (
               <div key={label} className="rounded-xl border border-hairline bg-white/[0.02] px-4 py-3">
-                <dt className="text-xs text-slate-500">{label}</dt>
+                <dt className="text-xs text-slate-400">{label}</dt>
                 <dd className="mt-0.5 text-sm font-medium text-slate-100">{value}</dd>
               </div>
             ))}
@@ -244,7 +290,7 @@ function OrganizationPanel({ organization, people }: { organization: Organizatio
         <CardBody className="overflow-x-auto">
           <table className="w-full min-w-[30rem] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-hairline text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-hairline text-left text-xs font-medium uppercase tracking-wide text-slate-400">
                 <th scope="col" className="pb-3 pr-4">Department</th>
                 <th scope="col" className="pb-3 pr-4">Lead</th>
                 <th scope="col" className="pb-3 pr-4 text-right">Headcount</th>
@@ -312,12 +358,12 @@ function RolesPanel({
                   {members.length}
                 </span>
               </div>
-              <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-400">{role.description}</p>
+              <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-300">{role.description}</p>
               <div className="mt-3 flex -space-x-2">
                 {members.slice(0, 5).map((p) => (
                   <Avatar key={p.id} person={p} size="xs" className="ring-2 ring-base-900" />
                 ))}
-                {members.length === 0 && <span className="text-xs text-slate-600">No members</span>}
+                {members.length === 0 && <span className="text-xs text-slate-400">No members</span>}
               </div>
             </li>
           );
@@ -329,7 +375,7 @@ function RolesPanel({
         <CardBody className="overflow-x-auto">
           <table className="w-full min-w-[40rem] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-hairline text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-hairline text-left text-xs font-medium uppercase tracking-wide text-slate-400">
                 <th scope="col" className="pb-3 pr-4">Module</th>
                 {ACCESS_ROLE_ORDER.map((r) => (
                   <th key={r} scope="col" className="px-2 pb-3 text-center">
@@ -347,7 +393,7 @@ function RolesPanel({
                     return (
                       <td key={r} className="px-2 py-2.5 text-center">
                         {level === "none" ? (
-                          <span className="text-xs text-slate-600">—<span className="sr-only">No access</span></span>
+                          <span className="text-xs text-slate-400">—<span className="sr-only">No access</span></span>
                         ) : (
                           <Badge tone={PERMISSION_TONE[level]}>{PERMISSION_LABEL[level]}</Badge>
                         )}
@@ -388,12 +434,12 @@ function RolesPanel({
                 <Avatar person={p} size="sm" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-slate-100">{p.name}</p>
-                  <p className="truncate text-xs text-slate-500">
+                  <p className="truncate text-xs text-slate-400">
                     {p.title} · {p.email}
                   </p>
                 </div>
               </div>
-              <label className="flex items-center gap-2 text-xs text-slate-400">
+              <label className="flex items-center gap-2 text-xs text-slate-300">
                 <span className="sr-only">Role for {p.name}</span>
                 <select
                   className="field w-full appearance-none sm:w-36"
@@ -442,7 +488,7 @@ function SecurityPanel({ controls }: { controls: SecurityControl[] }) {
                   {control.label}
                   <Badge tone={control.phase === "Phase 2" ? "violet" : "slate"}>{control.phase}</Badge>
                 </p>
-                <p className="mt-0.5 text-xs text-slate-400">{control.description}</p>
+                <p className="mt-0.5 text-xs text-slate-300">{control.description}</p>
               </div>
               <Switch checked={false} disabled label={`${control.label} (not available yet)`} />
             </li>
@@ -480,7 +526,7 @@ function BillingPanel({
           <CardHeader title="Plan" subtitle="Demo subscription" action={<Badge tone="violet">{workspace.plan}</Badge>} />
           <CardBody className="space-y-5">
             <div>
-              <div className="mb-1.5 flex items-center justify-between text-xs text-slate-400">
+              <div className="mb-1.5 flex items-center justify-between text-xs text-slate-300">
                 <span>Seats used</span>
                 <span className="tabular-nums text-slate-200">
                   {seatsUsed} of {seatsIncluded}
@@ -495,7 +541,7 @@ function BillingPanel({
                 ["Billing contact", "Not set"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-xl border border-hairline bg-white/[0.02] px-4 py-3">
-                  <dt className="text-xs text-slate-500">{label}</dt>
+                  <dt className="text-xs text-slate-400">{label}</dt>
                   <dd className="mt-0.5 text-sm text-slate-300">{value}</dd>
                 </div>
               ))}
@@ -514,7 +560,7 @@ function BillingPanel({
         <Card>
           <CardHeader title="Payment method" />
           <CardBody>
-            <p className="text-sm text-slate-400">No payment method on file.</p>
+            <p className="text-sm text-slate-300">No payment method on file.</p>
             <button type="button" className="btn btn-secondary mt-4" disabled>
               Add payment method
             </button>

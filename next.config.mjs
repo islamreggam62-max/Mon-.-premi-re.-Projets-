@@ -6,6 +6,10 @@ const nextConfig = {
   devIndicators: {
     position: "bottom-right",
   },
+  // `/` is the canonical Dashboard URL; `/dashboard` is kept as an alias.
+  async redirects() {
+    return [{ source: "/dashboard", destination: "/", permanent: false }];
+  },
 };
 
 export default nextConfig;

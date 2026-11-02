@@ -7,9 +7,10 @@ import {
   Check,
   Eye,
   Info,
+  FileSignature,
   MessageSquareWarning,
-  PackageCheck,
   RotateCcw,
+  Shuffle,
   Stamp,
   UserPlus,
   Wallet,
@@ -21,7 +22,12 @@ import { ApprovalStatusBadge, Badge, UrgencyBadge } from "@/components/ui/Badge"
 import { ToggleChip } from "@/components/ui/Controls";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Tabs } from "@/components/ui/Tabs";
-import { APPROVAL_KIND_LABEL, APPROVAL_STATUS_LABEL, APPROVAL_STATUS_ORDER } from "@/lib/labels";
+import {
+  APPROVAL_KIND_LABEL,
+  APPROVAL_KIND_ORDER,
+  APPROVAL_STATUS_LABEL,
+  APPROVAL_STATUS_ORDER,
+} from "@/lib/labels";
 import { approvalUrgency, indexById, isOpenApproval, sortOpenApprovals } from "@/lib/metrics";
 import type { Approval, ApprovalKind, ApprovalStatus, Person, Project } from "@/lib/types";
 import { cn, dueLabel, formatCompactCurrency, formatCurrency, formatDate, pluralize } from "@/lib/utils";
@@ -31,8 +37,17 @@ type KindFilter = "all" | ApprovalKind;
 
 const KIND_ICON: Record<ApprovalKind, LucideIcon> = {
   budget: Wallet,
+  contract: FileSignature,
   hiring: UserPlus,
-  deliverable: PackageCheck,
+  exception: Shuffle,
+};
+
+/** What the amount means for each request type. */
+const AMOUNT_LABEL: Record<ApprovalKind, string> = {
+  budget: "Requested budget",
+  contract: "Contract value",
+  hiring: "",
+  exception: "Exposure",
 };
 
 /** A decision taken in this tab. Lives in React state only — never persisted. */
@@ -82,7 +97,7 @@ export function ApprovalQueue({
       const u = approvalUrgency(a.dueBy, asOf);
       return u === "due-today" || u === "due-soon";
     }).length,
-    budget: open.filter((a) => a.kind === "budget").reduce((sum, a) => sum + (a.amount ?? 0), 0),
+    value: open.reduce((sum, a) => sum + (a.amount ?? 0), 0),
   };
 
   const tabs = [
@@ -133,7 +148,7 @@ export function ApprovalQueue({
         <Stat label="Open decisions" value={String(stats.open)} />
         <Stat label="Overdue" value={String(stats.overdue)} tone={stats.overdue ? "rose" : undefined} />
         <Stat label="Due within 3 days" value={String(stats.dueSoon)} tone={stats.dueSoon ? "amber" : undefined} />
-        <Stat label="Budget awaiting sign-off" value={formatCompactCurrency(stats.budget)} />
+        <Stat label="Value awaiting decision" value={formatCompactCurrency(stats.value)} />
       </section>
 
       <div className="mt-6 flex flex-col gap-4">
@@ -142,7 +157,7 @@ export function ApprovalQueue({
           <ToggleChip pressed={kindFilter === "all"} onToggle={() => setKindFilter("all")}>
             All types
           </ToggleChip>
-          {(Object.keys(APPROVAL_KIND_LABEL) as ApprovalKind[]).map((kind) => {
+          {APPROVAL_KIND_ORDER.map((kind) => {
             const Icon = KIND_ICON[kind];
             return (
               <ToggleChip key={kind} pressed={kindFilter === kind} onToggle={() => setKindFilter(kind)}>
@@ -154,7 +169,7 @@ export function ApprovalQueue({
         </div>
       </div>
 
-      <p className="mt-4 flex items-start gap-2 rounded-xl border border-hairline bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
+      <p className="mt-4 flex items-start gap-2 rounded-xl border border-hairline bg-white/[0.02] px-3 py-2 text-xs text-slate-300">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" aria-hidden="true" />
         Decisions update this browser tab only — nothing is sent or stored, and the queue resets on reload.
         Persistence arrives with Supabase in Phase 2.
@@ -191,11 +206,17 @@ export function ApprovalQueue({
                   <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0 lg:max-w-2xl">
                       <h2 className="text-base font-semibold text-slate-50">{a.title}</h2>
-                      <p className="mt-1 text-sm text-slate-400">{a.summary}</p>
+                      {a.counterparty && (
+                        <p className="mt-0.5 text-xs font-medium text-violet-200">Counterparty: {a.counterparty}</p>
+                      )}
+                      <p className="mt-1 text-sm text-slate-300">{a.summary}</p>
                     </div>
                     <div className="shrink-0 lg:text-right">
                       {a.amount !== undefined && (
-                        <p className="text-xl font-semibold tabular-nums text-slate-50">{formatCurrency(a.amount)}</p>
+                        <>
+                          <p className="text-[11px] uppercase tracking-wide text-slate-400">{AMOUNT_LABEL[a.kind]}</p>
+                          <p className="text-xl font-semibold tabular-nums text-slate-50">{formatCurrency(a.amount)}</p>
+                        </>
                       )}
                       {a.headcount !== undefined && (
                         <p className="text-xl font-semibold tabular-nums text-slate-50">{pluralize(a.headcount, "role")}</p>
@@ -205,30 +226,30 @@ export function ApprovalQueue({
 
                   <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-xs sm:grid-cols-4">
                     <div>
-                      <dt className="text-slate-500">Requested by</dt>
+                      <dt className="text-slate-400">Requested by</dt>
                       <dd className="mt-1 flex items-center gap-1.5 text-slate-200">
                         {requester && <Avatar person={requester} size="xs" />}
                         <span className="truncate">{requester?.name}</span>
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Approver</dt>
+                      <dt className="text-slate-400">Approver</dt>
                       <dd className="mt-1 flex items-center gap-1.5 text-slate-200">
                         {approver && <Avatar person={approver} size="xs" />}
                         <span className="truncate">{approver?.name}</span>
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Submitted</dt>
+                      <dt className="text-slate-400">Submitted</dt>
                       <dd className="mt-1 text-slate-200">{formatDate(a.submitted)}</dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">{isOpen ? "Decision due" : "Decided"}</dt>
+                      <dt className="text-slate-400">{isOpen ? "Decision due" : "Decided"}</dt>
                       <dd className="mt-1 text-slate-200">
                         {isOpen ? formatDate(a.dueBy) : a.decidedAt ? formatDate(a.decidedAt) : "—"}
                       </dd>
                       {isOpen && (
-                        <dd className={cn(urgency === "overdue" || urgency === "due-today" ? "text-rose-300" : "text-slate-500")}>
+                        <dd className={cn(urgency === "overdue" || urgency === "due-today" ? "text-rose-300" : "text-slate-400")}>
                           {dueLabel(a.dueBy, asOf)}
                         </dd>
                       )}
@@ -301,7 +322,7 @@ export function ApprovalQueue({
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "amber" }) {
   return (
     <div className="glass p-4">
-      <p className="text-xs text-slate-400">{label}</p>
+      <p className="text-xs text-slate-300">{label}</p>
       <p
         className={cn(
           "mt-1 text-xl font-semibold tabular-nums",

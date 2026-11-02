@@ -5,7 +5,89 @@
  * called and nothing here is generated at runtime. The UI badges every item
  * as a static preview.
  */
-import type { AiInsightPreview, BottleneckPreview, ReportSummaryPreview } from "@/lib/types";
+import type {
+  AiInsightPreview,
+  BottleneckPreview,
+  ExecutiveBriefPreview,
+  ReportSummaryPreview,
+  RiskDimension,
+} from "@/lib/types";
+
+export const EXECUTIVE_BRIEF: ExecutiveBriefPreview = {
+  headline: "Delivery risk is rising on Atlas and Forge; four decisions this week unblock most of it.",
+  points: [
+    "Two engineers above 90% workload carry the Atlas critical path.",
+    "Forge's missed milestone now gates the Summit GA launch assets.",
+    "Report submission is 70% today; three of four blockers wait on another team.",
+  ],
+  decisions: [
+    "Atlas infrastructure budget — $85K, overdue",
+    "Horizon ML backfill — due today",
+    "Pilot #4 discount exception — due Monday",
+    "Delegate the Forge token-naming decision",
+  ],
+};
+
+/** Exposure by dimension, 0–100. Hand-written preview values, not model output. */
+export const RISK_RADAR: RiskDimension[] = [
+  {
+    id: "delivery",
+    label: "Delivery",
+    score: 72,
+    previous: 64,
+    drivers: ["Atlas At Risk, Forge Delayed", "2 overdue tasks, 1 blocked critical task"],
+  },
+  {
+    id: "capacity",
+    label: "People capacity",
+    score: 68,
+    previous: 61,
+    drivers: ["2 engineers at 90%+ workload", "Lowest energy scores sit with blocked work"],
+  },
+  {
+    id: "dependencies",
+    label: "Cross-team dependencies",
+    score: 61,
+    previous: 55,
+    drivers: ["Finance export gates the billing migration", "Forge logo set gates GA assets"],
+  },
+  {
+    id: "decisions",
+    label: "Decision latency",
+    score: 58,
+    previous: 40,
+    drivers: ["1 approval overdue", "4 approvals due within 3 days"],
+  },
+  {
+    id: "financial",
+    label: "Financial",
+    score: 34,
+    previous: 36,
+    drivers: ["Forge: 59% of budget spent at 29% progress", "Portfolio spend within plan"],
+  },
+  {
+    id: "customer",
+    label: "Customer",
+    score: 29,
+    previous: 33,
+    drivers: ["Beacon: coverage gaps on 18 of the top-50 accounts", "3 Summit pilots signed"],
+  },
+  {
+    id: "compliance",
+    label: "Compliance",
+    score: 18,
+    previous: 18,
+    drivers: ["External audit engagement approved", "Legal review of AI data terms pending"],
+  },
+];
+
+/** Example questions for the prompt composer. Nothing is sent in Phase 1. */
+export const PROMPT_SUGGESTIONS: string[] = [
+  "Which projects are most likely to slip this quarter?",
+  "Summarize today's blockers by department",
+  "Which decisions are waiting on me, ranked by impact?",
+  "Who is over capacity next week?",
+];
 
 export const AI_INSIGHTS: AiInsightPreview[] = [
   {
@@ -135,8 +217,8 @@ export const BOTTLENECKS: BottleneckPreview[] = [
     severity: "high",
     title: "Approval queue latency",
     area: "Approvals",
-    signal: "1 overdue, 3 due within 3 days",
-    detail: "Budget and hiring decisions are clustering at the end of the week.",
+    signal: "1 overdue, 4 due within 3 days",
+    detail: "Budget, hiring, contract, and exception decisions are clustering at the end of the week.",
     affectedIds: ["u-amara"],
     suggestedAction: "Hold a 20-minute decision block on Monday morning.",
   },

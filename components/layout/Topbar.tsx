@@ -6,9 +6,8 @@ import type { RefObject } from "react";
 import {
   AlertTriangle,
   Bell,
-  Check,
   ChevronDown,
-  ChevronsUpDown,
+  ChevronRight,
   CircleAlert,
   FlaskConical,
   Info,
@@ -51,22 +50,30 @@ export function Topbar({
           ref={menuButtonRef}
           type="button"
           onClick={onOpenMenu}
-          className="focus-ring -ml-1 rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 lg:hidden"
+          className="focus-ring -ml-1 rounded-lg p-2 text-slate-300 hover:bg-white/5 hover:text-slate-200 lg:hidden"
           aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <WorkspaceSwitcher workspaces={workspaces} current={workspace} />
-
-        <span className="hidden text-slate-600 md:inline" aria-hidden="true">
-          /
-        </span>
-        <span className="hidden truncate text-sm font-medium text-slate-300 md:inline">
-          {page.label}
-        </span>
-
-        <div className="flex-1" />
+        <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
+          <ol className="flex min-w-0 items-center gap-2 text-sm">
+            <li className="hidden shrink-0 md:block">
+              <Link href="/" className="focus-ring rounded text-slate-400 hover:text-slate-200">
+                {workspace.name}
+              </Link>
+            </li>
+            <li className="hidden shrink-0 text-slate-400 md:block" aria-hidden="true">
+              <ChevronRight className="h-4 w-4" />
+            </li>
+            <li className="min-w-0">
+              <span aria-current="page" className="block truncate font-semibold text-slate-50">
+                {page.label}
+              </span>
+              <span className="hidden truncate text-xs text-slate-400 xl:block">{page.description}</span>
+            </li>
+          </ol>
+        </nav>
 
         <SearchPlaceholder />
         <DemoModeBadge />
@@ -78,77 +85,6 @@ export function Topbar({
 }
 
 /* ----------------------------------------------------------------------------
- * Workspace switcher
- * ------------------------------------------------------------------------- */
-
-function WorkspaceSwitcher({ workspaces, current }: { workspaces: Workspace[]; current: Workspace }) {
-  return (
-    <Popover
-      align="left"
-      panelLabel="Workspaces"
-      panelClassName="w-72"
-      triggerClassName="hover:bg-white/5"
-      trigger={() => (
-        <span className="flex items-center gap-2 rounded-xl px-1.5 py-1">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet to-violet-soft text-[10px] font-bold text-white">
-            NX
-          </span>
-          <span className="sr-only">Workspace: </span>
-          <span className="hidden max-w-[9rem] truncate text-sm font-semibold text-slate-100 sm:inline">
-            {current.name}
-          </span>
-          <span className="hidden rounded-md bg-violet/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-200 ring-1 ring-inset ring-violet/30 sm:inline">
-            {current.plan}
-          </span>
-          <ChevronsUpDown className="h-4 w-4 text-slate-500" aria-hidden="true" />
-        </span>
-      )}
-    >
-      <div className="border-b border-hairline px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Workspaces</p>
-      </div>
-      <ul className="p-2">
-        {workspaces.map((ws) => (
-          <li key={ws.id}>
-            <div
-              aria-disabled={!ws.available}
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5",
-                ws.current ? "bg-violet/10" : "opacity-60",
-              )}
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06] text-[11px] font-semibold text-slate-300">
-                {ws.name
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-100">{ws.name}</p>
-                <p className="truncate text-xs text-slate-500">
-                  {ws.plan} · {ws.region}
-                </p>
-              </div>
-              {ws.current ? (
-                <Check className="h-4 w-4 text-violet-300" aria-label="Current workspace" />
-              ) : (
-                <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                  Phase 2
-                </span>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-      <p className="border-t border-hairline px-4 py-3 text-xs text-slate-500">
-        Switching between workspaces arrives in Phase 2.
-      </p>
-    </Popover>
-  );
-}
-
-/* ----------------------------------------------------------------------------
  * Search (placeholder)
  * ------------------------------------------------------------------------- */
 
@@ -156,7 +92,7 @@ function SearchPlaceholder() {
   return (
     <div className="relative hidden md:block" title="Global search arrives in Phase 2">
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         aria-hidden="true"
       />
       <input
@@ -166,7 +102,7 @@ function SearchPlaceholder() {
         placeholder="Search NEXORA…"
         className="field w-56 cursor-default pl-9 pr-16 lg:w-72"
       />
-      <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-hairline bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
+      <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-hairline bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
         Phase 2
       </span>
     </div>
@@ -180,25 +116,24 @@ function SearchPlaceholder() {
 function DemoModeBadge() {
   return (
     <Popover
-      panelLabel="About demo mode"
+      panelLabel="About demo data mode"
       panelClassName="w-80"
       trigger={() => (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-violet/15 px-2.5 py-1 text-xs font-semibold text-violet-200 ring-1 ring-inset ring-violet/35">
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-violet/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-violet-100 ring-1 ring-inset ring-violet/50">
           <span className="relative flex h-2 w-2" aria-hidden="true">
             <span className="absolute inline-flex h-full w-full rounded-full bg-violet-soft opacity-60 motion-safe:animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-soft" />
           </span>
-          <span className="hidden sm:inline">Demo mode</span>
-          <span className="sm:hidden">Demo</span>
+          Demo data mode
         </span>
       )}
     >
       <div className="p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-slate-100">
           <FlaskConical className="h-4 w-4 text-violet-300" aria-hidden="true" />
-          You are viewing demo mode
+          You are viewing demo data
         </p>
-        <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-400">
+        <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-300">
           <li>
             All figures are static demonstration data as of{" "}
             <span className="text-slate-200">{formatLongDate(DEMO_AS_OF)}</span>.
@@ -267,8 +202,8 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
                     </span>
                     <span className="min-w-0">
                       <span className="block text-sm font-medium text-slate-100">{n.title}</span>
-                      <span className="mt-0.5 block text-xs text-slate-400">{n.detail}</span>
-                      <span className="mt-1 block text-[11px] text-slate-500">
+                      <span className="mt-0.5 block text-xs text-slate-300">{n.detail}</span>
+                      <span className="mt-1 block text-[11px] text-slate-400">
                         {formatShortDate(n.time)} · {formatTime(n.time)}
                       </span>
                     </span>
@@ -301,11 +236,11 @@ function ProfileMenu({ user }: { user: Person }) {
             <span className="block max-w-[10rem] truncate text-sm font-medium leading-tight text-slate-100">
               {user.name}
             </span>
-            <span className="block max-w-[10rem] truncate text-[11px] leading-tight text-slate-500">
+            <span className="block max-w-[10rem] truncate text-[11px] leading-tight text-slate-400">
               {user.title}
             </span>
           </span>
-          <ChevronDown className="hidden h-4 w-4 text-slate-500 lg:block" aria-hidden="true" />
+          <ChevronDown className="hidden h-4 w-4 text-slate-400 lg:block" aria-hidden="true" />
         </span>
       )}
     >
@@ -315,7 +250,7 @@ function ProfileMenu({ user }: { user: Person }) {
             <Avatar person={user} size="lg" />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-100">{user.name}</p>
-              <p className="truncate text-xs text-slate-400">{user.email}</p>
+              <p className="truncate text-xs text-slate-300">{user.email}</p>
               <Badge tone="violet" className="mt-1.5">
                 {ACCESS_ROLE_LABEL[user.accessRole]}
               </Badge>
@@ -328,7 +263,7 @@ function ProfileMenu({ user }: { user: Person }) {
                 onClick={close}
                 className="focus-ring flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-300 hover:bg-white/5 hover:text-slate-100"
               >
-                <Settings className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                <Settings className="h-4 w-4 text-slate-400" aria-hidden="true" />
                 Workspace settings
               </Link>
             </li>
@@ -338,7 +273,7 @@ function ProfileMenu({ user }: { user: Person }) {
                 onClick={close}
                 className="focus-ring flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-300 hover:bg-white/5 hover:text-slate-100"
               >
-                <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
                 Team directory
               </Link>
             </li>
@@ -346,7 +281,7 @@ function ProfileMenu({ user }: { user: Person }) {
               <button
                 type="button"
                 disabled
-                className="flex w-full cursor-not-allowed items-center gap-2.5 rounded-lg px-3 py-2 text-slate-500"
+                className="flex w-full cursor-not-allowed items-center gap-2.5 rounded-lg px-3 py-2 text-slate-400"
               >
                 <LogOut className="h-4 w-4" aria-hidden="true" />
                 Sign out

@@ -14,7 +14,7 @@ export function PageHeader({
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-1 max-w-2xl text-sm text-slate-400">{subtitle}</p>
+          <p className="mt-1 max-w-2xl text-sm text-slate-300">{subtitle}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

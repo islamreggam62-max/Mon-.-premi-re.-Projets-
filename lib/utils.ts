@@ -25,6 +25,40 @@ export function dayValue(iso: string): number {
   return Date.UTC(y, m - 1, d);
 }
 
+/** Epoch ms → "YYYY-MM-DD" (UTC). */
+export function toISODate(ms: number): string {
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+/** Monday–Friday. */
+export function isBusinessDay(iso: string): boolean {
+  const wd = new Date(dayValue(iso)).getUTCDay();
+  return wd !== 0 && wd !== 6;
+}
+
+/** The `count` business days ending on `asOf` (inclusive), newest first. */
+export function businessDaysBack(asOf: string, count: number): string[] {
+  const days: string[] = [];
+  let t = dayValue(asOf);
+  while (days.length < count) {
+    const iso = toISODate(t);
+    if (isBusinessDay(iso)) days.push(iso);
+    t -= DAY_MS;
+  }
+  return days;
+}
+
+/** "Oct", or "Jan 2027" for January (marks the year change on an axis). */
+export function formatMonthShort(iso: string): string {
+  const { y, m } = dateParts(iso);
+  return m === 0 ? `${MONTHS[m]} ${y}` : MONTHS[m];
+}
+
+/** "Fri" */
+export function formatWeekdayShort(iso: string): string {
+  return WEEKDAYS[new Date(dayValue(iso)).getUTCDay()].slice(0, 3);
+}
+
 /** Whole days from `ref` to `iso` (negative when `iso` is in the past). */
 export function daysUntil(iso: string, ref: string = DEMO_AS_OF): number {
   return Math.round((dayValue(iso) - dayValue(ref)) / DAY_MS);
