@@ -1,0 +1,26 @@
+{
+  "_comment": "Verite terrain du contrat de demonstration contrat_demo_v2.txt : defauts que J'AI PLANTES. Redige AVANT toute execution du banc d'essai ; ne pas l'ajuster apres avoir vu des sorties. Les motifs sont des expressions regulieres appliquees au texte normalise (minuscules, sans accents) : mesure GROSSIERE du rappel (un mot cite en passant compte), a lire en complement du jugement humain, jamais a sa place.",
+  "contract": "contrat_demo_v2.txt",
+  "issues": [
+    {"id": "responsabilite_illimitee", "label": "Art. 5 : responsabilite du Client illimitee",
+     "pattern": "responsabilite[^.\\n]{0,60}illimit|illimit[^.\\n]{0,60}responsabilite"},
+    {"id": "exoneration_fournisseur", "label": "Art. 5 : exoneration totale du Fournisseur",
+     "pattern": "exoner|ne saurait[^.\\n]{0,40}responsable|aucun cas[^.\\n]{0,60}responsable|degag"},
+    {"id": "revision_prix_unilaterale", "label": "Art. 3 : prix revisables unilateralement a tout moment",
+     "pattern": "(revis|modifi)[^.\\n]{0,60}unilat|unilat[^.\\n]{0,60}(prix|revis)"},
+    {"id": "resiliation_unilaterale", "label": "Art. 7 : resiliation par le seul Fournisseur, a tout moment et sans motif",
+     "pattern": "resili[^.\\n]{0,80}(sans motif|a tout moment|unilat)|(sans motif|a tout moment)[^.\\n]{0,80}resili"},
+    {"id": "preavis_8_jours", "label": "Art. 7 : preavis de seulement 8 jours",
+     "pattern": "(\\b8\\b|huit)[^.\\n]{0,12}jours"},
+    {"id": "reconduction_tacite", "label": "Art. 2 : reconduction tacite pour des periodes successives",
+     "pattern": "tacit"},
+    {"id": "arbitrage_cci", "label": "Art. 8 : arbitrage CCI (au lieu des tribunaux algeriens)",
+     "pattern": "\\bcci\\b|chambre de commerce internationale|arbitrage"},
+    {"id": "penalite_non_plafonnee", "label": "Art. 3 : penalite de 0,5 % par jour, sans plafond",
+     "pattern": "0[,.]5\\s*%|penalite[^.\\n]{0,80}(plafon|excessi|dispropor|jour)"},
+    {"id": "garanties_assurances_absentes", "label": "Clause de garanties / assurances absente (presente dans la v1)",
+     "pattern": "(absen|manqu|aucun|supprim|disparu)[^.\\n]{0,80}(assurance|garantie)|(assurance|garantie)[^.\\n]{0,80}(absen|manqu|supprim|disparu)"},
+    {"id": "confidentialite_absente", "label": "Clause de confidentialite absente",
+     "pattern": "confidentialit"}
+  ]
+}
