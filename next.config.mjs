@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 
 /**
  * Two build targets share this config:
- * - default: a Node server (`next start`, Vercel) with redirects and headers;
+ * - default: a Node server (`next start`, Vercel) with security headers;
  * - GITHUB_PAGES=true: a static export served from
  *   https://<owner>.github.io/<repo>/ — so it needs a basePath and trailing
  *   slashes, and cannot use server redirects or headers.
@@ -42,11 +42,6 @@ const nextConfig = {
         images: { unoptimized: true },
       }
     : {
-        // `/` is the canonical Dashboard URL; `/dashboard` is kept as an alias.
-        // (The static export serves app/dashboard/page.tsx instead.)
-        async redirects() {
-          return [{ source: "/dashboard", destination: "/", permanent: false }];
-        },
         async headers() {
           return [
             {

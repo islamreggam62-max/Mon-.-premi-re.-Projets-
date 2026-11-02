@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { AppShell } from "@/components/layout/AppShell";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
-import { APPROVALS } from "@/lib/data/approvals";
-import { NOTIFICATIONS } from "@/lib/data/dashboard";
-import { CURRENT_USER_ID, WORKSPACES } from "@/lib/data/meta";
-import { TEAM } from "@/lib/data/team";
-import { isOpenApproval } from "@/lib/metrics";
 
+/**
+ * Root layout: document, metadata, and the offline worker. The product UI
+ * (sidebar + top bar) lives in app/(app)/layout.tsx; the public landing page
+ * in app/(marketing) has its own header and footer.
+ */
 export const metadata: Metadata = {
   title: {
     default: "NEXORA — Executive Business Operating System",
@@ -33,20 +32,10 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const currentUser = TEAM.find((p) => p.id === CURRENT_USER_ID) ?? TEAM[0];
-  const openApprovals = APPROVALS.filter((a) => isOpenApproval(a.status)).length;
-
   return (
     <html lang="en">
       <body className="font-sans">
-        <AppShell
-          currentUser={currentUser}
-          workspaces={WORKSPACES}
-          notifications={NOTIFICATIONS}
-          navBadges={{ "/approvals": openApprovals }}
-        >
-          {children}
-        </AppShell>
+        {children}
         <ServiceWorkerRegister />
       </body>
     </html>

@@ -1,9 +1,9 @@
-import { HOME_HREF } from "@/lib/basePath";
+import { APP_HOME } from "@/lib/basePath";
 import type { NavItem } from "@/lib/types";
 
 /** The 8 core NEXORA modules, in command-center order. */
 export const NAV_ITEMS: NavItem[] = [
-  { href: HOME_HREF, label: "Dashboard", icon: "dashboard", description: "Executive command center" },
+  { href: APP_HOME, label: "Dashboard", icon: "dashboard", description: "Executive command center" },
   { href: "/team", label: "Team", icon: "team", description: "Directory, roles & workloads" },
   { href: "/projects", label: "Projects", icon: "projects", description: "Strategic portfolio" },
   { href: "/tasks", label: "Tasks", icon: "tasks", description: "Execution view" },
@@ -20,8 +20,6 @@ export function normalizePath(pathname: string): string {
 
 export function isActivePath(pathname: string, href: string): boolean {
   const path = normalizePath(pathname);
-  // "/dashboard" is an alias of the Dashboard (redirect on servers, page in the static export).
-  if (href === "/" || href === "/dashboard") return path === "/" || path === "/dashboard";
   return path === href || path.startsWith(`${href}/`);
 }
 

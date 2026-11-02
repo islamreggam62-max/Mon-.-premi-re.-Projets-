@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { pageUrl, withBase } from "@/lib/basePath";
+import { APP_HOME, pageUrl, withBase } from "@/lib/basePath";
 
 // Generated once at build time; required by the static export (GitHub Pages).
 export const dynamic = "force-static";
@@ -13,7 +13,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "NEXORA",
     description:
       "Executive command center for projects, tasks, daily reports, approvals, and AI operational intelligence.",
-    start_url: pageUrl("/"),
+    // The installed app opens straight into the product; "/" is the public landing page.
+    start_url: pageUrl(APP_HOME),
     scope: pageUrl("/"),
     display: "standalone",
     orientation: "any",

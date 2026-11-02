@@ -7,11 +7,11 @@ export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const TRAILING_SLASH = process.env.NEXT_PUBLIC_TRAILING_SLASH === "1";
 
 /**
- * In-app link target for the Dashboard. In the static export, Next.js resolves the
- * root route's prefetch payload to "<base>.txt" — outside the site folder on
- * GitHub Pages (404) — so links use the /dashboard alias there. Servers use "/".
+ * The product's entry route. "/" is the public landing page.
+ * (In-app links never point at "/": in the static export, Next.js resolves the
+ * root route's prefetch payload to "<base>.txt", which 404s on GitHub Pages.)
  */
-export const HOME_HREF = TRAILING_SLASH ? "/dashboard" : "/";
+export const APP_HOME = "/dashboard";
 
 /** A file URL under the base path, e.g. withBase("/icons/icon-192.png"). */
 export function withBase(path: string): string {
