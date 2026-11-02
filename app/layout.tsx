@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { APPROVALS } from "@/lib/data/approvals";
 import { NOTIFICATIONS } from "@/lib/data/dashboard";
 import { CURRENT_USER_ID, WORKSPACES } from "@/lib/data/meta";
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
   description:
     "NEXORA centralizes enterprise execution: executive KPIs, team, projects, tasks, daily reports, approvals, and AI operational intelligence.",
   applicationName: "NEXORA",
+  // Installed-app behavior on iOS (Add to Home Screen); Android/desktop use app/manifest.ts.
+  appleWebApp: {
+    capable: true,
+    title: "NEXORA",
+    statusBarStyle: "black",
+  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -39,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           {children}
         </AppShell>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

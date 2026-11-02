@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Popover } from "@/components/ui/Popover";
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { ACCESS_ROLE_LABEL } from "@/lib/labels";
-import { currentNavItem } from "@/lib/nav";
+import { findNavItem } from "@/lib/nav";
 import type { AppNotification, NotificationTone, Person, Workspace } from "@/lib/types";
 import { cn, formatLongDate, formatShortDate, formatTime } from "@/lib/utils";
 
@@ -40,7 +40,10 @@ export function Topbar({
   notifications: AppNotification[];
 }) {
   const pathname = usePathname();
-  const page = currentNavItem(pathname);
+  const page = findNavItem(pathname) ?? {
+    label: pathname === "/offline" ? "Offline" : "Page not found",
+    description: "",
+  };
   const workspace = workspaces.find((w) => w.current) ?? workspaces[0];
 
   return (

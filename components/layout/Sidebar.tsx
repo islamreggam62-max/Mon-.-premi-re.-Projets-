@@ -20,6 +20,7 @@ import {
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { NAV_ITEMS, isActivePath } from "@/lib/nav";
 import type { NavIcon, Workspace } from "@/lib/types";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -166,6 +167,7 @@ export function Sidebar({
       </nav>
 
       <div className="shrink-0 space-y-2 border-t border-hairline p-3">
+        <InstallAppButton collapsed={collapsed} />
         {!collapsed && (
           <div className="rounded-xl border border-violet/20 bg-violet/[0.06] p-3">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">

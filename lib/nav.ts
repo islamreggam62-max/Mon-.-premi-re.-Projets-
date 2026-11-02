@@ -17,6 +17,7 @@ export function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function currentNavItem(pathname: string): NavItem {
-  return NAV_ITEMS.find((item) => isActivePath(pathname, item.href)) ?? NAV_ITEMS[0];
+/** The module a path belongs to, or undefined for routes outside the 8 modules (404, /offline). */
+export function findNavItem(pathname: string): NavItem | undefined {
+  return NAV_ITEMS.find((item) => isActivePath(pathname, item.href));
 }

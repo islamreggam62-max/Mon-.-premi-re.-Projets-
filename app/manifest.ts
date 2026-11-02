@@ -1,0 +1,48 @@
+import type { MetadataRoute } from "next";
+
+/** Web app manifest: makes NEXORA installable as a standalone app (desktop, Android, iOS). */
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    id: "/",
+    name: "NEXORA — Executive Business Operating System",
+    short_name: "NEXORA",
+    description:
+      "Executive command center for projects, tasks, daily reports, approvals, and AI operational intelligence.",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    orientation: "any",
+    background_color: "#060913",
+    theme_color: "#060913",
+    lang: "en",
+    dir: "ltr",
+    categories: ["business", "productivity"],
+    icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/icons/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+    ],
+    shortcuts: [
+      { name: "Approvals", short_name: "Approvals", url: "/approvals", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
+      { name: "Daily Reports", short_name: "Reports", url: "/daily-reports", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
+      { name: "Tasks", short_name: "Tasks", url: "/tasks", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
+    ],
+    screenshots: [
+      {
+        src: "/screenshots/wide.png",
+        sizes: "1280x800",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Executive command center with KPIs and department health",
+      },
+      {
+        src: "/screenshots/narrow.png",
+        sizes: "390x844",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "NEXORA dashboard on mobile",
+      },
+    ],
+  };
+}
