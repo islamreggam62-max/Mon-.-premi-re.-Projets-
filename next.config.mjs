@@ -41,6 +41,8 @@ const nextConfig = {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_TRAILING_SLASH: isPages ? "1" : "0",
     NEXT_PUBLIC_SITE_ORIGIN: siteOrigin(),
+    // The privacy policy names the host, so it must know which build this is.
+    NEXT_PUBLIC_HOSTING: isPages ? "github-pages" : "server",
   },
   // The dev-only Next.js indicator defaults to bottom-left, where it covers the
   // collapsed sidebar's "Expand sidebar" control. Production is unaffected.

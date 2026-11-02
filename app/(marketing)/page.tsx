@@ -16,9 +16,11 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { APP_HOME } from "@/lib/basePath";
-import { PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
+import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
+import { SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/site";
 import { cn, formatCurrency, percent } from "@/lib/utils";
 import productShot from "@/public/screenshots/wide.png";
 
@@ -71,9 +73,33 @@ export default function LandingPage() {
   const annualSavings = yearAtMonthlyRate - annual.price;
   const annualPerMonth = annual.price / 12;
 
+  // Structured data for search engines and directories: the product and its two
+  // plans, nothing more (no ratings or reviews until real customers leave them).
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: SITE_DESCRIPTION,
+    url: absoluteUrl("/"),
+    offers: PLANS.map((plan) => ({
+      "@type": "Offer",
+      name: plan.name,
+      price: plan.price.toFixed(2),
+      priceCurrency: CURRENCY,
+      url: `${absoluteUrl("/")}#pricing`,
+    })),
+  };
+
   return (
     <div id="top" className="min-h-screen">
-      <LandingHeader />
+      <script
+        type="application/ld+json"
+        // JSON.stringify output with "<" escaped cannot close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
+      <LandingHeader onLanding />
 
       <main>
         {/* Hero */}
@@ -258,22 +284,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-hairline">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-xs text-slate-400 sm:flex-row sm:px-6">
-          <p>© 2026 NEXORA. All rights reserved.</p>
-          <nav aria-label="Footer" className="flex gap-4">
-            <Link href={APP_HOME} className="hover:text-slate-200">
-              Live demo
-            </Link>
-            <a href="#pricing" className="hover:text-slate-200">
-              Pricing
-            </a>
-            <a href="#faq" className="hover:text-slate-200">
-              FAQ
-            </a>
-          </nav>
-        </div>
-      </footer>
+      <LandingFooter onLanding />
     </div>
   );
 }
