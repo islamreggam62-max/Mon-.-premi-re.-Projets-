@@ -1,0 +1,73 @@
+# Builds NEXORA as a static site and publishes it to GitHub Pages:
+#   https://<owner>.github.io/<repo>/
+#
+# - Pull requests: lint, typecheck, and build only (no deploy).
+# - Default branch (or a manual run on it): build, then deploy.
+#
+# One-time setup in the repository: Settings → Pages → Source: "GitHub Actions".
+name: Deploy NEXORA to GitHub Pages
+
+on:
+  push:
+    branches: ["main", "claude/orchestrater-cyber-offensive-4do8x6"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build static site
+        run: npx next build
+        env:
+          GITHUB_PAGES: "true"
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      # Without this, GitHub Pages runs Jekyll, which skips the `_next` folder.
+      - name: Disable Jekyll
+        run: touch out/.nojekyll
+
+      - name: Upload site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    # GitHub Pages only accepts deployments from the default branch by default.
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
