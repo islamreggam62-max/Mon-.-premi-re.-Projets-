@@ -26,7 +26,7 @@ export const LEGAL_UPDATED = "2026-11-02";
  * Once set, the plans become "Request this plan" emails and the privacy policy
  * says what happens to those emails.
  */
-export const CONTACT_EMAIL = "";
+export const CONTACT_EMAIL = "islamreggam62@gmail.com";
 
 /** mailto: link that opens a pre-filled subscription request. */
 export function salesMailto(planName?: string): string {
