@@ -20,13 +20,21 @@ const CACHE = `nexora-${VERSION}`;
 
 const page = (path) => (path === "/" ? `${BASE}/` : `${BASE}${path}${TRAILING_SLASH ? "/" : ""}`);
 const OFFLINE = page("/offline");
-// "/dashboard" is the Dashboard alias: its own page in the static export, a redirect to "/" on servers.
+// "/" is the public landing page; "/dashboard" and the modules are the product.
 const PAGES = ["/", "/dashboard", "/team", "/projects", "/tasks", "/daily-reports", "/approvals", "/ai-intelligence", "/settings", "/offline"].map(page);
 const STATIC = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", "/icons/icon.svg"].map(
   (p) => `${BASE}${p}`,
 );
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const ASSET_RE = new RegExp(`${escapeRe(BASE)}/_next/static/[^"'\\s)\\\\]+`, "g");
+// Parentheses are allowed: route groups put "(app)" in chunk paths.
+const ASSET_RE = new RegExp(`${escapeRe(BASE)}/_next/static/[^"'\\s<>\\\\]+`, "g");
+const count = (s, ch) => s.split(ch).length - 1;
+/** Drops a ")" that closes a CSS url(...) rather than belonging to the path. */
+function assetUrl(match) {
+  let url = match;
+  while (url.endsWith(")") && count(url, ")") > count(url, "(")) url = url.slice(0, -1);
+  return url;
+}
 
 /** A cacheable copy without the "redirected" flag (browsers reject those for navigations). */
 async function clean(response) {
@@ -47,7 +55,7 @@ async function precache() {
       if (!response.ok) return;
       const html = await response.clone().text();
       await cache.put(new URL(response.url).pathname, await clean(response));
-      for (const match of html.matchAll(ASSET_RE)) assets.add(match[0]);
+      for (const match of html.matchAll(ASSET_RE)) assets.add(assetUrl(match[0]));
     }),
   );
   await Promise.all(

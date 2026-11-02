@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HOME_HREF } from "@/lib/basePath";
+import { APP_HOME } from "@/lib/basePath";
 import { WifiOff } from "lucide-react";
 import { RetryButton } from "@/components/pwa/RetryButton";
 
@@ -23,7 +23,7 @@ export default function OfflinePage() {
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <RetryButton />
-        <Link href={HOME_HREF} className="btn btn-secondary">
+        <Link href={APP_HOME} className="btn btn-secondary">
           Open the dashboard
         </Link>
       </div>

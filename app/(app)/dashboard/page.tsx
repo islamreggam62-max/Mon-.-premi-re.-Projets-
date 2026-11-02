@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -57,6 +58,8 @@ const KIND_ICON: Record<ApprovalKind, LucideIcon> = {
   hiring: UserPlus,
   exception: Shuffle,
 };
+
+export const metadata: Metadata = { title: "Dashboard" };
 
 export default function DashboardPage() {
   const people = indexById(TEAM);
