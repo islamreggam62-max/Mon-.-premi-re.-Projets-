@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { BASE_PATH } from "@/lib/basePath";
 
 /**
  * Registers the offline service worker in production builds only (in dev it
  * would cache pages and fight hot reload). The version query ties the worker's
- * cache to the build, so each deployment replaces the previous cache.
+ * cache to the build; `ts` tells it whether page URLs end with a slash (static export).
  */
 export function ServiceWorkerRegister() {
   useEffect(() => {
     if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) return;
-    const version = encodeURIComponent(process.env.NEXT_PUBLIC_APP_VERSION ?? "dev");
+    const params = new URLSearchParams({
+      v: process.env.NEXT_PUBLIC_APP_VERSION ?? "dev",
+      ts: process.env.NEXT_PUBLIC_TRAILING_SLASH === "1" ? "1" : "0",
+    });
     const register = () => {
-      navigator.serviceWorker.register(`/sw.js?v=${version}`, { scope: "/" }).catch(() => {
+      navigator.serviceWorker.register(`${BASE_PATH}/sw.js?${params}`, { scope: `${BASE_PATH}/` }).catch(() => {
         /* offline support is optional: the app works without it */
       });
     };

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HOME_HREF } from "@/lib/basePath";
 import { Compass } from "lucide-react";
 
 export default function NotFound() {
@@ -11,7 +12,7 @@ export default function NotFound() {
       <p className="mt-2 max-w-sm text-sm text-slate-300">
         This page isn&apos;t part of NEXORA Phase 1. Use the navigation to reach one of the eight modules.
       </p>
-      <Link href="/" className="btn btn-primary mt-6">
+      <Link href={HOME_HREF} className="btn btn-primary mt-6">
         Back to the command center
       </Link>
     </div>

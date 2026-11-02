@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { DEMO_AS_OF } from "@/lib/data/meta";
+import { HOME_HREF } from "@/lib/basePath";
 import { NAV_ITEMS, isActivePath } from "@/lib/nav";
 import type { NavIcon, Workspace } from "@/lib/types";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
@@ -76,7 +77,7 @@ export function Sidebar({
         )}
       >
         <Link
-          href="/"
+          href={HOME_HREF}
           onClick={onClose}
           className="focus-ring flex items-center gap-2.5 rounded-xl"
           aria-label="NEXORA — go to Dashboard"

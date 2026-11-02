@@ -6,31 +6,33 @@
  * - Hashed build assets (/_next/static) and icons: cache first (immutable URLs).
  * - RSC payloads and anything cross-origin pass straight through.
  *
- * The cache is versioned by the ?v= query the page registers with (the build's
- * commit), so every deployment installs a new worker and drops the old cache.
+ * Works at the domain root (server deployments) and under a sub-path (GitHub
+ * Pages): the base path is taken from this script's own URL. The cache is
+ * versioned by the ?v= query the page registers with (the build's commit), so
+ * every deployment installs a new worker and drops the old cache.
  * Nothing here calls an API or stores user data: the demo is fully static.
  */
-const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const params = new URL(self.location.href).searchParams;
+const VERSION = params.get("v") || "dev";
+const TRAILING_SLASH = params.get("ts") === "1";
+const BASE = self.location.pathname.replace(/\/sw\.js$/, "");
 const CACHE = `nexora-${VERSION}`;
 
-const PAGES = [
-  "/",
-  "/team",
-  "/projects",
-  "/tasks",
-  "/daily-reports",
-  "/approvals",
-  "/ai-intelligence",
-  "/settings",
-  "/offline",
-];
-const STATIC = [
-  "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/maskable-512.png",
-  "/icons/icon.svg",
-];
+const page = (path) => (path === "/" ? `${BASE}/` : `${BASE}${path}${TRAILING_SLASH ? "/" : ""}`);
+const OFFLINE = page("/offline");
+// "/dashboard" is the Dashboard alias: its own page in the static export, a redirect to "/" on servers.
+const PAGES = ["/", "/dashboard", "/team", "/projects", "/tasks", "/daily-reports", "/approvals", "/ai-intelligence", "/settings", "/offline"].map(page);
+const STATIC = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", "/icons/icon.svg"].map(
+  (p) => `${BASE}${p}`,
+);
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const ASSET_RE = new RegExp(`${escapeRe(BASE)}/_next/static/[^"'\\s)\\\\]+`, "g");
+
+/** A cacheable copy without the "redirected" flag (browsers reject those for navigations). */
+async function clean(response) {
+  if (!response.redirected) return response;
+  return new Response(await response.arrayBuffer(), { status: response.status, statusText: response.statusText, headers: response.headers });
+}
 
 async function precache() {
   const cache = await caches.open(CACHE);
@@ -43,9 +45,9 @@ async function precache() {
     PAGES.map(async (path) => {
       const response = await fetch(path, { cache: "no-store" });
       if (!response.ok) return;
-      await cache.put(path, response.clone());
-      const html = await response.text();
-      for (const match of html.matchAll(/\/_next\/static\/[^"'\s)\\]+/g)) assets.add(match[0]);
+      const html = await response.clone().text();
+      await cache.put(new URL(response.url).pathname, await clean(response));
+      for (const match of html.matchAll(ASSET_RE)) assets.add(match[0]);
     }),
   );
   await Promise.all(
@@ -58,6 +60,12 @@ async function precache() {
       }
     }),
   );
+}
+
+/** Cached page for a path, tolerating a missing or extra trailing slash. */
+async function cachedPage(pathname) {
+  const alt = pathname.endsWith("/") ? pathname.slice(0, -1) : `${pathname}/`;
+  return (await caches.match(pathname)) || (await caches.match(alt));
 }
 
 self.addEventListener("install", (event) => {
@@ -74,7 +82,7 @@ self.addEventListener("activate", (event) => {
 });
 
 function isImmutable(url) {
-  return url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/");
+  return url.pathname.startsWith(`${BASE}/_next/static/`) || url.pathname.startsWith(`${BASE}/icons/`);
 }
 
 self.addEventListener("fetch", (event) => {
@@ -107,20 +115,20 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response.ok && response.type === "basic") {
+          if (response.ok && response.type === "basic" && !response.redirected) {
             const copy = response.clone();
             caches.open(CACHE).then((cache) => cache.put(url.pathname, copy));
           }
           return response;
         })
         .catch(async () => {
-          const cached = await caches.match(url.pathname);
+          const cached = await cachedPage(url.pathname);
           if (cached) return cached;
-          if (url.pathname === "/offline") return Response.error();
+          if (url.pathname === OFFLINE || `${url.pathname}/` === OFFLINE) return Response.error();
           // Redirect (not rewrite) so the URL matches the cached /offline HTML;
           // serving it under another path would break React hydration.
           const from = encodeURIComponent(url.pathname + url.search);
-          return Response.redirect(`/offline?from=${from}`, 302);
+          return Response.redirect(`${OFFLINE}?from=${from}`, 302);
         }),
     );
     return;

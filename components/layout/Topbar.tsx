@@ -22,7 +22,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Popover } from "@/components/ui/Popover";
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { ACCESS_ROLE_LABEL } from "@/lib/labels";
-import { findNavItem } from "@/lib/nav";
+import { HOME_HREF } from "@/lib/basePath";
+import { findNavItem, normalizePath } from "@/lib/nav";
 import type { AppNotification, NotificationTone, Person, Workspace } from "@/lib/types";
 import { cn, formatLongDate, formatShortDate, formatTime } from "@/lib/utils";
 
@@ -41,7 +42,7 @@ export function Topbar({
 }) {
   const pathname = usePathname();
   const page = findNavItem(pathname) ?? {
-    label: pathname === "/offline" ? "Offline" : "Page not found",
+    label: normalizePath(pathname) === "/offline" ? "Offline" : "Page not found",
     description: "",
   };
   const workspace = workspaces.find((w) => w.current) ?? workspaces[0];
@@ -62,7 +63,7 @@ export function Topbar({
         <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
           <ol className="flex min-w-0 items-center gap-2 text-sm">
             <li className="hidden shrink-0 md:block">
-              <Link href="/" className="focus-ring rounded text-slate-400 hover:text-slate-200">
+              <Link href={HOME_HREF} className="focus-ring rounded text-slate-400 hover:text-slate-200">
                 {workspace.name}
               </Link>
             </li>

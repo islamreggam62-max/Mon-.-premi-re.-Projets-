@@ -1,8 +1,9 @@
+import { HOME_HREF } from "@/lib/basePath";
 import type { NavItem } from "@/lib/types";
 
 /** The 8 core NEXORA modules, in command-center order. */
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Dashboard", icon: "dashboard", description: "Executive command center" },
+  { href: HOME_HREF, label: "Dashboard", icon: "dashboard", description: "Executive command center" },
   { href: "/team", label: "Team", icon: "team", description: "Directory, roles & workloads" },
   { href: "/projects", label: "Projects", icon: "projects", description: "Strategic portfolio" },
   { href: "/tasks", label: "Tasks", icon: "tasks", description: "Execution view" },
@@ -12,9 +13,16 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/settings", label: "Settings", icon: "settings", description: "Workspace & access" },
 ];
 
+/** Drops the static export's trailing slash: "/team/" → "/team" (root stays "/"). */
+export function normalizePath(pathname: string): string {
+  return pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+}
+
 export function isActivePath(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const path = normalizePath(pathname);
+  // "/dashboard" is an alias of the Dashboard (redirect on servers, page in the static export).
+  if (href === "/" || href === "/dashboard") return path === "/" || path === "/dashboard";
+  return path === href || path.startsWith(`${href}/`);
 }
 
 /** The module a path belongs to, or undefined for routes outside the 8 modules (404, /offline). */
