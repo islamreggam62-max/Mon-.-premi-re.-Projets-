@@ -143,6 +143,27 @@ Vérifié : 71 tests ; exécution complète avec un LLM factice (aucune valeur d
 **Non vérifié : tout résultat avec un vrai modèle.** Les courriers/lettres : non
 développés (nécessitent les modèles de l'utilisateur).
 
+## Version 0.5.0 — NAFTAL dans la conversation Claude (MCP)
+
+Demande : « que la conversation Claude et NAFTAL Legal Intelligence fonctionnent
+ensemble ». Réponse : serveur MCP local pour Claude Desktop.
+
+- `mcp_server.py` : 11 outils (liste/lecture/import, analyse document ou texte collé,
+  comparaison, risques, recherche corpus, références, rapports) + 3 prompts reprenant le
+  cerveau juridique. Aucun appel LLM côté NAFTAL. Audit de chaque appel.
+- `claude_desktop.py` + CLI `--install-claude | --check-mcp | --claude-config`.
+- `db.py` : `atexit` ferme le pool (connexion SQLite orpheline à la sortie).
+- Dépendance : `mcp>=2.3,<3` (API 2.x : `MCPServer`, attributs `input_schema`, etc.).
+
+Défauts trouvés et corrigés pendant le développement : sortie structurée refusée pour un
+`dict` nu ; messages d'erreur masqués par le SDK pour toute exception non `ToolError`
+(la conversation n'aurait jamais su pourquoi un appel échouait) ; `--check-mcp` lisait le
+mauvais champ et affichait « None document(s) ».
+
+Vérifié : 84 tests (dont protocole réel de bout en bout, lancement depuis un autre dossier,
+fusion de configuration, refus d'un JSON illisible), 0 avertissement. **Non vérifié : dans
+Claude Desktop lui-même.**
+
 ### Pistes d'amélioration (prochaines sessions)
 - OCR optionnel pour les PDF scannés.
 - Recherche sémantique / RAG (embeddings) pour l'assistant et la recherche.

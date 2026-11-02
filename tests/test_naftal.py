@@ -638,6 +638,205 @@ class TestProviderSystemField(unittest.TestCase):
                          ["system", "user"])
 
 
+def _mcp_available() -> bool:
+    try:
+        import mcp.server.mcpserver  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+class TestMCPTools(unittest.TestCase):
+    """Outils exposes a la conversation Claude (appeles ici directement, sans protocole)."""
+
+    @classmethod
+    def setUpClass(cls):
+        from naftal import mcp_server as M
+        from naftal.db import create_all
+        create_all()
+        cls.M = M
+        s = _SAMPLES
+        cls.v1 = M.naftal_import_file(path=str(s / "contrat_demo_v1.txt"), contract_title="MCP demo",
+                                      version_label="V1")["importe"]
+        cls.v2 = M.naftal_import_file(path=str(s / "contrat_demo_v2.txt"), contract_id=cls.v1["contract_id"],
+                                      version_label="V2")["importe"]
+
+    def test_import_attaches_versions_to_same_contract(self):
+        self.assertEqual(self.v1["contract_id"], self.v2["contract_id"])
+        self.assertTrue(self.v2["texte_extrait"])
+        listed = self.M.naftal_list_documents(query="MCP demo")
+        self.assertGreaterEqual(listed["nombre"], 2)
+
+    def test_read_article_and_pagination(self):
+        r = self.M.naftal_read_document(document_id=self.v2["document_id"], article="Article 5")
+        self.assertIn("illimitee", r["texte"])
+        self.assertIn("Article 8", [p["ref"] for p in r["plan"]])
+        page = self.M.naftal_read_document(document_id=self.v2["document_id"], max_chars=500)
+        self.assertEqual(len(page["texte"]), 500)
+        self.assertEqual(page["suite"], 500)
+        last = self.M.naftal_read_document(document_id=self.v2["document_id"], offset=page["longueur_totale"] - 10)
+        self.assertIsNone(last["suite"])
+
+    def test_analysis_is_grounded_and_persisted(self):
+        from sqlalchemy import func, select
+        from naftal.db import session_scope
+        from naftal.models import Analysis
+        with session_scope() as db:
+            before = db.scalar(select(func.count()).select_from(Analysis))
+        a = self.M.naftal_analyze_document(document_id=self.v2["document_id"])
+        self.assertGreaterEqual(a["score_de_risque"], 60)
+        self.assertIn("Garanties et assurances", [x["categorie"] for x in a["provisions_absentes"]])
+        self.assertIn("Article 8", [x["article"] for x in a["points_d_attention"]])     # arbitrage CCI
+        self.assertIn("filet de securite", a["moteur"])
+        with session_scope() as db:
+            self.assertEqual(db.scalar(select(func.count()).select_from(Analysis)), before + 1)
+
+    def test_compare_risk_search_references_report(self):
+        c = self.M.naftal_compare_documents(document_id_a=self.v1["document_id"], document_id_b=self.v2["document_id"])
+        self.assertLess(c["score_de_risque"]["version_a"], c["score_de_risque"]["version_b"])
+        self.assertIn(("Article 7", "Article 6"), [(x["article_a"], x["article_b"]) for x in c["changements"]])
+        self.assertEqual(self.M.naftal_risk_report(document_id=self.v2["document_id"])["niveau_global"], "CRITICAL")
+        s = self.M.naftal_search(query="résiliation anticipée", scope="contrat")
+        self.assertTrue(s["resultats"])
+        self.assertTrue(all(x["type"] == "contrat" for x in s["resultats"]))
+        refs = self.M.naftal_legal_references(query="hydrocarbures")
+        self.assertIn("a verifier", refs["avertissement"])
+        self.assertTrue(all(r["statut"] == "a_verifier" for r in refs["references"]))
+        rep = self.M.naftal_generate_report(kind="comparaison", document_id=self.v1["document_id"],
+                                            document_id_b=self.v2["document_id"], fmt="docx")
+        self.assertTrue(Path(rep["fichier"]).is_file())
+
+    def test_pasted_text_tools(self):
+        self.assertGreaterEqual(self.M.naftal_analyze_text(text=V2)["score_de_risque"], 60)
+        self.assertTrue(self.M.naftal_compare_texts(text_a=V1, text_b=V2)["changements"])
+
+    def test_errors_are_explicit(self):
+        M = self.M
+        cases = [
+            (lambda: M.naftal_read_document(document_id=999999), "introuvable"),
+            (lambda: M.naftal_read_document(document_id=self.v2["document_id"], article="42"), "Articles disponibles"),
+            (lambda: M.naftal_import_file(path=str(Path(_TMP) / "absent.docx")), "introuvable"),
+            (lambda: M.naftal_import_file(path=__file__), "Format non pris en charge"),
+            (lambda: M.naftal_analyze_text(text="   "), "vide"),
+            (lambda: M.naftal_analyze_text(text="x" * (M.MAX_TEXT + 1)), "depasse"),
+            (lambda: M.naftal_compare_documents(document_id_a=1, document_id_b=1), "differents"),
+            (lambda: M.naftal_search(query="force", scope="ailleurs"), "scope"),
+            (lambda: M.naftal_generate_report(kind="autre", document_id=self.v1["document_id"]), "kind"),
+        ]
+        for call, expected in cases:
+            with self.assertRaises(M.ToolError) as cm:
+                call()
+            self.assertIn(expected, str(cm.exception))
+
+    def test_every_call_is_audited(self):
+        from sqlalchemy import select
+        from naftal.db import session_scope
+        from naftal.models import AuditLog
+        self.M.naftal_legal_references(query="audit-marqueur")
+        with session_scope() as db:
+            row = db.scalars(select(AuditLog).where(AuditLog.action == "mcp_legal_references")
+                             .order_by(AuditLog.id.desc())).first()
+        self.assertEqual(row.user_email, self.M.MCP_USER)
+        self.assertIn("audit-marqueur", row.detail)
+
+    def test_prompts_carry_the_naftal_method(self):
+        from naftal.llm import legal_brain
+        p = self.M.prompt_revue_contrat("7")
+        self.assertIn(legal_brain.SYSTEM_PROMPT, p)
+        self.assertIn("document_id = 7", p)
+        self.assertIn("auditeur independant", p)
+        self.assertIn("Ne retouche PAS les conditions", self.M.prompt_correction_avenant("3"))
+
+
+class TestClaudeDesktopConfig(unittest.TestCase):
+    def test_entry_uses_absolute_paths_of_this_machine(self):
+        import sys
+        from naftal.claude_desktop import PROJECT_ROOT, server_entry
+        e = server_entry()
+        self.assertEqual(e["command"], sys.executable)
+        self.assertEqual(e["args"], ["-m", "naftal.mcp_server"])
+        self.assertEqual(Path(e["env"]["PYTHONPATH"]), PROJECT_ROOT)
+        self.assertTrue((PROJECT_ROOT / "naftal" / "mcp_server.py").is_file())
+        for k in ("NAFTAL_DATA_DIR", "NAFTAL_ENV_FILE"):
+            self.assertTrue(Path(e["env"][k]).is_absolute(), k)
+
+    def test_install_creates_merges_and_backs_up(self):
+        import json
+        from naftal.claude_desktop import SERVER_KEY, install
+        cfg = Path(_TMP) / "claude" / "claude_desktop_config.json"
+        r = install(cfg, {"command": "py", "args": []})
+        self.assertIsNone(r["backup"])
+        self.assertIn(SERVER_KEY, json.loads(cfg.read_text())["mcpServers"])
+        # config existante (avec BOM, comme le Bloc-notes) : autres serveurs et reglages conserves
+        cfg.write_bytes(b"\xef\xbb\xbf" + json.dumps(
+            {"mcpServers": {"autre": {"command": "x"}}, "theme": "dark"}).encode())
+        r = install(cfg, {"command": "py2", "args": []})
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        self.assertEqual(data["mcpServers"]["autre"], {"command": "x"})
+        self.assertEqual(data["theme"], "dark")
+        self.assertEqual(data["mcpServers"][SERVER_KEY]["command"], "py2")
+        self.assertEqual(r["other_servers"], ["autre"])
+        self.assertTrue(Path(r["backup"]).is_file())
+        # reinstallation : remplace, ne duplique pas
+        self.assertTrue(install(cfg, {"command": "py3", "args": []})["replaced"])
+
+    def test_install_refuses_to_touch_an_unreadable_config(self):
+        from naftal.claude_desktop import InstallError, install
+        cfg = Path(_TMP) / "claude-bad.json"
+        cfg.write_text('{"mcpServers": {"autre": ')          # JSON tronque
+        with self.assertRaises(InstallError):
+            install(cfg, {"command": "py"})
+        self.assertEqual(cfg.read_text(), '{"mcpServers": {"autre": ')
+        cfg.write_text('{"mcpServers": ["pas", "un", "objet"]}')
+        with self.assertRaises(InstallError):
+            install(cfg, {"command": "py"})
+
+
+@unittest.skipUnless(_mcp_available(), "bibliotheque mcp non installee")
+class TestMCPProtocolEndToEnd(unittest.TestCase):
+    """Vrai protocole MCP sur stdio, serveur lance comme Claude Desktop le ferait."""
+
+    def test_full_session(self):
+        import asyncio
+        import json
+        import os
+        import sys
+        from mcp.client.session import ClientSession
+        from mcp.client.stdio import StdioServerParameters, stdio_client
+        from naftal.claude_desktop import PROJECT_ROOT
+
+        async def session():
+            env = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT)}
+            params = StdioServerParameters(command=sys.executable, args=["-m", "naftal.mcp_server"],
+                                           env=env, cwd=str(Path(_TMP)))          # autre dossier courant
+            with open(os.devnull, "w") as dn:
+                async with stdio_client(params, errlog=dn) as (r, w):
+                    async with ClientSession(r, w) as s:
+                        init = await s.initialize()
+                        tools = (await s.list_tools()).tools
+                        ok = await s.call_tool("naftal_analyze_text", {"text": V2})
+                        bad = await s.call_tool("naftal_read_document", {"document_id": 999999})
+                        prompt = await s.get_prompt("revue_contrat", {"document_id": "1"})
+                        return init, tools, ok, bad, prompt
+
+        init, tools, ok, bad, prompt = asyncio.run(session())
+        self.assertIn("NE PAS", init.instructions.upper().replace("N'INVENTE", "NE PAS"))
+        self.assertEqual(len(tools), 11)
+        self.assertTrue(all(t.input_schema.get("type") == "object" for t in tools))
+        self.assertFalse(ok.is_error)
+        self.assertGreaterEqual(ok.structured_content["score_de_risque"], 60)
+        self.assertEqual(json.loads(ok.content[0].text)["score_de_risque"], ok.structured_content["score_de_risque"])
+        self.assertTrue(bad.is_error)
+        self.assertIn("introuvable", bad.content[0].text)        # le motif atteint la conversation
+        self.assertIn("auditeur independant", prompt.messages[0].content.text)
+
+    def test_check_command_does_a_real_handshake(self):
+        from naftal.claude_desktop import check
+        ok, msg = check()
+        self.assertTrue(ok, msg)
+        self.assertIn("11 outils", msg)
+
+
 class TestAIPipeline(unittest.TestCase):
     def test_two_stage_with_self_verify(self):
         from naftal.analysis.ai_pipeline import deep_analysis

@@ -8,6 +8,9 @@ Usage :
     python -m naftal --check-llm     # teste la connexion IA sans envoyer de contrat
     python -m naftal --bakeoff demo  # banc d'essai AVEUGLE : chat nu / chat+regles / pipeline NAFTAL
     python -m naftal --bakeoff-reveal DOSSIER   # revele quel bras est quelle sortie
+    python -m naftal --install-claude  # branche NAFTAL dans Claude Desktop (outils dans la conversation)
+    python -m naftal --check-mcp       # verifie que le serveur MCP repond
+    python -m naftal --claude-config   # affiche le bloc de configuration a coller a la main
 """
 from __future__ import annotations
 
@@ -87,7 +90,19 @@ def main() -> None:
     parser.add_argument("--yes", action="store_true", help="Confirme l'envoi externe (sans question).")
     parser.add_argument("--bakeoff-reveal", metavar="DOSSIER", default=None,
                         help="Revele la correspondance sortie -> bras d'un banc d'essai termine.")
+    parser.add_argument("--install-claude", action="store_true",
+                        help="Ajoute NAFTAL a Claude Desktop (verification + sauvegarde de la config).")
+    parser.add_argument("--check-mcp", action="store_true",
+                        help="Lance le serveur MCP comme Claude Desktop et verifie qu'il repond.")
+    parser.add_argument("--claude-config", action="store_true",
+                        help="Affiche le bloc de configuration Claude Desktop (chemins absolus de ce poste).")
     args = parser.parse_args()
+
+    if args.install_claude or args.check_mcp or args.claude_config:
+        from .claude_desktop import cli as claude_cli
+
+        action = "install" if args.install_claude else ("check" if args.check_mcp else "config")
+        raise SystemExit(claude_cli(action))
 
     if args.bakeoff_reveal:
         from .bakeoff import BakeoffError, reveal

@@ -1,6 +1,7 @@
 """Couche base de donnees (SQLAlchemy 2.0)."""
 from __future__ import annotations
 
+import atexit
 from collections.abc import Iterator
 
 from sqlalchemy import create_engine
@@ -31,6 +32,9 @@ def init_engine():
     if _engine is None:
         _engine = _make_engine()
         _SessionLocal = sessionmaker(bind=_engine, autoflush=False, expire_on_commit=False)
+        # Ferme les connexions du pool a la sortie du processus (serveur MCP lance et
+        # arrete par Claude Desktop, commandes en ligne) : pas de connexion SQLite orpheline.
+        atexit.register(_engine.dispose)
     return _engine
 
 

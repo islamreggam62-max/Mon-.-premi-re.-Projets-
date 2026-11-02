@@ -130,6 +130,39 @@ les accidents » (= assurance). C'est le cas que les embeddings visent.
 > **distinct** de `NAFTAL_LLM_ENABLED`. Pour un corpus qui ne peut pas sortir,
 > pointez `NAFTAL_EMBED_BASE_URL` vers un serveur d'embeddings **local**.
 
+### Travailler DEPUIS la conversation Claude (Claude Desktop, MCP)
+La conversation Claude raisonne et rédige ; NAFTAL lui fournit vos contrats et ses outils.
+```bash
+pip install -r naftal/requirements.txt
+python -m naftal --install-claude   # vérifie le serveur puis l'ajoute à Claude Desktop (sauvegarde)
+python -m naftal --check-mcp        # diagnostic : vraie poignée de main MCP
+python -m naftal --claude-config    # bloc JSON à coller à la main si besoin
+```
+- **11 outils** (`naftal/mcp_server.py`) : lister / lire (par article ou par tranches) /
+  importer un fichier local, analyse déterministe d'un document ou d'un texte collé,
+  comparaison de versions, rapport de risques, recherche dans tout le corpus,
+  références « à vérifier », génération de rapports DOCX/PDF/XLSX.
+- **3 modèles de demande** (`revue_contrat`, `correction_avenant`, `memo_juridique`) qui
+  apportent dans la conversation la persona, la checklist et la relecture critique NAFTAL.
+- **Aucun appel au LLM NAFTAL** : pas de clé d'API ; le raisonnement est celui de la
+  conversation (abonnement Claude). Même base de données que l'application web.
+- **Confidentialité** : les résultats des outils entrent dans la conversation (donc chez
+  Anthropic), comme un copier-coller. Chaque appel est journalisé (« claude (MCP) »).
+- Chemins absolus générés automatiquement (Claude Desktop lance le serveur depuis un autre
+  dossier ; sans eux il ouvrirait une base vide). Installation : fusion avec les autres
+  serveurs, sauvegarde horodatée, refus de toucher un fichier JSON illisible.
+- **Vérifié** : protocole réel via le client officiel (SDK `mcp` 2.x) — initialisation,
+  11 outils, sortie structurée, messages d'erreur transmis à la conversation, prompts,
+  lancement depuis un autre dossier. **Non vérifié : dans l'application Claude Desktop
+  elle-même** (indisponible ici). Uniquement Claude Desktop (Windows/macOS) : ni le
+  navigateur ni le mobile, sauf à exposer le serveur sur Internet (déconseillé ici).
+
+Défauts trouvés en développant ce module (corrigés) : avec le SDK v2, (1) un type de retour
+`dict` nu empêchait toute sortie structurée ; (2) une exception ordinaire voyait son
+message **gardé côté serveur** — la conversation n'aurait vu que « Error executing tool »,
+sans savoir pourquoi. Corrigé en levant le `ToolError` du SDK, vérifié par le protocole.
+Le pool SQLite est en outre fermé à la sortie du processus.
+
 ### Principes de rigueur
 - **Jamais d'invention.** Une provision absente est marquée *absente*, pas inventée.
 - **Déterministe par défaut.** Le moteur d'analyse repose sur des règles ; il est

@@ -21,3 +21,7 @@ requests>=2.31
 
 # pydantic est tire par fastapi, epingle ici pour la v2
 pydantic>=2.5
+
+# Integration avec la conversation Claude (Claude Desktop) via MCP.
+# Version 2.x requise (API differente de la 1.x). Python >= 3.10.
+mcp>=2.3,<3
