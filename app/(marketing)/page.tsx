@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ClipboardList,
   FlaskConical,
+  Mail,
   FolderKanban,
   LayoutDashboard,
   ListChecks,
@@ -16,9 +17,11 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { APP_HOME } from "@/lib/basePath";
-import { PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
+import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
+import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl, salesMailto } from "@/lib/site";
 import { cn, formatCurrency, percent } from "@/lib/utils";
 import productShot from "@/public/screenshots/wide.png";
 
@@ -60,7 +63,9 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How do I subscribe?",
-    a: "Online payment is being set up. Until checkout opens, explore the live demo — the plans and prices below are the ones that will apply.",
+    a: CONTACT_EMAIL
+      ? `Email ${CONTACT_EMAIL} with the plan you want, Monthly or Annual, and we will reply with the next steps. Online checkout will come later.`
+      : "Online payment is being set up. Until checkout opens, explore the live demo — the plans and prices below are the ones that will apply.",
   },
 ];
 
@@ -71,9 +76,33 @@ export default function LandingPage() {
   const annualSavings = yearAtMonthlyRate - annual.price;
   const annualPerMonth = annual.price / 12;
 
+  // Structured data for search engines and directories: the product and its two
+  // plans, nothing more (no ratings or reviews until real customers leave them).
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: SITE_DESCRIPTION,
+    url: absoluteUrl("/"),
+    offers: PLANS.map((plan) => ({
+      "@type": "Offer",
+      name: plan.name,
+      price: plan.price.toFixed(2),
+      priceCurrency: CURRENCY,
+      url: `${absoluteUrl("/")}#pricing`,
+    })),
+  };
+
   return (
     <div id="top" className="min-h-screen">
-      <LandingHeader />
+      <script
+        type="application/ld+json"
+        // JSON.stringify output with "<" escaped cannot close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
+      <LandingHeader onLanding />
 
       <main>
         {/* Hero */}
@@ -208,20 +237,49 @@ export default function LandingPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href={APP_HOME}
-                      className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
-                    >
-                      Start with the live demo
-                    </Link>
+                    {CONTACT_EMAIL ? (
+                      <div className="mt-8 flex flex-col items-center gap-3">
+                        <a
+                          href={salesMailto(plan.name)}
+                          className={cn("btn w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
+                          data-testid={`request-${plan.id}`}
+                        >
+                          <Mail className="h-4 w-4" aria-hidden="true" />
+                          Request the {plan.name} plan
+                        </a>
+                        <Link href={APP_HOME} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
+                          or try the live demo first
+                        </Link>
+                      </div>
+                    ) : (
+                      <Link
+                        href={APP_HOME}
+                        className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
+                      >
+                        Start with the live demo
+                      </Link>
+                    )}
                   </article>
                 );
               })}
             </div>
 
             <p className="mx-auto mt-8 max-w-2xl text-center text-xs leading-relaxed text-slate-400" data-testid="pricing-note">
-              Prices in US dollars. Online payment is not open yet — subscriptions start when checkout launches. NEXORA is
-              in early access and currently runs on sample data.
+              {CONTACT_EMAIL ? (
+                <>
+                  Prices in US dollars. Online payment is not open yet: to subscribe, email{" "}
+                  <a href={salesMailto()} className="font-medium text-violet-200 underline underline-offset-2">
+                    {CONTACT_EMAIL}
+                  </a>{" "}
+                  with the plan you want and we will reply with the next steps. NEXORA is in early access and currently
+                  runs on sample data.
+                </>
+              ) : (
+                <>
+                  Prices in US dollars. Online payment is not open yet — subscriptions start when checkout launches.
+                  NEXORA is in early access and currently runs on sample data.
+                </>
+              )}
             </p>
           </div>
         </section>
@@ -258,22 +316,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-hairline">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-xs text-slate-400 sm:flex-row sm:px-6">
-          <p>© 2026 NEXORA. All rights reserved.</p>
-          <nav aria-label="Footer" className="flex gap-4">
-            <Link href={APP_HOME} className="hover:text-slate-200">
-              Live demo
-            </Link>
-            <a href="#pricing" className="hover:text-slate-200">
-              Pricing
-            </a>
-            <a href="#faq" className="hover:text-slate-200">
-              FAQ
-            </a>
-          </nav>
-        </div>
-      </footer>
+      <LandingFooter onLanding />
     </div>
   );
 }

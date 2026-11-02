@@ -8,6 +8,17 @@ import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
  * in app/(marketing) has its own header and footer.
  */
 export const metadata: Metadata = {
+  // Absolute origin for link previews (Next.js adds the base path itself);
+  // app/opengraph-image.png and app/twitter-image.png supply the card image.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_ORIGIN ?? "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    siteName: "NEXORA",
+    title: "NEXORA — The Executive Business Operating System",
+    description:
+      "One command center for executives: KPIs, projects, tasks, daily reports, approvals, and AI operational intelligence.",
+  },
+  twitter: { card: "summary_large_image" },
   title: {
     default: "NEXORA — Executive Business Operating System",
     template: "%s · NEXORA",

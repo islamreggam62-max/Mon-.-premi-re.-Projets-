@@ -10,6 +10,18 @@ import { execSync } from "node:child_process";
 const isPages = process.env.GITHUB_PAGES === "true";
 const basePath = isPages ? process.env.PAGES_BASE_PATH ?? "/Mon-.-premi-re.-Projets-" : "";
 
+/**
+ * Public origin, for absolute link-preview URLs (og:image must be absolute).
+ * SITE_ORIGIN wins (e.g. a custom domain); otherwise GitHub Actions' owner gives
+ * https://<owner>.github.io, and Vercel its production domain.
+ */
+function siteOrigin() {
+  if (process.env.SITE_ORIGIN) return process.env.SITE_ORIGIN.replace(/\/$/, "");
+  if (isPages && process.env.GITHUB_REPOSITORY_OWNER) return `https://${process.env.GITHUB_REPOSITORY_OWNER.toLowerCase()}.github.io`;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  return "http://localhost:3000";
+}
+
 /** Build version for the service worker cache. Deterministic across build workers. */
 function appVersion() {
   const sha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA;
@@ -28,6 +40,9 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: appVersion(),
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_TRAILING_SLASH: isPages ? "1" : "0",
+    NEXT_PUBLIC_SITE_ORIGIN: siteOrigin(),
+    // The privacy policy names the host, so it must know which build this is.
+    NEXT_PUBLIC_HOSTING: isPages ? "github-pages" : "server",
   },
   // The dev-only Next.js indicator defaults to bottom-left, where it covers the
   // collapsed sidebar's "Expand sidebar" control. Production is unaffected.
