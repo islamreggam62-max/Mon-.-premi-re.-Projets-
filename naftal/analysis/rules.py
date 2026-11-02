@@ -213,7 +213,10 @@ RISK_PATTERNS: tuple[RiskPattern, ...] = (
     RiskPattern(
         key="juridiction_etrangere",
         category="Droit applicable et reglement des litiges",
-        pattern=_rx(r"(droit|loi)\s+(francais|suisse|anglais|etranger)|tribunaux\s+de\s+(paris|geneve|londres)|arbitrage\s+(international|cci|icc)"),
+        # NB : « reglement d'arbitrage de la Chambre de commerce internationale (CCI) » est la
+        # formule usuelle ; l'ancien motif exigeait « arbitrage » juste avant « cci/international »
+        # et la manquait (faux negatif revele par la verite terrain du banc d'essai).
+        pattern=_rx(r"(droit|loi)\s+(francais|suisse|anglais|etranger)|tribunaux\s+de\s+(paris|geneve|londres)|arbitrage\s+(international|cci|icc)|chambre\s+de\s+commerce\s+internationale|\b(cci|icc)\b"),
         severity="MEDIUM",
         problem="Droit applicable etranger ou arbitrage international.",
         significance="Le choix d'un droit/for etranger peut desavantager la partie algerienne et complexifier l'execution.",

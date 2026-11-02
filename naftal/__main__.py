@@ -6,6 +6,8 @@ Usage :
     python -m naftal --host 0.0.0.0 --port 8000
     python -m naftal --setup-llm     # active l'IA (cle saisie en mode masque)
     python -m naftal --check-llm     # teste la connexion IA sans envoyer de contrat
+    python -m naftal --bakeoff demo  # banc d'essai AVEUGLE : chat nu / chat+regles / pipeline NAFTAL
+    python -m naftal --bakeoff-reveal DOSSIER   # revele quel bras est quelle sortie
 """
 from __future__ import annotations
 
@@ -76,7 +78,31 @@ def main() -> None:
                         help="Assistant d'activation de l'IA (cle masquee, test de connexion).")
     parser.add_argument("--check-llm", action="store_true",
                         help="Teste la connexion IA avec un message anodin (aucun contrat envoye).")
+    parser.add_argument("--bakeoff", metavar="demo|FICHIER",
+                        help="Banc d'essai aveugle (3 bras, meme modele) sur le contrat de demo ou un fichier.")
+    parser.add_argument("--runs", type=int, default=1, help="Executions par bras (defaut 1 ; 3 recommande).")
+    parser.add_argument("--seed", type=int, default=None, help="Graine du melange des sorties (reproductible).")
+    parser.add_argument("--truth", metavar="JSON", default=None,
+                        help="Verite terrain (defauts attendus) pour un fichier personnel.")
+    parser.add_argument("--yes", action="store_true", help="Confirme l'envoi externe (sans question).")
+    parser.add_argument("--bakeoff-reveal", metavar="DOSSIER", default=None,
+                        help="Revele la correspondance sortie -> bras d'un banc d'essai termine.")
     args = parser.parse_args()
+
+    if args.bakeoff_reveal:
+        from .bakeoff import BakeoffError, reveal
+
+        try:
+            print(reveal(args.bakeoff_reveal))
+        except BakeoffError as exc:
+            print(f"[ECHEC] {exc}")
+            raise SystemExit(1)
+        raise SystemExit(0)
+    if args.bakeoff:
+        from .bakeoff import cli as bakeoff_cli
+
+        raise SystemExit(bakeoff_cli(args.bakeoff, runs=args.runs, seed=args.seed,
+                                     truth_path=args.truth, yes=args.yes))
 
     if args.setup_llm or args.check_llm:
         from .setup_cli import check_llm, setup_llm

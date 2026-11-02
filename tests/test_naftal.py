@@ -472,6 +472,172 @@ class TestSetupCli(unittest.TestCase):
         self.assertIn("--check-llm", out)
 
 
+class TestBakeoffMetrics(unittest.TestCase):
+    """Les mesures objectives doivent distinguer le vrai du faux (sinon le banc d'essai ment)."""
+
+    def test_fabricated_quote_is_caught_and_accents_are_ignored(self):
+        from naftal.bakeoff import quote_stats
+        out = ("« Le Fournisseur peut résilier le présent contrat à tout moment et sans motif » (vrai, accentué)\n"
+               "« Le Fournisseur garantit une indemnisation intégrale en toute circonstance » (inventé)\n"
+               "« tacitement » (trop court : ignoré)\n"
+               "« Le Fournisseur peut résilier le présent contrat [...] moyennant un préavis de huit (8) jours » (ellipse)")
+        self.assertEqual(quote_stats(out, V2), (3, 2))
+
+    def test_article_refs_exclude_law_and_flag_nonexistent(self):
+        from naftal.bakeoff import article_ref_stats
+        out = "Article 5 est abusif ; l'article 127 du Code civil s'applique ; voir Article 12 et art. 3."
+        # V2 a les articles 1 a 8 : « 12 » n'existe pas ; « 127 du Code civil » n'est pas un renvoi au contrat
+        self.assertEqual(article_ref_stats(out, V2), (3, 2))
+
+    def test_legal_refs_flagged_on_same_or_next_line(self):
+        from naftal.bakeoff import legal_ref_stats
+        out = ("Selon l'article 127 du Code civil (à vérifier), la force majeure s'applique.\n"
+               "La loi n° 05-07 encadre le secteur.\n"
+               "Ordonnance n° 75-58\n(à vérifier sur le JORADP)")
+        self.assertEqual(legal_ref_stats(out), (3, 2))
+
+    def test_truth_patterns_compile_and_discriminate(self):
+        import json
+        import re
+        from naftal.bakeoff import SAMPLES, truth_recall
+        truth = json.loads((SAMPLES / "contrat_demo_v2.truth.json").read_text(encoding="utf-8"))
+        for issue in truth["issues"]:
+            re.compile(issue["pattern"])
+        self.assertEqual(truth_recall("Le contrat est équilibré. Rien à signaler.", truth)[:2], (0, 10))
+        found, total, missed = truth_recall(
+            "responsabilité du Client illimitée ; reconduction tacite ; arbitrage CCI", truth)
+        self.assertEqual((found, total), (3, 10))
+        self.assertTrue(any("confidentialite" in m for m in missed))
+
+    def test_rules_engine_now_flags_cci_arbitration_clause(self):
+        # Regression : « reglement d'arbitrage de la Chambre de commerce internationale (CCI) »
+        # etait un faux negatif (motif trop etroit), revele par la verite terrain du banc d'essai.
+        issues = analyze_text(V2).issues()
+        self.assertTrue(any(f["article_ref"] == "Article 8" and "arbitrage" in f["problem"].lower()
+                            for f in issues))
+        self.assertLess(analyze_text(V1).risk_score, 20)        # pas de faux positif sur v1
+
+
+class TestBakeoffRun(unittest.TestCase):
+    def _fake(self, calls, ok=True):
+        from naftal.llm.provider import LLMResult
+
+        def fn(system, prompt, max_tokens):
+            calls.append((system, prompt, max_tokens))
+            if not ok:
+                return LLMResult(ok=False, error="HTTP 401: invalid x-api-key")
+            return LLMResult(ok=True, text=f"Analyse numero {len(calls)} : « Le Fournisseur peut résilier le "
+                                           "présent contrat à tout moment et sans motif ».",
+                             provider="fake", model="m", tokens_in=100, tokens_out=50)
+        return fn
+
+    def test_arms_differ_exactly_as_documented(self):
+        from naftal.bakeoff import minimal_prompt, run_arm
+        from naftal.llm import legal_brain
+        calls = []
+        a = run_arm("A", V2, self._fake(calls))
+        self.assertEqual((calls[0][0], calls[0][1]), ("", minimal_prompt(V2)))        # aucun systeme
+        calls.clear()
+        run_arm("B", V2, self._fake(calls))
+        self.assertEqual((calls[0][0], calls[0][1]), (legal_brain.SYSTEM_PROMPT, minimal_prompt(V2)))
+        calls.clear()
+        c = run_arm("C", V2, self._fake(calls))
+        self.assertEqual(len(calls), 2)                                                # analyse + audit
+        self.assertIn("Passe en revue", calls[0][1])                                   # checklist
+        self.assertIn("auditeur", calls[1][1].lower())
+        self.assertTrue(c["self_verified"])
+        self.assertEqual({x[2] for x in calls}, {2600})                                # meme budget par appel
+        self.assertEqual((a["calls"], a["tokens_in"], a["tokens_out"]), (1, 100, 50))
+        self.assertEqual(c["calls"], 2)
+
+    def test_packaging_is_blind_complete_and_reproducible(self):
+        import json
+        from naftal.bakeoff import ARM_LABELS, load_demo, run_bakeoff
+        text, name, truth = load_demo()
+        root = run_bakeoff(text, name, runs=2, llm_fn=self._fake([]), truth=truth, seed=7,
+                           out_dir=Path(_TMP) / "bk1", progress=lambda *_: None)
+        outs = sorted(p.name for p in (root / "sorties").iterdir())
+        self.assertEqual(outs, [f"S{i:02d}.md" for i in range(1, 7)])                 # 3 bras x 2 runs
+        key = json.loads((root / "a_ouvrir_apres_le_classement" / "cle.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(key), [f"S{i:02d}" for i in range(1, 7)])
+        self.assertEqual(sorted(v["bras"] for v in key.values()), ["A", "A", "B", "B", "C", "C"])
+        for f in (root / "sorties").iterdir():                                         # aucun indice de bras
+            body = f.read_text(encoding="utf-8").lower()
+            for label in ARM_LABELS.values():
+                self.assertNotIn(label.split(" (")[0].lower(), body)
+        sheet = (root / "fiche_notation.md").read_text(encoding="utf-8")
+        self.assertTrue(all(f"| S{i:02d} |" in sheet for i in range(1, 7)))
+        self.assertNotIn("bras", sheet.lower().replace("a_ouvrir_apres", ""))         # la fiche ne trahit rien
+        # meme graine => meme melange
+        root2 = run_bakeoff(text, name, runs=2, llm_fn=self._fake([]), truth=truth, seed=7,
+                            out_dir=Path(_TMP) / "bk2", progress=lambda *_: None)
+        key2 = json.loads((root2 / "a_ouvrir_apres_le_classement" / "cle.json").read_text(encoding="utf-8"))
+        self.assertEqual(key, key2)
+        from naftal.bakeoff import reveal
+        self.assertIn("bras A", reveal(root))
+
+    def test_stops_at_first_failure_to_avoid_wasting_calls(self):
+        from naftal.bakeoff import BakeoffError, run_bakeoff
+        calls = []
+        with self.assertRaises(BakeoffError) as cm:
+            run_bakeoff(V2, "x", runs=3, llm_fn=self._fake(calls, ok=False), out_dir=Path(_TMP) / "bk3",
+                        progress=lambda *_: None)
+        self.assertEqual(len(calls), 1)
+        self.assertIn("401", str(cm.exception))
+
+    def test_cli_requires_llm_and_explicit_consent_for_real_documents(self):
+        from naftal.bakeoff import cli
+        msgs, calls = [], []
+        # IA non activee (tests) -> refus net, aucun appel
+        self.assertEqual(cli("demo", out=msgs.append), 1)
+        self.assertTrue(any("--setup-llm" in m for m in msgs))
+        # document reel : sans « OUI », rien n'est envoye
+        real = Path(_TMP) / "contrat_reel.txt"
+        real.write_text(V1, encoding="utf-8")
+        self.assertEqual(cli(str(real), llm_fn=self._fake(calls), input_fn=lambda _p: "non", out=msgs.append), 1)
+        self.assertEqual(calls, [])
+        # avec consentement : s'execute
+        self.assertEqual(cli(str(real), llm_fn=self._fake(calls), input_fn=lambda _p: "oui",
+                             out=msgs.append), 0)
+        self.assertEqual(len(calls), 4)                                                # 1 + 1 + 2
+        # demo : synthetique, pas de question
+        calls.clear()
+        self.assertEqual(cli("demo", llm_fn=self._fake(calls), input_fn=lambda _p: self.fail("question inattendue"),
+                             out=msgs.append), 0)
+
+
+class TestProviderSystemField(unittest.TestCase):
+    def _capture(self, fn_name, system):
+        import types
+        from unittest import mock
+        from naftal.llm import provider
+        s = types.SimpleNamespace(llm_model="m", llm_base_url="", llm_api_key="k", llm_provider="x")
+        seen = {}
+
+        class R:
+            status_code = 200
+            text = ""
+
+            def json(self):
+                return {"content": [{"text": "ok"}], "usage": {},
+                        "choices": [{"message": {"content": "ok"}}]}
+
+        def post(url, headers=None, json=None, timeout=None):
+            seen.update(json)
+            return R()
+
+        with mock.patch("requests.post", post):
+            getattr(provider, fn_name)(s, system, "bonjour", 10)
+        return seen
+
+    def test_empty_system_is_omitted_for_both_providers(self):
+        self.assertNotIn("system", self._capture("_call_anthropic", ""))
+        self.assertIn("system", self._capture("_call_anthropic", "regles"))
+        self.assertEqual([m["role"] for m in self._capture("_call_openai_compatible", "")["messages"]], ["user"])
+        self.assertEqual([m["role"] for m in self._capture("_call_openai_compatible", "r")["messages"]],
+                         ["system", "user"])
+
+
 class TestAIPipeline(unittest.TestCase):
     def test_two_stage_with_self_verify(self):
         from naftal.analysis.ai_pipeline import deep_analysis

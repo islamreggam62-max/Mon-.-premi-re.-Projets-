@@ -12,3 +12,7 @@ authorization.yaml
 reports/
 *.report.json
 *.report.txt
+
+# Sorties du banc d'essai (analyses de contrats : potentiellement confidentielles)
+bakeoff-*/
+bk_*/

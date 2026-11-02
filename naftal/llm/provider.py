@@ -60,9 +60,10 @@ def _call_anthropic(s, system: str, prompt: str, max_tokens: int) -> LLMResult:
     payload = {
         "model": model,
         "max_tokens": max_tokens,
-        "system": system,
         "messages": [{"role": "user", "content": prompt}],
     }
+    if system:  # pas de champ « system » vide (banc d'essai : bras « chat nu »)
+        payload["system"] = system
     r = requests.post(url, headers=headers, json=payload, timeout=90)
     if r.status_code != 200:
         return LLMResult(ok=False, error=f"HTTP {r.status_code}: {r.text[:300]}", provider="anthropic", model=model)
@@ -82,14 +83,10 @@ def _call_openai_compatible(s, system: str, prompt: str, max_tokens: int) -> LLM
     base = s.llm_base_url or "https://api.openai.com/v1"
     url = base.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {s.llm_api_key}", "content-type": "application/json"}
-    payload = {
-        "model": model,
-        "max_tokens": max_tokens,
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": prompt},
-        ],
-    }
+    messages = [{"role": "user", "content": prompt}]
+    if system:
+        messages.insert(0, {"role": "system", "content": system})
+    payload = {"model": model, "max_tokens": max_tokens, "messages": messages}
     r = requests.post(url, headers=headers, json=payload, timeout=90)
     if r.status_code != 200:
         return LLMResult(ok=False, error=f"HTTP {r.status_code}: {r.text[:300]}", provider=s.llm_provider, model=model)

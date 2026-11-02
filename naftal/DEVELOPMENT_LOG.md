@@ -115,6 +115,34 @@ Vérifié (61 tests) + assistant lancé dans un pseudo-terminal réel + appel r�
 réel avec clé fausse (401). **Non vérifié** : appel réussi avec une vraie clé, et le
 format exact de la requête pour un modèle donné au-delà de l'authentification.
 
+## Version 0.4.0 — banc d'essai aveugle (« plus fort qu'un chat ? »)
+
+Question de l'utilisateur : l'outil est-il devenu plus fort qu'un chat ordinaire en
+contrats et courriers ? Réponse honnête : **non démontré**. Impossible de le mesurer
+ici : aucune clé d'API, et une « comparaison » faite par l'auteur (qui a planté les
+défauts et connaît la liste) serait un théâtre (concepteur = concurrent = juge).
+
+- `bakeoff.py` : 3 bras (A chat nu / B chat + règles / C pipeline), même modèle, même
+  contrat, même budget ; sorties anonymisées et mélangées (graine reproductible) ;
+  fiche de notation à l'aveugle pour le juriste ; mesures objectives révélées après :
+  citations verbatim, renvois d'articles réels (hors « article 127 du Code civil »),
+  références légales marquées « à vérifier », rappel des défauts plantés. S'arrête au
+  premier échec (pas d'appels gaspillés). Consentement OUI pour un document réel.
+- `samples/contrat_demo_v2.truth.json` : 10 défauts plantés, rédigés AVANT toute exécution.
+- CLI : `--bakeoff demo|FICHIER [--runs N --seed S --truth J --yes]`, `--bakeoff-reveal DIR`.
+- `llm/provider.py` : champ `system` omis s'il est vide (bras A).
+
+Trouvé en validant la vérité terrain : le moteur de règles ne signalait pas
+« règlement d'arbitrage de la Chambre de commerce internationale (CCI) » (faux négatif,
+motif trop étroit) → corrigé + test. Sur 10 défauts plantés, le moteur de règles en
+retrouve désormais 9 ; il **ne signale toujours pas** le préavis très court (8 jours) :
+lacune connue, **volontairement non corrigée** pour ne pas ajuster le moteur sur les
+éléments mêmes du test. Ce 9/10 est donc un diagnostic, pas une performance.
+
+Vérifié : 71 tests ; exécution complète avec un LLM factice (aucune valeur de preuve).
+**Non vérifié : tout résultat avec un vrai modèle.** Les courriers/lettres : non
+développés (nécessitent les modèles de l'utilisateur).
+
 ### Pistes d'amélioration (prochaines sessions)
 - OCR optionnel pour les PDF scannés.
 - Recherche sémantique / RAG (embeddings) pour l'assistant et la recherche.

@@ -63,6 +63,33 @@ python -m naftal --check-llm    # teste la connexion avec un message anodin (auc
   console Anthropic). L'analyse approfondie fait **deux appels** (analyse + audit) :
   attention au coût sur de longs contrats.
 
+#### Mesurer « plus fort qu'un chat ordinaire » : banc d'essai aveugle
+```bash
+python -m naftal --bakeoff demo                       # contrat synthétique (aucune confidentialité en jeu)
+python -m naftal --bakeoff contrat.docx --runs 3      # votre contrat (consentement OUI demandé)
+python -m naftal --bakeoff-reveal <dossier>           # après avoir classé les sorties
+```
+Trois bras, **même modèle, même contrat, même budget de sortie** : **A** chat nu ·
+**B** chat + règles NAFTAL (persona/rigueur) · **C** pipeline complet (checklist +
+pré-analyse par règles + auto-vérification). A→B mesure persona et règles ; **B→C mesure
+ce que les couches propres à NAFTAL apportent réellement**. Les sorties sont anonymisées
+et mélangées ; le juriste les classe **sans savoir** d'où elles viennent ; les mesures
+objectives (citations retrouvées mot pour mot, renvois à des articles réels, références
+légales marquées « à vérifier », rappel des défauts plantés — vérité terrain rédigée
+**avant** toute exécution : `samples/contrat_demo_v2.truth.json`) sont révélées ensuite.
+
+Limites : un contrat, peu d'exécutions (`--runs 3`), modèle non déterministe ; le bras B
+**approche** votre chat (claude.ai ajoute réglages, mémoire et compétences que l'API n'a
+pas) ; rappel par expressions régulières grossier ; l'anonymat est partiel (la mise en
+forme peut trahir C) ; **ne couvre pas les courriers** (non développés). **Aucun résultat
+n'est publié ici : l'outil n'a pas encore été exécuté avec un vrai modèle** (aucune clé
+disponible lors du développement) ; il est vérifié avec un LLM factice uniquement.
+
+Défaut trouvé en préparant la vérité terrain : le moteur de règles manquait la clause
+« règlement d'arbitrage de la Chambre de commerce internationale (CCI) » (motif trop
+étroit) — corrigé et testé. **Lacune connue, non corrigée** : aucune règle ne signale un
+préavis de résiliation très court (ex. 8 jours).
+
 ### Recherche dans les clauses (RAG) — `Contrats` → « Recherche plein texte »
 Cherche **dans le texte** de tous les contrats et références (pas seulement dans
 les métadonnées). Moteur local, déterministe, sans dépendance :
