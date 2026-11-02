@@ -3,8 +3,9 @@ __pycache__/
 .venv/
 venv/
 # Never commit a real authorization file or reports containing findings.
+# Anchored to the repo root so source folders named "reports" (components/reports) stay tracked.
 authorization.yaml
-reports/
+/reports/
 *.report.json
 *.report.txt
 
