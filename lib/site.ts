@@ -18,7 +18,7 @@ export function absoluteUrl(path: string): string {
 }
 
 /** Date shown on the privacy policy and terms (ISO). Change it with their text. */
-export const LEGAL_UPDATED = "2026-11-02";
+export const LEGAL_UPDATED = "2026-11-03";
 
 /**
  * Public sales and contact address. Empty until the owner chooses one: while
@@ -28,9 +28,24 @@ export const LEGAL_UPDATED = "2026-11-02";
  */
 export const CONTACT_EMAIL = "islamreggam62@gmail.com";
 
+/** Session-storage key holding the campaign label of the current visit. */
+export const CAMPAIGN_KEY = "nexora:campaign";
+
+/**
+ * Campaign label from a query string (`?src=linkedin-ads` or `?utm_source=…`):
+ * lower-case letters, digits, dash and underscore, 1-32 characters; anything
+ * else is ignored, so a crafted link cannot inject text into the email.
+ */
+export function campaignFrom(search: string): string | null {
+  const params = new URLSearchParams(search);
+  const raw = (params.get("src") ?? params.get("utm_source") ?? "").trim().toLowerCase();
+  return /^[a-z0-9_-]{1,32}$/.test(raw) ? raw : null;
+}
+
 /** mailto: link that opens a pre-filled subscription request. */
-export function salesMailto(planName?: string): string {
-  const subject = planName ? `NEXORA subscription: ${planName} plan` : "NEXORA subscription";
+export function salesMailto(planName?: string, source?: string | null): string {
+  const base = planName ? `NEXORA subscription: ${planName} plan` : "NEXORA subscription";
+  const subject = source ? `${base} [${source}]` : base;
   const body = [
     "Hello,",
     "",

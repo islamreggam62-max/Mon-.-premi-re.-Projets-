@@ -40,6 +40,12 @@ export default function PrivacyPage() {
             key <code className="text-slate-200">nexora:sidebar-collapsed</code>. It never leaves your device.
           </li>
           <li>
+            If you arrive through one of our links that names a campaign (for example{" "}
+            <code className="text-slate-200">?src=linkedin-ads</code>), that label is kept for your visit only, in your
+            browser&apos;s session storage under <code className="text-slate-200">nexora:campaign</code>, and added to the
+            subject of an email you choose to send us. It is never sent anywhere on its own.
+          </li>
+          <li>
             Copies of the site&apos;s pages and files, stored by your browser (a service worker) so NEXORA opens faster
             and works offline. This cache contains no personal data.
           </li>
