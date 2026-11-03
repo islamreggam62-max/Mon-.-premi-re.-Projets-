@@ -1,5 +1,5 @@
 # Applies the Supabase migrations to a throwaway Postgres and runs the
-# tenant-isolation tests (supabase/tests). A failing check means a company
+# database security tests (supabase/tests). A failing check means a company
 # could see or change another company's data, or a role could exceed its rights.
 name: Database security tests
 

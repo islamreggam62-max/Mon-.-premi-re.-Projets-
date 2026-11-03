@@ -5,55 +5,7 @@
 \set ON_ERROR_STOP on
 \set QUIET on
 
--- ---------------------------------------------------------------- helpers
-create schema if not exists tests;
-grant usage on schema tests to anon, authenticated;
-
-create or replace function tests.ok(cond boolean, label text) returns void
-language plpgsql as $$
-begin
-  if cond is not true then
-    raise exception 'FAIL: %', label;
-  end if;
-  raise notice 'PASS: %', label;
-end;
-$$;
-
--- Run a statement and require a given SQLSTATE (its effects are rolled back).
-create or replace function tests.fails(stmt text, state text, label text) returns void
-language plpgsql as $$
-begin
-  begin
-    execute stmt;
-  exception when others then
-    if sqlstate = state then
-      raise notice 'PASS: % (% %)', label, sqlstate, sqlerrm;
-      return;
-    end if;
-    raise exception 'FAIL: % (expected %, got %: %)', label, state, sqlstate, sqlerrm;
-  end;
-  raise exception 'FAIL: % (expected error %, but it succeeded)', label, state;
-end;
-$$;
-
--- Number of rows a statement touched (0 means RLS silently filtered it).
-create or replace function tests.rows(stmt text) returns bigint
-language plpgsql as $$
-declare n bigint;
-begin
-  execute stmt;
-  get diagnostics n = row_count;
-  return n;
-end;
-$$;
-
-grant execute on all functions in schema tests to anon, authenticated;
-
--- Act as a signed-in user (call as superuser, then switch role).
-create or replace function tests.login(uid uuid) returns void
-language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, false);
-$$;
+\ir helpers.sql
 
 -- ------------------------------------------------------------------ users
 insert into auth.users (id, email, raw_user_meta_data) values
@@ -80,14 +32,23 @@ select tests.fails('select public.create_workspace(''Nope'')', '42501', 'anon ca
 reset role;
 
 -- ------------------------------------------------- two independent companies
+-- The NEXORA owner issues each customer an activation code (see 20_activation_codes).
+insert into auth.users (id, email) values ('00000000-0000-4000-8000-0000000000aa', 'owner@nexora.test');
+insert into public.platform_admins (user_id) values ('00000000-0000-4000-8000-0000000000aa');
+select tests.login('00000000-0000-4000-8000-0000000000aa');
+set role authenticated;
+select activation_code as code_a from public.issue_activation_code('annual', 'amina@acme.test') \gset
+select activation_code as code_b from public.issue_activation_code('monthly', 'bilal@beta.test') \gset
+reset role;
+
 select tests.login(:'ua');
 set role authenticated;
-select public.create_workspace('Acme Industries', 'Manufacturing') as ws_a \gset
+select public.create_workspace('Acme Industries', 'Manufacturing', p_code => :'code_a') as ws_a \gset
 reset role;
 
 select tests.login(:'ub');
 set role authenticated;
-select public.create_workspace('Beta Logistics', 'Logistics') as ws_b \gset
+select public.create_workspace('Beta Logistics', 'Logistics', p_code => :'code_b') as ws_b \gset
 insert into public.projects (workspace_id, code, name) values (:'ws_b', 'BETA', 'Beta secret project') returning id as proj_b \gset
 reset role;
 

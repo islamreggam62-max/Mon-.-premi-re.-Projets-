@@ -1,5 +1,7 @@
 -- Local test stand-in for what Supabase provides: the anon/authenticated roles,
--- an auth.users table, and auth.uid() reading the JWT claims of the request.
+-- an auth.users table, auth.uid() reading the JWT claims of the request, and
+-- Supabase's default grants on new objects in public (all of them to anon and
+-- authenticated), so a migration that forgets to revoke one fails the tests.
 -- Never apply this to a Supabase project, which already has the real ones.
 do $$
 begin
@@ -22,3 +24,7 @@ $$;
 
 grant usage on schema auth to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
+
+alter default privileges in schema public grant all on tables to anon, authenticated;
+alter default privileges in schema public grant all on functions to anon, authenticated;
+alter default privileges in schema public grant all on sequences to anon, authenticated;
