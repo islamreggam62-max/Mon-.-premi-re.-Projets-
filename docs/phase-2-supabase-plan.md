@@ -3,8 +3,9 @@
 > **Status (step 1 done):** the core schema, row-level security, and the
 > multi-step functions are implemented in `supabase/migrations/20261102000000_core.sql`;
 > owner-issued activation codes in `supabase/migrations/20261103000000_activation_codes.sql`.
-> They are covered by `supabase/tests/10_tenancy.test.sql` (54 checks: tenant isolation,
-> roles, invites, approvals and their audit trail) and `supabase/tests/20_activation_codes.test.sql`
+> They are covered by `supabase/tests/10_tenancy.test.sql` (67 checks: tenant isolation,
+> roles, invites, approvals and their audit trail, separation of duties: nobody decides
+> their own request, only the owner manages admins, a viewer writes nothing) and `supabase/tests/20_activation_codes.test.sql`
 > (47 checks: who may issue and use a code, single use, expiry, email binding,
 > nothing stored in clear). Run them with `DATABASE_URL=… scripts/test-db.sh`; CI runs
 > them in `.github/workflows/database.yml`. The app does not use the database yet

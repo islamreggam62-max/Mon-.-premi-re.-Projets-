@@ -183,4 +183,66 @@ select tests.ok(
 select tests.ok((select count(*) from public.profiles) = 1, 'B sees only their own profile');
 reset role;
 
+-- ------------------------------- separation of duties, admin roles, viewers
+-- Nobody approves their own request, whatever their role.
+select tests.login(:'um'); set role authenticated;
+select tests.fails(format('insert into public.approvals (workspace_id, kind, title, approver_id) values (%L, ''exception'', ''Self-approved'', %L)', :'ws_a', :'um'),
+  '42501', 'a manager cannot name themselves approver');
+reset role;
+select tests.login(:'ua'); set role authenticated;
+insert into public.approvals (workspace_id, kind, title, approver_id) values (:'ws_a', 'exception', 'Owner request', :'um') returning id as appr_own \gset
+select tests.fails(format('select public.decide_approval(%L, ''approved'')', :'appr_own'), '42501', 'even the owner cannot decide a request they submitted');
+reset role;
+
+-- An outsider learns nothing from the functions' answers.
+select tests.login(:'ub'); set role authenticated;
+select tests.ok(
+  tests.error_of(format('select public.set_member_role(%L, %L, ''member'')', :'ws_a', gen_random_uuid()))
+    = tests.error_of(format('select public.set_member_role(%L, %L, ''member'')', :'ws_a', :'ua'))
+  and tests.error_of(format('select public.set_member_role(%L, %L, ''member'')', :'ws_a', :'ua')) like '42501 %',
+  'set_member_role answers an outsider the same for a stranger and for the owner');
+select tests.ok(
+  tests.error_of(format('select public.decide_approval(%L, ''approved'')', gen_random_uuid()))
+    = tests.error_of(format('select public.decide_approval(%L, ''approved'')', :'appr_own'))
+  and tests.error_of(format('select public.decide_approval(%L, ''approved'')', :'appr_own')) like '42501 %',
+  'decide_approval answers an outsider the same for a missing and a real request');
+reset role;
+
+-- Only the owner manages admins, through invites and removals too.
+select tests.login(:'ua'); set role authenticated;
+select public.set_member_role(:'ws_a', :'um', 'admin');
+select public.set_member_role(:'ws_a', :'uc', 'admin');
+reset role;
+select tests.login(:'um'); set role authenticated;
+select tests.fails(format('insert into public.workspace_invites (workspace_id, email, role) values (%L, ''friend@acme.test'', ''admin'')', :'ws_a'),
+  '42501', 'an admin cannot invite another admin');
+select tests.ok(tests.rows(format('insert into public.workspace_invites (workspace_id, email, role) values (%L, ''new@acme.test'', ''manager'')', :'ws_a')) = 1,
+  'an admin still invites managers');
+select tests.ok(tests.rows(format('delete from public.workspace_members where workspace_id = %L and user_id = %L', :'ws_a', :'uc')) = 0,
+  'an admin cannot remove another admin');
+select tests.ok(tests.rows(format('delete from public.workspace_members where workspace_id = %L and user_id = %L', :'ws_a', :'uv')) = 1,
+  'an admin can remove a viewer');
+reset role;
+select tests.login(:'ua'); set role authenticated;
+select tests.ok(tests.rows(format('insert into public.workspace_invites (workspace_id, email, role) values (%L, ''deputy@acme.test'', ''admin'')', :'ws_a')) = 1,
+  'the owner can invite an admin');
+reset role;
+
+-- Demoted to viewer: no more writing, even on one's own report.
+select tests.login(:'uc'); set role authenticated;
+select tests.ok(tests.rows(format('update public.daily_reports set priorities = ''{"Finish the list today"}'' where id = %L', :'report_c')) = 1,
+  'before demotion, the author edits their report');
+reset role;
+select tests.login(:'ua'); set role authenticated;
+select public.set_member_role(:'ws_a', :'uc', 'viewer');
+reset role;
+select tests.login(:'uc'); set role authenticated;
+select tests.ok(tests.rows(format('update public.daily_reports set priorities = ''{"Edited after demotion"}'' where id = %L', :'report_c')) = 0,
+  'a member demoted to viewer cannot edit their report any more');
+select tests.fails(format('insert into public.report_blockers (report_id, description) values (%L, ''Added after demotion'')', :'report_c'),
+  '42501', 'nor add a blocker to it');
+select tests.ok(tests.rows(format('update public.report_blockers set description = ''Edited after demotion'' where report_id = %L', :'report_c')) = 0,
+  'nor edit its blockers');
+reset role;
+
 \echo ALL TENANCY CHECKS PASSED

@@ -265,17 +265,28 @@ create policy departments_write on public.departments for all to authenticated
   using (public.has_role(workspace_id, '{owner,admin}')) with check (public.has_role(workspace_id, '{owner,admin}'));
 
 -- Members: members read the directory. Role changes go through set_member_role().
--- Owner/admins may remove non-owners; anyone but the owner may leave.
+-- Anyone but the owner may leave; the owner removes anyone else; admins remove
+-- non-admins (only the owner manages admins, as in set_member_role).
 create policy members_select on public.workspace_members for select to authenticated
   using (public.is_member(workspace_id));
 create policy members_delete on public.workspace_members for delete to authenticated
-  using (role <> 'owner' and (user_id = auth.uid() or public.has_role(workspace_id, '{owner,admin}')));
+  using (
+    role <> 'owner' and (
+      user_id = auth.uid()
+      or public.has_role(workspace_id, '{owner}')
+      or (role <> 'admin' and public.has_role(workspace_id, '{admin}'))
+    )
+  );
 
--- Invites: owner and admins only. Accepting goes through accept_invite().
+-- Invites: owner and admins only; only the owner may invite an admin.
+-- Accepting goes through accept_invite().
 create policy invites_select on public.workspace_invites for select to authenticated
   using (public.has_role(workspace_id, '{owner,admin}'));
 create policy invites_insert on public.workspace_invites for insert to authenticated
-  with check (public.has_role(workspace_id, '{owner,admin}') and invited_by = auth.uid() and accepted_at is null);
+  with check (
+    public.has_role(workspace_id, '{owner,admin}') and invited_by = auth.uid() and accepted_at is null
+    and (role <> 'admin' or public.has_role(workspace_id, '{owner}'))
+  );
 create policy invites_delete on public.workspace_invites for delete to authenticated
   using (public.has_role(workspace_id, '{owner,admin}'));
 
@@ -320,23 +331,38 @@ create policy reports_insert on public.daily_reports for insert to authenticated
     and report_date between current_date - 1 and current_date + 1
   );
 create policy reports_update on public.daily_reports for update to authenticated
-  using (author_id = auth.uid() and report_date between current_date - 1 and current_date + 1)
-  with check (author_id = auth.uid() and report_date between current_date - 1 and current_date + 1);
+  using (
+    author_id = auth.uid()
+    and public.has_role(workspace_id, '{owner,admin,manager,member}')
+    and report_date between current_date - 1 and current_date + 1
+  )
+  with check (
+    author_id = auth.uid()
+    and public.has_role(workspace_id, '{owner,admin,manager,member}')
+    and report_date between current_date - 1 and current_date + 1
+  );
 
--- Blockers follow their report: visible with it; the author adds and edits;
--- managers+ may also update them (to resolve).
+-- Blockers follow their report: visible with it; the author adds and edits
+-- (while not a viewer); managers+ may also update them (to resolve).
 create policy blockers_select on public.report_blockers for select to authenticated
   using (exists (select 1 from public.daily_reports r where r.id = report_id));
 create policy blockers_insert on public.report_blockers for insert to authenticated
-  with check (exists (select 1 from public.daily_reports r where r.id = report_id and r.author_id = auth.uid()));
+  with check (exists (
+    select 1 from public.daily_reports r
+    where r.id = report_id and r.author_id = auth.uid()
+      and public.has_role(r.workspace_id, '{owner,admin,manager,member}')
+  ));
 create policy blockers_update on public.report_blockers for update to authenticated
   using (exists (
     select 1 from public.daily_reports r
-    where r.id = report_id and (r.author_id = auth.uid() or public.has_role(r.workspace_id, '{owner,admin,manager}'))
+    where r.id = report_id and (
+      (r.author_id = auth.uid() and public.has_role(r.workspace_id, '{owner,admin,manager,member}'))
+      or public.has_role(r.workspace_id, '{owner,admin,manager}')
+    )
   ));
 
 -- Approvals: requester, approver, and owner/admins read; managers+ submit, to a
--- manager+ approver. Decisions go through decide_approval().
+-- manager+ approver other than themselves. Decisions go through decide_approval().
 create policy approvals_select on public.approvals for select to authenticated
   using (
     requested_by = auth.uid() or approver_id = auth.uid()
@@ -345,6 +371,7 @@ create policy approvals_select on public.approvals for select to authenticated
 create policy approvals_insert on public.approvals for insert to authenticated
   with check (
     requested_by = auth.uid()
+    and approver_id <> requested_by
     and status = 'pending' and decided_at is null
     and public.has_role(workspace_id, '{owner,admin,manager}')
     and exists (
@@ -409,6 +436,8 @@ end;
 $$;
 
 -- Approve, reject, ask for changes, or start a review; recorded in approval_events.
+-- The approver or an owner/admin decides, never the requester. A missing request
+-- and a forbidden one give the same error, so outsiders learn nothing.
 create function public.decide_approval(p_id uuid, p_status public.approval_status, p_note text default null)
 returns public.approval_status
 language plpgsql security definer set search_path = '' as $$
@@ -417,11 +446,11 @@ declare
   a public.approvals%rowtype;
 begin
   select * into a from public.approvals where id = p_id for update;
-  if not found then
-    raise exception 'Approval not found' using errcode = 'P0002';
+  if not found or uid is null or not (a.approver_id = uid or public.has_role(a.workspace_id, '{owner,admin}')) then
+    raise exception 'This request is not yours to decide' using errcode = '42501';
   end if;
-  if uid is null or not (a.approver_id = uid or public.has_role(a.workspace_id, '{owner,admin}')) then
-    raise exception 'Only the approver or an admin can decide' using errcode = '42501';
+  if a.requested_by = uid then
+    raise exception 'Nobody decides a request they submitted' using errcode = '42501';
   end if;
   if a.status in ('approved', 'rejected') then
     raise exception 'This request is already decided' using errcode = '55000';
@@ -441,13 +470,17 @@ end;
 $$;
 
 -- Change a member's role. Owner/admins manage manager/member/viewer; only the
--- owner grants or removes admin; the owner's own role never changes here.
+-- owner grants or removes admin; the owner's own role never changes here. The
+-- caller is checked first, so a non-admin learns nothing about the members.
 create function public.set_member_role(p_workspace uuid, p_user uuid, p_role public.access_role)
 returns void
 language plpgsql security definer set search_path = '' as $$
 declare
   target public.access_role;
 begin
+  if not public.has_role(p_workspace, '{owner,admin}') then
+    raise exception 'Only the owner or an admin can change roles' using errcode = '42501';
+  end if;
   select role into target from public.workspace_members where workspace_id = p_workspace and user_id = p_user;
   if not found then
     raise exception 'Member not found' using errcode = 'P0002';
@@ -455,12 +488,8 @@ begin
   if p_role = 'owner' or target = 'owner' then
     raise exception 'Ownership cannot be changed here' using errcode = '42501';
   end if;
-  if (p_role = 'admin' or target = 'admin') then
-    if not public.has_role(p_workspace, '{owner}') then
-      raise exception 'Only the owner manages admins' using errcode = '42501';
-    end if;
-  elsif not public.has_role(p_workspace, '{owner,admin}') then
-    raise exception 'Only the owner or an admin can change roles' using errcode = '42501';
+  if (p_role = 'admin' or target = 'admin') and not public.has_role(p_workspace, '{owner}') then
+    raise exception 'Only the owner manages admins' using errcode = '42501';
   end if;
   update public.workspace_members set role = p_role where workspace_id = p_workspace and user_id = p_user;
 end;

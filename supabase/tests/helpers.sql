@@ -42,6 +42,19 @@ begin
 end;
 $$;
 
+-- SQLSTATE and message a statement fails with ('OK' if it succeeds); its effects are rolled back.
+create or replace function tests.error_of(stmt text) returns text
+language plpgsql as $$
+begin
+  begin
+    execute stmt;
+  exception when others then
+    return sqlstate || ' ' || sqlerrm;
+  end;
+  return 'OK';
+end;
+$$;
+
 grant execute on all functions in schema tests to anon, authenticated;
 
 -- Act as a signed-in user (call as superuser, then switch role).
