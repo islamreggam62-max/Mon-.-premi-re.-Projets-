@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Dialog } from "@/components/ui/Dialog";
@@ -11,7 +12,6 @@ import { useNexora } from "@/lib/store/StoreProvider";
 import type { DailyReport, EnergyLevel, ReportBlocker, Severity } from "@/lib/types";
 import { DeleteButton, lines, peopleOptions } from "./shared";
 
-const SEVERITY_OPTIONS = (["high", "medium", "low"] as Severity[]).map((s) => ({ value: s, label: SEVERITY_LABEL[s] }));
 const ENERGY_OPTIONS = ([1, 2, 3, 4, 5] as const).map((e) => ({ value: String(e), label: `${e} / 5` }));
 
 /**
@@ -36,19 +36,21 @@ function ReportForm({ report, onDone }: { report?: DailyReport; onDone: () => vo
   const [energy, setEnergy] = useState(String(report?.energy ?? 4));
   const [error, setError] = useState("");
 
+  const severityOptions = (["high", "medium", "low"] as Severity[]).map((s) => ({ value: s, label: SEVERITY_LABEL[s] }));
+
   function setBlocker(i: number, patch: Partial<ReportBlocker>) {
     setBlockers((list) => list.map((b, j) => (j === i ? { ...b, ...patch } : b)));
   }
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (!date) return setError("Choose the report's date.");
+    if (!date) return setError(t("Choose the report's date."));
     const duplicate = data.reports.find((r) => r.authorId === authorId && r.date === date && r.id !== report?.id);
-    if (duplicate) return setError("This person already has a report for that day. Edit that report instead.");
+    if (duplicate) return setError(t("This person already has a report for that day. Edit that report instead."));
     const done = lines(completed);
     const next = lines(priorities);
     const cleanBlockers = blockers.filter((b) => b.description.trim()).map((b) => ({ ...b, description: b.description.trim(), waitingOn: b.waitingOn.trim() || "—" }));
-    if (!done.length && !next.length && !cleanBlockers.length) return setError("Add at least one completed item, priority, or blocker.");
+    if (!done.length && !next.length && !cleanBlockers.length) return setError(t("Add at least one completed item, priority, or blocker."));
     actions.saveReport({
       id: report?.id ?? newId("r"),
       authorId,
@@ -72,21 +74,21 @@ function ReportForm({ report, onDone }: { report?: DailyReport; onDone: () => vo
       </FormGrid>
 
       <fieldset className="mt-5">
-        <legend className="text-xs font-semibold text-slate-300">Blockers</legend>
+        <legend className="text-xs font-semibold text-slate-300">{t("Blockers")}</legend>
         <ul className="mt-2 space-y-3">
           {blockers.map((b, i) => (
             <li key={b.id} className="rounded-xl border border-hairline p-3">
               <div className="flex items-start gap-2">
                 <input
-                  aria-label={`Blocker ${i + 1}`}
-                  placeholder="What is blocked"
+                  aria-label={t("Blocker {n}", { n: i + 1 })}
+                  placeholder={t("What is blocked")}
                   value={b.description}
                   onChange={(e) => setBlocker(i, { description: e.target.value })}
                   className="field min-w-0 flex-1"
                 />
                 <button
                   type="button"
-                  aria-label={`Remove blocker ${i + 1}`}
+                  aria-label={t("Remove blocker {n}", { n: i + 1 })}
                   onClick={() => setBlockers((list) => list.filter((_, j) => j !== i))}
                   className="focus-ring rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-100"
                 >
@@ -95,19 +97,19 @@ function ReportForm({ report, onDone }: { report?: DailyReport; onDone: () => vo
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 <input
-                  aria-label={`Blocker ${i + 1}: waiting on`}
-                  placeholder="Waiting on (person, team, supplier…)"
+                  aria-label={t("Blocker {n}: waiting on", { n: i + 1 })}
+                  placeholder={t("Waiting on (person, team, supplier…)")}
                   value={b.waitingOn === "—" ? "" : b.waitingOn}
                   onChange={(e) => setBlocker(i, { waitingOn: e.target.value })}
                   className="field min-w-0 flex-1 basis-48"
                 />
                 <select
-                  aria-label={`Blocker ${i + 1}: severity`}
+                  aria-label={t("Blocker {n}: severity", { n: i + 1 })}
                   value={b.severity}
                   onChange={(e) => setBlocker(i, { severity: e.target.value as Severity })}
                   className="field w-auto"
                 >
-                  {SEVERITY_OPTIONS.map((o) => (
+                  {severityOptions.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}
                     </option>
@@ -123,7 +125,7 @@ function ReportForm({ report, onDone }: { report?: DailyReport; onDone: () => vo
           onClick={() => setBlockers((list) => [...list, { id: newId("b"), description: "", waitingOn: "", severity: "medium" }])}
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          Add blocker
+          {t("Add blocker")}
         </button>
       </fieldset>
 

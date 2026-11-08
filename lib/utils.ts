@@ -3,9 +3,11 @@
  *
  * Dates and numbers are formatted by hand, in UTC, so the server render and the
  * browser hydration always produce identical strings regardless of the viewer's
- * time zone or ICU version (avoids React hydration mismatches).
+ * time zone or ICU version (avoids React hydration mismatches). Month and day
+ * names follow the interface language (lib/i18n).
  */
 import { DEMO_AS_OF } from "@/lib/data/meta";
+import { getLanguage, t, tn, type Lang } from "@/lib/i18n/core";
 
 export function cn(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -16,8 +18,25 @@ export function cn(...parts: Array<string | false | null | undefined>): string {
  * ------------------------------------------------------------------------- */
 
 const DAY_MS = 86_400_000;
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const MONTHS: Record<Lang, string[]> = {
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  fr: ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."],
+  ar: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+  zh: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+};
+const WEEKDAYS: Record<Lang, string[]> = {
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  fr: ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
+  ar: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+  zh: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+};
+const WEEKDAYS_SHORT: Record<Lang, string[]> = {
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  fr: ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."],
+  ar: WEEKDAYS.ar,
+  zh: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+};
 
 /** "YYYY-MM-DD" (or a full ISO timestamp) → epoch ms at UTC midnight of that day. */
 export function dayValue(iso: string): number {
@@ -51,12 +70,14 @@ export function businessDaysBack(asOf: string, count: number): string[] {
 /** "Oct", or "Jan 2027" for January (marks the year change on an axis). */
 export function formatMonthShort(iso: string): string {
   const { y, m } = dateParts(iso);
-  return m === 0 ? `${MONTHS[m]} ${y}` : MONTHS[m];
+  const lang = getLanguage();
+  if (m !== 0) return MONTHS[lang][m];
+  return lang === "zh" ? `${y}年1月` : `${MONTHS[lang][0]} ${y}`;
 }
 
 /** "Fri" */
 export function formatWeekdayShort(iso: string): string {
-  return WEEKDAYS[new Date(dayValue(iso)).getUTCDay()].slice(0, 3);
+  return WEEKDAYS_SHORT[getLanguage()][new Date(dayValue(iso)).getUTCDay()];
 }
 
 /** Whole days from `ref` to `iso` (negative when `iso` is in the past). */
@@ -69,30 +90,40 @@ function dateParts(iso: string) {
   return { y: d.getUTCFullYear(), m: d.getUTCMonth(), day: d.getUTCDate(), wd: d.getUTCDay() };
 }
 
-/** "Oct 30, 2026" */
+/** "Oct 30, 2026", "30 oct. 2026", "30 أكتوبر 2026", "2026年10月30日" */
 export function formatDate(iso: string): string {
   const { y, m, day } = dateParts(iso);
-  return `${MONTHS[m]} ${day}, ${y}`;
+  const lang = getLanguage();
+  if (lang === "en") return `${MONTHS.en[m]} ${day}, ${y}`;
+  if (lang === "zh") return `${y}年${m + 1}月${day}日`;
+  return `${day} ${MONTHS[lang][m]} ${y}`;
 }
 
-/** "Oct 30" */
+/** "Oct 30", "30 oct.", "30 أكتوبر", "10月30日" */
 export function formatShortDate(iso: string): string {
   const { m, day } = dateParts(iso);
-  return `${MONTHS[m]} ${day}`;
+  const lang = getLanguage();
+  if (lang === "en") return `${MONTHS.en[m]} ${day}`;
+  if (lang === "zh") return `${m + 1}月${day}日`;
+  return `${day} ${MONTHS[lang][m]}`;
 }
 
-/** "Friday, Oct 30, 2026" */
+/** "Friday, Oct 30, 2026", "vendredi 30 oct. 2026", "الجمعة 30 أكتوبر 2026", "2026年10月30日 星期五" */
 export function formatLongDate(iso: string): string {
-  const { y, m, day, wd } = dateParts(iso);
-  return `${WEEKDAYS[wd]}, ${MONTHS[m]} ${day}, ${y}`;
+  const { wd } = dateParts(iso);
+  const lang = getLanguage();
+  if (lang === "en") return `${WEEKDAYS.en[wd]}, ${formatDate(iso)}`;
+  if (lang === "zh") return `${formatDate(iso)} ${WEEKDAYS.zh[wd]}`;
+  return `${WEEKDAYS[lang][wd]} ${formatDate(iso)}`;
 }
 
-/** "5:42 PM UTC" */
+/** "5:42 PM UTC" in English, "17:42 UTC" elsewhere. */
 export function formatTime(isoDateTime: string): string {
   const d = new Date(isoDateTime);
   if (Number.isNaN(d.getTime())) return isoDateTime;
   const h = d.getUTCHours();
   const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  if (getLanguage() !== "en") return `${h}:${mm} UTC`;
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return `${h12}:${mm} ${h < 12 ? "AM" : "PM"} UTC`;
 }
@@ -100,20 +131,19 @@ export function formatTime(isoDateTime: string): string {
 /** "Today", "Yesterday", "Tomorrow", "in 4 days", "3 days ago". */
 export function relativeDay(iso: string, ref: string = DEMO_AS_OF): string {
   const d = daysUntil(iso, ref);
-  if (d === 0) return "Today";
-  if (d === -1) return "Yesterday";
-  if (d === 1) return "Tomorrow";
-  return d > 0 ? `in ${d} days` : `${-d} days ago`;
+  if (d === 0) return t("Today");
+  if (d === -1) return t("Yesterday");
+  if (d === 1) return t("Tomorrow");
+  return d > 0 ? tn(d, "in {n} day", "in {n} days") : tn(-d, "{n} day ago", "{n} days ago");
 }
 
 /** Deadline phrasing: "Due today", "Due in 3 days", "2 days overdue". */
 export function dueLabel(iso: string, ref: string = DEMO_AS_OF): string {
   const d = daysUntil(iso, ref);
-  if (d < -1) return `${-d} days overdue`;
-  if (d === -1) return "1 day overdue";
-  if (d === 0) return "Due today";
-  if (d === 1) return "Due tomorrow";
-  return `Due in ${d} days`;
+  if (d < 0) return tn(-d, "{n} day overdue", "{n} days overdue");
+  if (d === 0) return t("Due today");
+  if (d === 1) return t("Due tomorrow");
+  return tn(d, "Due in {n} day", "Due in {n} days");
 }
 
 /* ----------------------------------------------------------------------------
@@ -137,7 +167,9 @@ export function setDisplayCurrency(code: string): void {
 }
 
 function withCurrency(sign: string, amount: string): string {
-  return displayCurrency === "USD" ? `${sign}$${amount}` : `${sign}${amount} ${displayCurrency}`;
+  const text = displayCurrency === "USD" ? `${sign}$${amount}` : `${sign}${amount} ${displayCurrency}`;
+  // Inside right-to-left text (Arabic), keep "$1.4M" in reading order: a left-to-right isolate.
+  return getLanguage() === "ar" ? `⁦${text}⁩` : text;
 }
 
 /** "$85,000" or "85,000 DZD" */

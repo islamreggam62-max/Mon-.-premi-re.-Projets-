@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import type { Person } from "@/lib/types";
@@ -40,18 +41,18 @@ export function DeleteButton({ label, onConfirm, blockedReason }: { label: strin
     return (
       <button type="button" className="btn btn-danger px-3 py-2 text-sm" onClick={() => setConfirm(true)}>
         <Trash2 className="h-4 w-4" aria-hidden="true" />
-        {label}
+        {t(label)}
       </button>
     );
   }
   return (
     <span className="flex flex-wrap items-center gap-2">
-      <span className="text-xs text-slate-300">Delete for good?</span>
+      <span className="text-xs text-slate-300">{t("Delete for good?")}</span>
       <button type="button" className="btn btn-danger px-3 py-2 text-sm" onClick={onConfirm}>
-        Delete
+        {t("Delete")}
       </button>
       <button type="button" className="btn btn-secondary px-3 py-2 text-sm" onClick={() => setConfirm(false)}>
-        Keep
+        {t("Keep")}
       </button>
     </span>
   );

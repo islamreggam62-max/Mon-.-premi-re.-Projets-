@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { CircleCheck, CircleDollarSign, Clock3, FolderKanban, TriangleAlert } from "lucide-react";
 import { ProjectFormDialog } from "@/components/forms/ProjectForm";
@@ -45,7 +46,7 @@ export function ProjectsView() {
         />
       ) : (
         <>
-          <section aria-label="Portfolio summary" className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <section aria-label={t("Portfolio summary")} className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
             <MiniStat icon={CircleCheck} label="On Track" value={String(counts["on-track"])} tone="emerald" />
             <MiniStat icon={TriangleAlert} label="At Risk / Delayed" value={`${counts["at-risk"]} / ${counts.delayed}`} tone="amber" />
             <MiniStat icon={Clock3} label="Deadlines in 30 days" value={String(dueIn30)} />
@@ -53,7 +54,7 @@ export function ProjectsView() {
               icon={CircleDollarSign}
               label="Budget used"
               value={budget > 0 ? `${percent(spent, budget)}%` : "—"}
-              hint={budget > 0 ? `${formatCompactCurrency(spent)} of ${formatCompactCurrency(budget)}` : "no budget entered"}
+              hint={budget > 0 ? t("{a} of {b}", { a: formatCompactCurrency(spent), b: formatCompactCurrency(budget) }) : "no budget entered"}
             />
           </section>
           <ProjectPortfolio projects={projects} people={data.people} asOf={asOf} onEdit={setEditing} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { t, tn } from "@/lib/i18n/core";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
@@ -31,7 +32,7 @@ import {
 } from "@/lib/labels";
 import { approvalUrgency, indexById, isOpenApproval, sortOpenApprovals } from "@/lib/metrics";
 import type { Approval, ApprovalKind, ApprovalStatus, Person, Project } from "@/lib/types";
-import { cn, dueLabel, formatCompactCurrency, formatCurrency, formatDate, pluralize } from "@/lib/utils";
+import { cn, dueLabel, formatCompactCurrency, formatCurrency, formatDate } from "@/lib/utils";
 
 type StateFilter = "open" | ApprovalStatus | "all";
 type KindFilter = "all" | ApprovalKind;
@@ -110,13 +111,13 @@ export function ApprovalQueue({
   };
 
   const tabs = [
-    { id: "open" as StateFilter, label: "Open", count: ofKind.filter((a) => isOpenApproval(a.status)).length },
+    { id: "open" as StateFilter, label: t("Open"), count: ofKind.filter((a) => isOpenApproval(a.status)).length },
     ...APPROVAL_STATUS_ORDER.map((s) => ({
       id: s as StateFilter,
       label: APPROVAL_STATUS_LABEL[s],
       count: ofKind.filter((a) => a.status === s).length,
     })),
-    { id: "all" as StateFilter, label: "All", count: ofKind.length },
+    { id: "all" as StateFilter, label: t("All"), count: ofKind.length },
   ];
 
   const visible = useMemo(() => {
@@ -157,7 +158,7 @@ export function ApprovalQueue({
         delete next[approval.id];
         return next;
       });
-      setAnnouncement(`Decision undone: ${approval.title}`);
+      setAnnouncement(t("Decision undone: {title}", { title: approval.title }));
       return;
     }
     setDecisions((prev) => {
@@ -165,12 +166,12 @@ export function ApprovalQueue({
       delete next[approval.id];
       return next;
     });
-    setAnnouncement(`Decision undone: ${approval.title}`);
+    setAnnouncement(t("Decision undone: {title}", { title: approval.title }));
   }
 
   return (
     <div>
-      <section aria-label="Queue summary" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section aria-label={t("Queue summary")} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="Open decisions" value={String(stats.open)} />
         <Stat label="Overdue" value={String(stats.overdue)} tone={stats.overdue ? "rose" : undefined} />
         <Stat label="Due within 3 days" value={String(stats.dueSoon)} tone={stats.dueSoon ? "amber" : undefined} />
@@ -178,10 +179,10 @@ export function ApprovalQueue({
       </section>
 
       <div className="mt-6 flex flex-col gap-4">
-        <Tabs items={tabs} value={stateFilter} onChange={setStateFilter} ariaLabel="Filter by review state" />
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by request type">
+        <Tabs items={tabs} value={stateFilter} onChange={setStateFilter} ariaLabel={t("Filter by review state")} />
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("Filter by request type")}>
           <ToggleChip pressed={kindFilter === "all"} onToggle={() => setKindFilter("all")}>
-            All types
+            {t("All types")}
           </ToggleChip>
           {APPROVAL_KIND_ORDER.map((kind) => {
             const Icon = KIND_ICON[kind];
@@ -198,8 +199,8 @@ export function ApprovalQueue({
       <p className="mt-4 flex items-start gap-2 rounded-xl border border-hairline bg-white/[0.02] px-3 py-2 text-xs text-slate-300">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" aria-hidden="true" />
         {onDecide
-          ? "Decisions are saved on this device as soon as you take them."
-          : "Decisions update this browser tab only — nothing is sent or stored, and the queue resets on reload."}
+          ? t("Decisions are saved on this device as soon as you take them.")
+          : t("Decisions update this browser tab only — nothing is sent or stored, and the queue resets on reload.")}
       </p>
       <p className="sr-only" aria-live="polite">
         {announcement}
@@ -227,51 +228,51 @@ export function ApprovalQueue({
                     </Badge>
                     <ApprovalStatusBadge status={a.status} />
                     {isOpen && <UrgencyBadge urgency={urgency} />}
-                    {changedHere && <Badge tone="slate">{onDecide ? "Decided just now" : "Changed in this session"}</Badge>}
+                    {changedHere && <Badge tone="slate">{onDecide ? t("Decided just now") : t("Changed in this session")}</Badge>}
                   </div>
 
                   <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0 lg:max-w-2xl">
                       <h2 className="text-base font-semibold text-slate-50">{a.title}</h2>
                       {a.counterparty && (
-                        <p className="mt-0.5 text-xs font-medium text-violet-200">Counterparty: {a.counterparty}</p>
+                        <p className="mt-0.5 text-xs font-medium text-violet-200">{t("Counterparty: {name}", { name: a.counterparty })}</p>
                       )}
                       <p className="mt-1 text-sm text-slate-300">{a.summary}</p>
                     </div>
-                    <div className="shrink-0 lg:text-right">
+                    <div className="shrink-0 lg:text-end">
                       {a.amount !== undefined && (
                         <>
-                          <p className="text-[11px] uppercase tracking-wide text-slate-400">{AMOUNT_LABEL[a.kind]}</p>
+                          <p className="text-[11px] uppercase tracking-wide text-slate-400">{t(AMOUNT_LABEL[a.kind])}</p>
                           <p className="text-xl font-semibold tabular-nums text-slate-50">{formatCurrency(a.amount)}</p>
                         </>
                       )}
                       {a.headcount !== undefined && (
-                        <p className="text-xl font-semibold tabular-nums text-slate-50">{pluralize(a.headcount, "role")}</p>
+                        <p className="text-xl font-semibold tabular-nums text-slate-50">{tn(a.headcount, "{n} role", "{n} roles")}</p>
                       )}
                     </div>
                   </div>
 
                   <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-xs sm:grid-cols-4">
                     <div>
-                      <dt className="text-slate-400">Requested by</dt>
+                      <dt className="text-slate-400">{t("Requested by")}</dt>
                       <dd className="mt-1 flex items-center gap-1.5 text-slate-200">
                         {requester && <Avatar person={requester} size="xs" />}
                         <span className="truncate">{requester?.name}</span>
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-400">Approver</dt>
+                      <dt className="text-slate-400">{t("Approver")}</dt>
                       <dd className="mt-1 flex items-center gap-1.5 text-slate-200">
                         {approver && <Avatar person={approver} size="xs" />}
                         <span className="truncate">{approver?.name}</span>
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-400">Submitted</dt>
+                      <dt className="text-slate-400">{t("Submitted")}</dt>
                       <dd className="mt-1 text-slate-200">{formatDate(a.submitted)}</dd>
                     </div>
                     <div>
-                      <dt className="text-slate-400">{isOpen ? "Decision due" : "Decided"}</dt>
+                      <dt className="text-slate-400">{isOpen ? t("Decision due") : t("Decided")}</dt>
                       <dd className="mt-1 text-slate-200">
                         {isOpen ? formatDate(a.dueBy) : a.decidedAt ? formatDate(a.decidedAt) : "—"}
                       </dd>
@@ -303,7 +304,7 @@ export function ApprovalQueue({
                         href={`/projects#${project.id}`}
                         className="focus-ring inline-flex items-center gap-1 rounded text-xs font-medium text-violet-300 hover:text-violet-200"
                       >
-                        {project.name.split(" — ")[0]} project <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                        {t("{name} project", { name: project.name.split(" — ")[0] })} <ArrowRight className="h-3 w-3 rtl:-scale-x-100" aria-hidden="true" />
                       </Link>
                     ) : (
                       <span />
@@ -311,32 +312,32 @@ export function ApprovalQueue({
                     <div className="flex flex-wrap gap-2">
                       {a.status === "pending" && (
                         <button type="button" className="btn btn-secondary" onClick={() => decide(a, "in-review")}>
-                          <Eye className="h-3.5 w-3.5" aria-hidden="true" /> Start review
+                          <Eye className="h-3.5 w-3.5" aria-hidden="true" /> {t("Start review")}
                         </button>
                       )}
                       {a.status === "in-review" && (
                         <button type="button" className="btn btn-secondary" onClick={() => decide(a, "changes-requested")}>
-                          <MessageSquareWarning className="h-3.5 w-3.5" aria-hidden="true" /> Request changes
+                          <MessageSquareWarning className="h-3.5 w-3.5" aria-hidden="true" /> {t("Request changes")}
                         </button>
                       )}
                       {isOpen && (
                         <>
                           <button type="button" className="btn btn-danger" onClick={() => decide(a, "rejected")}>
-                            <X className="h-3.5 w-3.5" aria-hidden="true" /> Reject
+                            <X className="h-3.5 w-3.5" aria-hidden="true" /> {t("Reject")}
                           </button>
                           <button type="button" className="btn btn-primary" onClick={() => decide(a, "approved")}>
-                            <Check className="h-3.5 w-3.5" aria-hidden="true" /> Approve
+                            <Check className="h-3.5 w-3.5" aria-hidden="true" /> {t("Approve")}
                           </button>
                         </>
                       )}
                       {onEdit && isOpen && (
                         <button type="button" className="btn btn-secondary" onClick={() => onEdit(a)}>
-                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> {t("Edit")}
                         </button>
                       )}
                       {changedHere && (
                         <button type="button" className="btn btn-secondary" onClick={() => undo(a)}>
-                          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" /> Undo
+                          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" /> {t("Undo")}
                         </button>
                       )}
                     </div>
@@ -354,7 +355,7 @@ export function ApprovalQueue({
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "amber" }) {
   return (
     <div className="glass p-4">
-      <p className="text-xs text-slate-300">{label}</p>
+      <p className="text-xs text-slate-300">{t(label)}</p>
       <p
         className={cn(
           "mt-1 text-xl font-semibold tabular-nums",

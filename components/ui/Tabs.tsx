@@ -37,8 +37,12 @@ export function Tabs<T extends string>({
 
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     let next = -1;
-    if (event.key === "ArrowRight") next = (index + 1) % items.length;
-    else if (event.key === "ArrowLeft") next = (index - 1 + items.length) % items.length;
+    // Right-to-left interfaces (Arabic) put the next tab on the left.
+    const rtl = document.documentElement.dir === "rtl";
+    const forward = rtl ? "ArrowLeft" : "ArrowRight";
+    const backward = rtl ? "ArrowRight" : "ArrowLeft";
+    if (event.key === forward) next = (index + 1) % items.length;
+    else if (event.key === backward) next = (index - 1 + items.length) % items.length;
     else if (event.key === "Home") next = 0;
     else if (event.key === "End") next = items.length - 1;
     if (next < 0) return;

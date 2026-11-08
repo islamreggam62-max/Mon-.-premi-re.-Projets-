@@ -42,7 +42,7 @@ export function ProgressBar({
         />
       </div>
       {showLabel && (
-        <span className="w-9 shrink-0 text-right text-xs tabular-nums text-slate-300">
+        <span className="w-9 shrink-0 text-end text-xs tabular-nums text-slate-300">
           {clamped}%
         </span>
       )}

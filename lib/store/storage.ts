@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n/core";
 import { STORE_VERSION, type NexoraData } from "./schema";
 
 /** localStorage key of the device copy. Survives app updates; removed with the app's storage. */
@@ -10,16 +11,16 @@ const ARRAY_FIELDS = ["people", "projects", "tasks", "reports", "approvals"] as 
  * Returns the reason when it is not, so an import can say what is wrong.
  */
 export function validateData(value: unknown): { ok: true; data: NexoraData } | { ok: false; reason: string } {
-  if (!value || typeof value !== "object") return { ok: false, reason: "This is not a NEXORA backup." };
+  if (!value || typeof value !== "object") return { ok: false, reason: t("This is not a NEXORA backup.") };
   const v = value as Partial<NexoraData>;
-  if (v.version !== STORE_VERSION) return { ok: false, reason: "This backup comes from another version of NEXORA." };
-  if (v.mode !== "sample" && v.mode !== "company") return { ok: false, reason: "This backup has no data mode." };
-  if (!v.company || typeof v.company.name !== "string") return { ok: false, reason: "This backup has no company profile." };
+  if (v.version !== STORE_VERSION) return { ok: false, reason: t("This backup comes from another version of NEXORA.") };
+  if (v.mode !== "sample" && v.mode !== "company") return { ok: false, reason: t("This backup has no data mode.") };
+  if (!v.company || typeof v.company.name !== "string") return { ok: false, reason: t("This backup has no company profile.") };
   for (const field of ARRAY_FIELDS) {
-    if (!Array.isArray(v[field])) return { ok: false, reason: `This backup is missing its ${field}.` };
+    if (!Array.isArray(v[field])) return { ok: false, reason: t("This backup is missing its {field}.", { field }) };
   }
   if (typeof v.currentUserId !== "string" || !v.people!.some((p) => p?.id === v.currentUserId)) {
-    return { ok: false, reason: "This backup does not say who uses it." };
+    return { ok: false, reason: t("This backup does not say who uses it.") };
   }
   return { ok: true, data: { ...v, reportHistory: v.reportHistory ?? {} } as NexoraData };
 }

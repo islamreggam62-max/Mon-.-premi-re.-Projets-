@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { CircleAlert, Clock, ListTodo, OctagonX } from "lucide-react";
 import { TaskFormDialog } from "@/components/forms/TaskForm";
@@ -41,8 +42,8 @@ export function TasksView() {
         />
       ) : (
         <>
-          <section aria-label="Task summary" className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <MiniStat icon={ListTodo} label="Open tasks" value={String(open.length)} hint={`of ${tasks.length} total`} />
+          <section aria-label={t("Task summary")} className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <MiniStat icon={ListTodo} label="Open tasks" value={String(open.length)} hint={t("of {n} total", { n: tasks.length })} />
             <MiniStat icon={CircleAlert} label="Critical open" value={String(critical)} tone={critical ? "rose" : "default"} />
             <MiniStat icon={Clock} label="Overdue" value={String(overdue)} tone={overdue ? "rose" : "default"} />
             <MiniStat icon={OctagonX} label="Blocked" value={String(blocked)} tone={blocked ? "amber" : "default"} />

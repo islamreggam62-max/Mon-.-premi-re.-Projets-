@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import Link from "next/link";
 import { ArrowRight, Ban, BrainCircuit, FlaskConical, ShieldCheck, UserCheck } from "lucide-react";
 import { BottleneckRow, InsightCard, SummaryCard } from "@/components/ai/PreviewCards";
@@ -43,12 +44,11 @@ function AiNotConnected() {
             <BrainCircuit className="h-5 w-5 text-violet-200" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-slate-50">No AI model is connected yet</h2>
+            <h2 className="text-base font-semibold text-slate-50">{t("No AI model is connected yet")}</h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-300">
-              AI analysis needs your records to be sent to a model, so it comes with company accounts, with your consent.
-              Until then, nothing leaves this device and NEXORA does not invent insights about your company.
+              {t("AI analysis needs your records to be sent to a model, so it comes with company accounts, with your consent. Until then, nothing leaves this device and NEXORA does not invent insights about your company.")}
             </p>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Available now, without AI</p>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-400">{t("Available now, without AI")}</p>
             <ul className="mt-2 space-y-2">
               {links.map((l) => (
                 <li key={l.href}>
@@ -56,9 +56,9 @@ function AiNotConnected() {
                     href={l.href}
                     className="focus-ring inline-flex items-center gap-1.5 rounded text-sm font-semibold text-violet-300 hover:text-violet-200"
                   >
-                    {l.label} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t(l.label)} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
                   </Link>
-                  <span className="ml-2 text-sm text-slate-400">{l.detail}</span>
+                  <span className="ms-2 text-sm text-slate-400">{t(l.detail)}</span>
                 </li>
               ))}
             </ul>
@@ -79,7 +79,7 @@ function SampleAiPreview() {
     <Card>
       <CardHeader
         title="Organizational risk radar"
-        subtitle={`Exposure by dimension, 0–100 · ${elevated} high or elevated · ${rising} rising since last week`}
+        subtitle={t("Exposure by dimension, 0–100 · {a} high or elevated · {b} rising since last week", { a: elevated, b: rising })}
         action={<DemoBadge />}
       />
       <CardBody>
@@ -104,7 +104,7 @@ function SampleAiPreview() {
     <div className="space-y-8">
       <section aria-labelledby="ai-insights-heading">
         <h2 id="ai-insights-heading" className="mb-3 text-sm font-semibold text-slate-50">
-          Executive insights
+          {t("Executive insights")}
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {AI_INSIGHTS.map((insight) => (
@@ -114,7 +114,7 @@ function SampleAiPreview() {
       </section>
       <section aria-labelledby="ai-summaries-heading">
         <h2 id="ai-summaries-heading" className="mb-3 text-sm font-semibold text-slate-50">
-          Daily report synthesis
+          {t("Daily report synthesis")}
         </h2>
         <div className="space-y-4">
           {REPORT_SUMMARIES.map((summary) => (
@@ -145,20 +145,19 @@ function SampleAiPreview() {
           <FlaskConical className="h-5 w-5 text-white" aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-50">Preview only — no AI model is connected</p>
+          <p className="text-sm font-semibold text-slate-50">{t("Preview only — no AI model is connected")}</p>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-200">
-            Everything on this page is static, hand-written demonstration content showing the layout of future AI output.
-            No API is called and nothing is generated.
+            {t("Everything on this page is static, hand-written demonstration content showing the layout of future AI output. No API is called and nothing is generated.")}
           </p>
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-slate-300">
             <li className="flex items-center gap-1.5">
-              <Ban className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> No model calls
+              <Ban className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> {t("No model calls")}
             </li>
             <li className="flex items-center gap-1.5">
-              <UserCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> Insights are advisory; executives decide
+              <UserCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> {t("Insights are advisory; executives decide")}
             </li>
             <li className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> No keys or credentials in this build
+              <ShieldCheck className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" /> {t("No keys or credentials in this build")}
             </li>
           </ul>
         </div>
@@ -168,12 +167,12 @@ function SampleAiPreview() {
 
       <div className="mt-8">
         <TabbedPanels
-          ariaLabel="AI Intelligence previews"
+          ariaLabel={t("AI Intelligence previews")}
           idPrefix="ai"
           tabs={[
-            { id: "radar", label: "Risk radar", count: RISK_RADAR.length, content: radar },
-            { id: "bottlenecks", label: "Bottlenecks", count: BOTTLENECKS.length, content: bottlenecks },
-            { id: "synthesis", label: "Synthesis", count: AI_INSIGHTS.length + REPORT_SUMMARIES.length, content: synthesis },
+            { id: "radar", label: t("Risk radar"), count: RISK_RADAR.length, content: radar },
+            { id: "bottlenecks", label: t("Bottlenecks"), count: BOTTLENECKS.length, content: bottlenecks },
+            { id: "synthesis", label: t("Synthesis"), count: AI_INSIGHTS.length + REPORT_SUMMARIES.length, content: synthesis },
           ]}
         />
       </div>

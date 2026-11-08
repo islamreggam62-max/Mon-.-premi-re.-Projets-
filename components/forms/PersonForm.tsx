@@ -1,20 +1,20 @@
 "use client";
 
+import { t, tn } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { CheckboxField, FormActions, FormGrid, SelectField, TextField } from "@/components/ui/Form";
 import { PRESENCE_LABEL } from "@/lib/labels";
-import { DEPARTMENT_OPTIONS, ROLE_OPTIONS } from "@/lib/store/options";
+import { departmentOptions, roleOptions } from "@/lib/store/options";
 import { initialsOf, newId, todayISO } from "@/lib/store/schema";
 import { useNexora } from "@/lib/store/StoreProvider";
 import type { AccessRole, Department, Person, PresenceStatus } from "@/lib/types";
 import { DeleteButton, parseWhole } from "./shared";
 
-const PRESENCE_OPTIONS = (Object.keys(PRESENCE_LABEL) as PresenceStatus[]).map((s) => ({ value: s, label: PRESENCE_LABEL[s] }));
 
 export function PersonFormDialog({ open, onClose, person }: { open: boolean; onClose: () => void; person?: Person }) {
   return (
-    <Dialog open={open} onClose={onClose} title={person ? `Edit ${person.name}` : "Add a team member"} description="Saved on this device. People do not need an account.">
+    <Dialog open={open} onClose={onClose} title={person ? t("Edit {name}", { name: person.name }) : "Add a team member"} description="Saved on this device. People do not need an account.">
       <PersonForm key={person?.id ?? "new"} person={person} onDone={onClose} />
     </Dialog>
   );
@@ -34,28 +34,35 @@ function PersonForm({ person, onDone }: { person?: Person; onDone: () => void })
   const [reportsDaily, setReportsDaily] = useState(person?.reportsDaily ?? true);
   const [error, setError] = useState("");
 
-  const roleOptions = isSelf ? ROLE_OPTIONS.filter((r) => r.value === role) : ROLE_OPTIONS.filter((r) => r.value !== "owner");
+  const presenceOptions = (Object.keys(PRESENCE_LABEL) as PresenceStatus[]).map((s) => ({ value: s, label: PRESENCE_LABEL[s] }));
+  const allRoles = roleOptions();
+  const roleChoices = isSelf ? allRoles.filter((r) => r.value === role) : allRoles.filter((r) => r.value !== "owner");
 
   const references = person
     ? [
-        [data.tasks.filter((t) => t.assigneeId === person.id).length, "task"],
-        [data.projects.filter((p) => p.ownerId === person.id || p.memberIds.includes(person.id)).length, "project"],
-        [data.approvals.filter((a) => a.requestedById === person.id || a.approverId === person.id).length, "approval"],
-        [data.reports.filter((r) => r.authorId === person.id).length, "report"],
-      ].filter(([n]) => (n as number) > 0)
+        tn(data.tasks.filter((x) => x.assigneeId === person.id).length, "{n} task", "{n} tasks"),
+        tn(data.projects.filter((p) => p.ownerId === person.id || p.memberIds.includes(person.id)).length, "{n} project", "{n} projects"),
+        tn(data.approvals.filter((a) => a.requestedById === person.id || a.approverId === person.id).length, "{n} approval", "{n} approvals"),
+        tn(data.reports.filter((r) => r.authorId === person.id).length, "{n} report", "{n} reports"),
+      ].filter((_, i) => [
+        data.tasks.some((x) => x.assigneeId === person.id),
+        data.projects.some((p) => p.ownerId === person.id || p.memberIds.includes(person.id)),
+        data.approvals.some((a) => a.requestedById === person.id || a.approverId === person.id),
+        data.reports.some((r) => r.authorId === person.id),
+      ][i])
     : [];
   const blockedReason = isSelf
-    ? "You cannot remove yourself."
+    ? t("You cannot remove yourself.")
     : references.length
-      ? `Linked to ${references.map(([n, w]) => `${n} ${w}${n === 1 ? "" : "s"}`).join(", ")}: reassign or delete those first.`
+      ? t("Linked to {items}: reassign or delete those first.", { items: references.join(t(", ")) })
       : undefined;
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (name.trim().length < 2) return setError("Enter a name (at least 2 characters).");
+    if (name.trim().length < 2) return setError(t("Enter a name (at least 2 characters)."));
     const load = parseWhole(workload, 0, 100);
-    if (load === null) return setError("Workload is a whole number from 0 to 100.");
-    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError("Enter a valid email address, or leave it empty.");
+    if (load === null) return setError(t("Workload is a whole number from 0 to 100."));
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError(t("Enter a valid email address, or leave it empty."));
     actions.savePerson({
       id: person?.id ?? newId("p"),
       name: name.trim(),
@@ -78,12 +85,12 @@ function PersonForm({ person, onDone }: { person?: Person; onDone: () => void })
       <FormGrid>
         <TextField label="Name" value={name} onChange={setName} required autoComplete="name" />
         <TextField label="Title" value={title} onChange={setTitle} placeholder="Sales manager" />
-        <SelectField label="Department" value={department} onChange={setDepartment} options={DEPARTMENT_OPTIONS} />
-        <SelectField label="Role" value={role} onChange={setRole} options={roleOptions} />
+        <SelectField label="Department" value={department} onChange={setDepartment} options={departmentOptions()} />
+        <SelectField label="Role" value={role} onChange={setRole} options={roleChoices} />
         <TextField label="Email" type="email" value={email} onChange={setEmail} hint="(optional)" />
         <TextField label="Location" value={location} onChange={setLocation} placeholder="Algiers" hint="(optional)" />
         <TextField label="Workload %" value={workload} onChange={setWorkload} inputMode="numeric" hint="0–100" />
-        <SelectField label="Status" value={status} onChange={setStatus} options={PRESENCE_OPTIONS} />
+        <SelectField label="Status" value={status} onChange={setStatus} options={presenceOptions} />
       </FormGrid>
       <div className="mt-4">
         <CheckboxField

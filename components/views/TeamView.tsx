@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Activity, ClipboardCheck, Gauge, TriangleAlert, Users } from "lucide-react";
 import { PersonFormDialog } from "@/components/forms/PersonForm";
@@ -34,7 +35,7 @@ export function TeamView() {
         action={<HeaderActions label="Add member" onNew={() => setEditing("new")} />}
       />
 
-      <section aria-label="Team summary" className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section aria-label={t("Team summary")} className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <MiniStat icon={Activity} label="Active now" value={`${active} / ${team.length}`} hint="marked Active" />
         <MiniStat icon={Gauge} label="Avg workload" value={pct(avgWorkload)} hint="excluding leave" />
         <MiniStat

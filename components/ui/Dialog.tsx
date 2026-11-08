@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useEffect, useId, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -51,19 +52,19 @@ export function Dialog({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <h2 id={titleId} className="text-lg font-semibold text-slate-50">
-                {title}
+                {t(title)}
               </h2>
               {description && (
                 <p id={descId} className="mt-1 text-sm text-slate-400">
-                  {description}
+                  {t(description)}
                 </p>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
-              className="focus-ring -mr-1 rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-100"
+              aria-label={t("Close")}
+              className="focus-ring -me-1 rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-100"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>

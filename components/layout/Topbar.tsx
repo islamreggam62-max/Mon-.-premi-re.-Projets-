@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { RefObject } from "react";
@@ -56,13 +57,13 @@ export function Topbar({
           ref={menuButtonRef}
           type="button"
           onClick={onOpenMenu}
-          className="focus-ring -ml-1 rounded-lg p-2 text-slate-300 hover:bg-white/5 hover:text-slate-200 lg:hidden"
-          aria-label="Open navigation menu"
+          className="focus-ring -ms-1 rounded-lg p-2 text-slate-300 hover:bg-white/5 hover:text-slate-200 lg:hidden"
+          aria-label={t("Open navigation menu")}
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
+        <nav aria-label={t("Breadcrumb")} className="min-w-0 flex-1">
           <ol className="flex min-w-0 items-center gap-2 text-sm">
             <li className="hidden shrink-0 md:block">
               <Link href={APP_HOME} className="focus-ring rounded text-slate-400 hover:text-slate-200">
@@ -70,13 +71,13 @@ export function Topbar({
               </Link>
             </li>
             <li className="hidden shrink-0 text-slate-400 md:block" aria-hidden="true">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 rtl:-scale-x-100" />
             </li>
             <li className="min-w-0">
               <span aria-current="page" className="block truncate font-semibold text-slate-50">
-                {page.label}
+                {t(page.label)}
               </span>
-              <span className="hidden truncate text-xs text-slate-400 xl:block">{page.description}</span>
+              <span className="hidden truncate text-xs text-slate-400 xl:block">{page.description && t(page.description)}</span>
             </li>
           </ol>
         </nav>
@@ -96,20 +97,20 @@ export function Topbar({
 
 function SearchPlaceholder() {
   return (
-    <div className="relative hidden md:block" title="Global search arrives in Phase 2">
+    <div className="relative hidden md:block" title={t("Global search arrives in Phase 2")}>
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         aria-hidden="true"
       />
       <input
         type="search"
         readOnly
-        aria-label="Global search (available in Phase 2)"
-        placeholder="Search NEXORA…"
-        className="field w-56 cursor-default pl-9 pr-16 lg:w-72"
+        aria-label={t("Global search (available in Phase 2)")}
+        placeholder={t("Search NEXORA…")}
+        className="field w-56 cursor-default ps-9 pe-16 lg:w-72"
       />
-      <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-hairline bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
-        Phase 2
+      <span className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 rounded-md border border-hairline bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
+        {t("Phase 2")}
       </span>
     </div>
   );
@@ -124,7 +125,7 @@ function DemoModeBadge() {
   if (data?.mode === "company") return <DeviceModeBadge />;
   return (
     <Popover
-      panelLabel="About demo data mode"
+      panelLabel={t("About demo data mode")}
       panelClassName="w-80"
       trigger={() => (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-violet/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-violet-100 ring-1 ring-inset ring-violet/50">
@@ -132,26 +133,22 @@ function DemoModeBadge() {
             <span className="absolute inline-flex h-full w-full rounded-full bg-violet-soft opacity-60 motion-safe:animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-soft" />
           </span>
-          Demo data mode
+          {t("Demo data mode")}
         </span>
       )}
     >
       <div className="p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-slate-100">
           <FlaskConical className="h-4 w-4 text-violet-300" aria-hidden="true" />
-          You are viewing a sample company
+          {t("You are viewing a sample company")}
         </p>
         <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-300">
-          <li>
-            People, projects, and figures are fictional, dated{" "}
-            <span className="text-slate-200">{formatLongDate(DEMO_AS_OF)}</span>.
-          </li>
-          <li>Your edits are saved on this device only. No server, database, or AI model is connected.</li>
+          <li>{t("People, projects, and figures are fictional, dated {date}.", { date: formatLongDate(DEMO_AS_OF) })}</li>
+          <li>{t("Your edits are saved on this device only. No server, database, or AI model is connected.")}</li>
           <li>
             <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
-              Set up your own company
-            </Link>{" "}
-            when you are ready.
+              {t("Set up your own company when you are ready.")}
+            </Link>
           </li>
         </ul>
       </div>
@@ -163,26 +160,25 @@ function DemoModeBadge() {
 function DeviceModeBadge() {
   return (
     <Popover
-      panelLabel="Where your data is saved"
+      panelLabel={t("Where your data is saved")}
       panelClassName="w-80"
       trigger={() => (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-inset ring-white/15">
           <Smartphone className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
-          <span className="hidden sm:inline">On this device</span>
+          <span className="hidden sm:inline">{t("On this device")}</span>
         </span>
       )}
     >
       <div className="p-4">
-        <p className="text-sm font-semibold text-slate-100">Saved on this device</p>
+        <p className="text-sm font-semibold text-slate-100">{t("Saved on this device")}</p>
         <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-300">
-          <li>Every change is saved here at once, and NEXORA works offline.</li>
-          <li>Nothing is sent anywhere. Company accounts shared with your team come in a later version.</li>
+          <li>{t("Every change is saved here at once, and NEXORA works offline.")}</li>
+          <li>{t("Nothing is sent anywhere. Company accounts shared with your team come in a later version.")}</li>
           <li>
-            Uninstalling the app or clearing its storage erases the data:{" "}
+            {t("Uninstalling the app or clearing its storage erases the data.")}{" "}
             <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
-              keep a backup
+              {t("Keep a backup.")}
             </Link>
-            .
           </li>
         </ul>
       </div>
@@ -205,8 +201,8 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
   const sample = data?.mode !== "company";
   return (
     <Popover
-      panelLabel="Notifications"
-      triggerLabel={`Notifications (${items.length})`}
+      panelLabel={t("Notifications")}
+      triggerLabel={`${t("Notifications")} (${items.length})`}
       panelClassName="w-[22rem]"
       triggerClassName="border border-hairline bg-white/[0.03] hover:border-white/15"
       trigger={() => (
@@ -214,7 +210,7 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
           <Bell className="h-[18px] w-[18px]" aria-hidden="true" />
           {items.length > 0 && (
             <span
-              className="absolute right-2 top-2 h-2 w-2 rounded-full bg-status-rose ring-2 ring-base-900"
+              className="absolute end-2 top-2 h-2 w-2 rounded-full bg-status-rose ring-2 ring-base-900"
               aria-hidden="true"
             />
           )}
@@ -224,12 +220,12 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
       {(close) => (
         <>
           <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-            <p className="text-sm font-semibold text-slate-100">Notifications</p>
-            {sample && <Badge tone="violet">Demo</Badge>}
+            <p className="text-sm font-semibold text-slate-100">{t("Notifications")}</p>
+            {sample && <Badge tone="violet">{t("Demo")}</Badge>}
           </div>
           {items.length === 0 && (
             <p className="px-4 py-6 text-sm text-slate-400">
-              No alerts. Overdue approvals, high blockers in today&apos;s reports, and delayed projects show up here.
+              {t("No alerts. Overdue approvals, high blockers in today's reports, and delayed projects show up here.")}
             </p>
           )}
           <ul className="max-h-[60vh] divide-y divide-white/5 overflow-y-auto">
@@ -276,14 +272,14 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
 function ProfileMenu({ user }: { user: Person }) {
   return (
     <Popover
-      panelLabel="Account"
-      triggerLabel={`Account menu for ${user.name}`}
+      panelLabel={t("Account")}
+      triggerLabel={t("Account menu for {name}", { name: user.name })}
       panelClassName="w-72"
       triggerClassName="hover:bg-white/5"
       trigger={() => (
-        <span className="flex items-center gap-2 rounded-xl p-1 lg:pr-2">
+        <span className="flex items-center gap-2 rounded-xl p-1 lg:pe-2">
           <Avatar person={user} size="sm" />
-          <span className="hidden text-left lg:block">
+          <span className="hidden text-start lg:block">
             <span className="block max-w-[10rem] truncate text-sm font-medium leading-tight text-slate-100">
               {user.name}
             </span>
@@ -315,7 +311,7 @@ function ProfileMenu({ user }: { user: Person }) {
                 className="focus-ring flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-300 hover:bg-white/5 hover:text-slate-100"
               >
                 <Settings className="h-4 w-4 text-slate-400" aria-hidden="true" />
-                Workspace settings
+                {t("Workspace settings")}
               </Link>
             </li>
             <li>
@@ -325,7 +321,7 @@ function ProfileMenu({ user }: { user: Person }) {
                 className="focus-ring flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-300 hover:bg-white/5 hover:text-slate-100"
               >
                 <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
-                Team directory
+                {t("Team directory")}
               </Link>
             </li>
             <li className="mt-1 border-t border-hairline pt-1">
@@ -335,8 +331,8 @@ function ProfileMenu({ user }: { user: Person }) {
                 className="flex w-full cursor-not-allowed items-center gap-2.5 rounded-lg px-3 py-2 text-slate-400"
               >
                 <LogOut className="h-4 w-4" aria-hidden="true" />
-                Sign out
-                <span className="ml-auto text-[10px] uppercase tracking-wide">Auth · Phase 2</span>
+                {t("Sign out")}
+                <span className="ms-auto text-[10px] uppercase tracking-wide">{t("Auth · Phase 2")}</span>
               </button>
             </li>
           </ul>

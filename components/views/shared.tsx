@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { Plus, Smartphone } from "lucide-react";
 import { Badge, DemoBadge } from "@/components/ui/Badge";
 import { useNexora } from "@/lib/store/StoreProvider";
@@ -11,7 +12,7 @@ export function DataBadge() {
   return (
     <Badge tone="slate">
       <Smartphone className="h-3 w-3" aria-hidden="true" />
-      On this device
+      {t("On this device")}
     </Badge>
   );
 }
@@ -30,7 +31,7 @@ export function NewButton({ label, onClick }: { label: string; onClick: () => vo
   return (
     <button type="button" onClick={onClick} className="btn btn-primary px-4 py-2 text-sm">
       <Plus className="h-4 w-4" aria-hidden="true" />
-      {label}
+      {t(label)}
     </button>
   );
 }

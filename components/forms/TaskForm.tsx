@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { FormActions, FormGrid, SelectField, TextField } from "@/components/ui/Form";
@@ -10,8 +11,6 @@ import { useNexora } from "@/lib/store/StoreProvider";
 import type { Priority, Task, TaskStatus } from "@/lib/types";
 import { DeleteButton, parseWhole, peopleOptions } from "./shared";
 
-const STATUS_OPTIONS = TASK_STATUS_ORDER.map((s) => ({ value: s, label: TASK_STATUS_LABEL[s] }));
-const PRIORITY_OPTIONS = [...PRIORITY_ORDER].reverse().map((p) => ({ value: p, label: PRIORITY_LABEL[p] }));
 
 /** Next task key, e.g. "T-12" (keys already used, including the sample's, are skipped). */
 function nextKey(tasks: Task[]): string {
@@ -24,7 +23,7 @@ function nextKey(tasks: Task[]): string {
 
 export function TaskFormDialog({ open, onClose, task }: { open: boolean; onClose: () => void; task?: Task }) {
   return (
-    <Dialog open={open} onClose={onClose} title={task ? `Edit ${task.key}` : "New task"}>
+    <Dialog open={open} onClose={onClose} title={task ? t("Edit {name}", { name: task.key }) : "New task"}>
       <TaskForm key={task?.id ?? "new"} task={task} onDone={onClose} />
     </Dialog>
   );
@@ -41,17 +40,19 @@ function TaskForm({ task, onDone }: { task?: Task; onDone: () => void }) {
   const [estimate, setEstimate] = useState(String(task?.estimateHours ?? 4));
   const [error, setError] = useState("");
 
+  const statusOptions = TASK_STATUS_ORDER.map((s) => ({ value: s, label: TASK_STATUS_LABEL[s] }));
+  const priorityOptions = [...PRIORITY_ORDER].reverse().map((p) => ({ value: p, label: PRIORITY_LABEL[p] }));
   const projectOptions = [
-    { value: "", label: "No project" },
+    { value: "", label: t("No project") },
     ...[...data.projects].sort((a, b) => a.name.localeCompare(b.name)).map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
   ];
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (title.trim().length < 3) return setError("Describe the task (at least 3 characters).");
-    if (!due) return setError("Choose a due date.");
+    if (title.trim().length < 3) return setError(t("Describe the task (at least 3 characters)."));
+    if (!due) return setError(t("Choose a due date."));
     const hours = parseWhole(estimate, 0, 1000);
-    if (hours === null) return setError("The estimate is a whole number of hours.");
+    if (hours === null) return setError(t("The estimate is a whole number of hours."));
     actions.saveTask({
       id: task?.id ?? newId("t"),
       key: task?.key ?? nextKey(data.tasks),
@@ -73,8 +74,8 @@ function TaskForm({ task, onDone }: { task?: Task; onDone: () => void }) {
         <TextField label="Task" value={title} onChange={setTitle} required className="sm:col-span-2" />
         <SelectField label="Project" value={projectId} onChange={setProjectId} options={projectOptions} />
         <SelectField label="Assignee" value={assigneeId} onChange={setAssigneeId} options={peopleOptions(data.people)} />
-        <SelectField label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
-        <SelectField label="Priority" value={priority} onChange={setPriority} options={PRIORITY_OPTIONS} />
+        <SelectField label="Status" value={status} onChange={setStatus} options={statusOptions} />
+        <SelectField label="Priority" value={priority} onChange={setPriority} options={priorityOptions} />
         <TextField label="Due date" type="date" value={due} onChange={setDue} required />
         <TextField label="Estimate (hours)" value={estimate} onChange={setEstimate} inputMode="numeric" />
       </FormGrid>

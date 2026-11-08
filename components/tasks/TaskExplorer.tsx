@@ -1,5 +1,6 @@
 "use client";
 
+import { t as tr } from "@/lib/i18n/core";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Clock, Columns3, ListChecks, Rows3 } from "lucide-react";
@@ -24,10 +25,10 @@ type View = "list" | "board";
 type SortKey = "due" | "priority" | "status";
 
 const PRIORITY_ACCENT: Record<Priority, string> = {
-  critical: "border-l-status-rose",
-  high: "border-l-status-amber",
-  medium: "border-l-status-sky",
-  low: "border-l-slate-600",
+  critical: "border-s-status-rose",
+  high: "border-s-status-amber",
+  medium: "border-s-status-sky",
+  low: "border-s-slate-600",
 };
 
 export function TaskExplorer({
@@ -91,7 +92,7 @@ export function TaskExplorer({
   const listItems = sorted.filter((t) => status === "all" || t.status === status);
 
   const statusTabs = [
-    { id: "all" as StatusFilter, label: "All", count: filtered.length },
+    { id: "all" as StatusFilter, label: tr("All"), count: filtered.length },
     ...TASK_STATUS_ORDER.map((s) => ({
       id: s as StatusFilter,
       label: TASK_STATUS_LABEL[s],
@@ -134,7 +135,7 @@ export function TaskExplorer({
             value={projectId}
             onChange={setProjectId}
             options={[
-              { value: "all", label: "All projects" },
+              { value: "all", label: tr("All projects") },
               ...projects.map((p) => ({ value: p.id, label: p.name.split(" — ")[0] })),
             ]}
           />
@@ -142,22 +143,22 @@ export function TaskExplorer({
             label="Assignee"
             value={assigneeId}
             onChange={setAssigneeId}
-            options={[{ value: "all", label: "Everyone" }, ...assignees.map((p) => ({ value: p.id, label: p.name }))]}
+            options={[{ value: "all", label: tr("Everyone") }, ...assignees.map((p) => ({ value: p.id, label: p.name }))]}
           />
           <Select<SortKey>
             label="Sort by"
             value={sort}
             onChange={setSort}
             options={[
-              { value: "due", label: "Deadline (soonest)" },
-              { value: "priority", label: "Priority" },
-              { value: "status", label: "Status" },
+              { value: "due", label: tr("Deadline (soonest)") },
+              { value: "priority", label: tr("Priority") },
+              { value: "status", label: tr("Status") },
             ]}
           />
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium text-slate-400" id="priority-filter-label">
-            Priority
+          <span className="me-1 text-xs font-medium text-slate-400" id="priority-filter-label">
+            {tr("Priority")}
           </span>
           <div role="group" aria-labelledby="priority-filter-label" className="flex flex-wrap gap-2">
             {PRIORITY_ORDER.map((p) => (
@@ -168,11 +169,11 @@ export function TaskExplorer({
           </div>
           <span className="mx-1 hidden h-4 w-px bg-hairline sm:inline-block" aria-hidden="true" />
           <ToggleChip pressed={overdueOnly} onToggle={() => setOverdueOnly((v) => !v)}>
-            <Clock className="h-3 w-3" aria-hidden="true" /> Overdue only
+            <Clock className="h-3 w-3" aria-hidden="true" /> {tr("Overdue only")}
           </ToggleChip>
           {filtersActive && (
-            <button type="button" onClick={reset} className="ml-auto text-xs font-medium text-violet-300 hover:text-violet-200">
-              Clear filters
+            <button type="button" onClick={reset} className="ms-auto text-xs font-medium text-violet-300 hover:text-violet-200">
+              {tr("Clear filters")}
             </button>
           )}
         </div>
@@ -181,24 +182,24 @@ export function TaskExplorer({
       {/* View controls */}
       <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         {view === "list" ? (
-          <Tabs items={statusTabs} value={status} onChange={setStatus} ariaLabel="Filter by status" className="md:flex-1" />
+          <Tabs items={statusTabs} value={status} onChange={setStatus} ariaLabel={tr("Filter by status")} className="md:flex-1" />
         ) : (
-          <p className="text-sm text-slate-300">Board grouped by status</p>
+          <p className="text-sm text-slate-300">{tr("Board grouped by status")}</p>
         )}
         <Tabs<View>
           variant="pill"
-          ariaLabel="Choose view"
+          ariaLabel={tr("Choose view")}
           value={view}
           onChange={setView}
           items={[
-            { id: "list", label: "List", icon: Rows3 },
-            { id: "board", label: "Board", icon: Columns3 },
+            { id: "list", label: tr("List"), icon: Rows3 },
+            { id: "board", label: tr("Board"), icon: Columns3 },
           ]}
         />
       </div>
 
       <p className="mt-4 text-xs text-slate-400" aria-live="polite">
-        Showing {visibleCount} of {tasks.length} tasks
+        {tr("Showing {a} of {b} tasks", { a: visibleCount, b: tasks.length })}
       </p>
 
       {visibleCount === 0 ? (
@@ -209,7 +210,7 @@ export function TaskExplorer({
             description="Adjust the filters or clear them to see every task."
             action={
               <button type="button" onClick={reset} className="btn btn-secondary">
-                Clear filters
+                {tr("Clear filters")}
               </button>
             }
           />
@@ -220,12 +221,12 @@ export function TaskExplorer({
             className="hidden border-b border-hairline px-5 py-3 text-xs font-medium uppercase tracking-wide text-slate-400 md:grid md:grid-cols-[minmax(0,2.4fr)_minmax(0,1.3fr)_minmax(0,1.2fr)_6.5rem_8rem_7.5rem] md:gap-4"
             aria-hidden="true"
           >
-            <span>Task</span>
-            <span>Project</span>
-            <span>Assignee</span>
-            <span>Priority</span>
-            <span>Status</span>
-            <span>Deadline</span>
+            <span>{tr("Task")}</span>
+            <span>{tr("Project")}</span>
+            <span>{tr("Assignee")}</span>
+            <span>{tr("Priority")}</span>
+            <span>{tr("Status")}</span>
+            <span>{tr("Deadline")}</span>
           </div>
           <ul className="divide-y divide-white/5">
             {listItems.map((t) => {
@@ -244,7 +245,7 @@ export function TaskExplorer({
                         type="button"
                         onClick={() => onEdit(t)}
                         className={cn(
-                          "focus-ring rounded text-left text-sm font-medium hover:underline",
+                          "focus-ring rounded text-start text-sm font-medium hover:underline",
                           t.status === "done" ? "text-slate-400 line-through" : "text-slate-100",
                         )}
                       >
@@ -269,7 +270,7 @@ export function TaskExplorer({
                     </div>
                     <div className="flex min-w-0 items-center gap-2">
                       {assignee && <Avatar person={assignee} size="xs" />}
-                      <span className="truncate text-sm text-slate-300">{assignee?.name ?? "Unassigned"}</span>
+                      <span className="truncate text-sm text-slate-300">{assignee?.name ?? tr("Unassigned")}</span>
                     </div>
                     <div>
                       <PriorityBadge priority={t.priority} />
@@ -279,7 +280,7 @@ export function TaskExplorer({
                         <select
                           value={t.status}
                           onChange={(event) => onStatusChange(t, event.target.value as TaskStatus)}
-                          aria-label={`Status of ${t.title}`}
+                          aria-label={tr("Status of {title}", { title: t.title })}
                           className="field w-auto py-1 text-xs"
                         >
                           {TASK_STATUS_ORDER.map((st) => (
@@ -294,7 +295,7 @@ export function TaskExplorer({
                     </div>
                     <div className={cn("text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-300")}>
                       <span className="text-slate-200">{formatShortDate(t.due)}</span>
-                      <span className="block">{t.status === "done" ? "Completed" : dueLabel(t.due, asOf)}</span>
+                      <span className="block">{t.status === "done" ? tr("Completed") : dueLabel(t.due, asOf)}</span>
                     </div>
                   </div>
                 </li>
@@ -318,7 +319,7 @@ export function TaskExplorer({
                     </span>
                   </div>
                   <div className="flex flex-1 flex-col gap-3 rounded-2xl border border-hairline bg-white/[0.015] p-2">
-                    {items.length === 0 && <p className="py-8 text-center text-xs text-slate-400">No tasks</p>}
+                    {items.length === 0 && <p className="py-8 text-center text-xs text-slate-400">{tr("No tasks")}</p>}
                     {items.map((t) => {
                       const project = projectsById[t.projectId];
                       const assignee = peopleById[t.assigneeId];
@@ -327,7 +328,7 @@ export function TaskExplorer({
                         <article
                           key={t.id}
                           className={cn(
-                            "rounded-xl border border-l-2 border-hairline bg-base-900/70 p-3.5 shadow-glass",
+                            "rounded-xl border border-s-2 border-hairline bg-base-900/70 p-3.5 shadow-glass",
                             PRIORITY_ACCENT[t.priority],
                           )}
                         >
@@ -336,7 +337,7 @@ export function TaskExplorer({
                             <button
                               type="button"
                               onClick={() => onEdit(t)}
-                              className="focus-ring mt-0.5 rounded text-left text-sm font-medium leading-snug text-slate-100 hover:underline"
+                              className="focus-ring mt-0.5 rounded text-start text-sm font-medium leading-snug text-slate-100 hover:underline"
                             >
                               {t.title}
                             </button>

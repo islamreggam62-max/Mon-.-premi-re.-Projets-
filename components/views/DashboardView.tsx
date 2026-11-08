@@ -25,7 +25,8 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { StatCard } from "@/components/ui/StatCard";
 import { EXECUTIVE_BRIEF } from "@/lib/data/aiPreview";
 import { KPI_BASELINES } from "@/lib/data/dashboard";
-import { APPROVAL_KIND_LABEL, DEPARTMENT_ORDER } from "@/lib/labels";
+import { APPROVAL_KIND_LABEL, DEPARTMENT_ORDER, HEALTH_LABEL, departmentLabel } from "@/lib/labels";
+import { t, tn } from "@/lib/i18n/core";
 import {
   approvalUrgency,
   collectBlockers,
@@ -45,7 +46,7 @@ import { asOfDay, currentUser } from "@/lib/store/derived";
 import type { NexoraData } from "@/lib/store/schema";
 import { useNexora } from "@/lib/store/StoreProvider";
 import type { ApprovalKind, Kpi } from "@/lib/types";
-import { businessDaysBack, cn, dueLabel, formatCompactCurrency, formatLongDate, pluralize } from "@/lib/utils";
+import { businessDaysBack, cn, dueLabel, formatCompactCurrency, formatLongDate } from "@/lib/utils";
 import { DataBadge } from "./shared";
 
 const KIND_ICON: Record<ApprovalKind, LucideIcon> = {
@@ -84,10 +85,10 @@ export function DashboardView() {
         id: "velocity",
         label: "Operational Velocity",
         value: openTasks ? `${velocity}%` : "—",
-        delta: sample ? formatDelta(velocity, KPI_BASELINES.velocityLastWeek, " pts") : "",
+        delta: sample ? formatDelta(velocity, KPI_BASELINES.velocityLastWeek, t(" pts")) : "",
         trend: sample ? trendOf(velocity, KPI_BASELINES.velocityLastWeek) : "flat",
         positiveWhenUp: true,
-        hint: openTasks ? `Open tasks on schedule${sample ? " · vs. last week" : ` · ${pluralize(openTasks, "open task")}`}` : "No open tasks",
+        hint: openTasks ? (sample ? t("Open tasks on schedule · vs. last week") : `${t("Open tasks on schedule")} · ${tn(openTasks, "{n} open task", "{n} open tasks")}`) : t("No open tasks"),
         href: "/tasks",
       },
     },
@@ -100,7 +101,7 @@ export function DashboardView() {
         delta: sample ? formatDelta(data.projects.length, KPI_BASELINES.activeProjectsQuarterStart) : "",
         trend: sample ? trendOf(data.projects.length, KPI_BASELINES.activeProjectsQuarterStart) : "flat",
         positiveWhenUp: true,
-        hint: `${counts["on-track"]} on track · ${counts["at-risk"]} at risk · ${counts.delayed} delayed`,
+        hint: t("{a} on track · {b} at risk · {c} delayed", { a: counts["on-track"], b: counts["at-risk"], c: counts.delayed }),
         href: "/projects",
       },
     },
@@ -110,12 +111,12 @@ export function DashboardView() {
         id: "reports",
         label: "Daily Report Submission",
         value: pulse.expected.length ? `${pulse.rate}%` : "—",
-        delta: pulse.expected.length ? formatDelta(pulse.rate, pulseYesterday.rate, " pts") : "",
+        delta: pulse.expected.length ? formatDelta(pulse.rate, pulseYesterday.rate, t(" pts")) : "",
         trend: trendOf(pulse.rate, pulseYesterday.rate),
         positiveWhenUp: true,
         hint: pulse.expected.length
-          ? `${pulse.submitted.length} of ${pulse.expected.length} submitted · vs. yesterday`
-          : "Nobody is set to file daily reports",
+          ? t("{a} of {b} submitted · vs. yesterday", { a: pulse.submitted.length, b: pulse.expected.length })
+          : t("Nobody is set to file daily reports"),
         href: "/daily-reports",
       },
     },
@@ -128,7 +129,7 @@ export function DashboardView() {
         delta: sample ? formatDelta(open.length, KPI_BASELINES.openApprovalsLastWeek) : "",
         trend: sample ? trendOf(open.length, KPI_BASELINES.openApprovalsLastWeek) : "flat",
         positiveWhenUp: false,
-        hint: `${overdueApprovals} overdue${sample ? " · vs. last week" : ""}`,
+        hint: sample ? t("{n} overdue · vs. last week", { n: overdueApprovals }) : t("{n} overdue", { n: overdueApprovals }),
         href: "/approvals",
       },
     },
@@ -143,13 +144,13 @@ export function DashboardView() {
     <div>
       <PageHeader
         title="Executive Command Center"
-        subtitle={`Welcome back${firstName ? `, ${firstName}` : ""}. Operations as of ${formatLongDate(asOf)}.`}
+        subtitle={firstName ? t("Welcome back, {name}. Operations as of {date}.", { name: firstName, date: formatLongDate(asOf) }) : t("Welcome back. Operations as of {date}.", { date: formatLongDate(asOf) })}
         action={<DataBadge />}
       />
 
       {!sample && <GettingStarted data={data} />}
 
-      <section aria-label="Key performance indicators" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label={t("Key performance indicators")} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map(({ kpi, icon }) => (
           <StatCard key={kpi.id} kpi={kpi} icon={icon} />
         ))}
@@ -162,13 +163,13 @@ export function DashboardView() {
             subtitle="Workload, today's report submission, and owned projects"
             action={
               <Link href="/team" className={LINK}>
-                Team <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("Team")} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             }
           />
           {departments.length === 0 ? (
             <CardBody>
-              <p className="text-sm text-slate-400">Add team members to see each department&apos;s workload and reports.</p>
+              <p className="text-sm text-slate-400">{t("Add team members to see each department's workload and reports.")}</p>
             </CardBody>
           ) : (
             <>
@@ -176,11 +177,11 @@ export function DashboardView() {
                 className="hidden border-b border-hairline px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400 md:grid md:grid-cols-[minmax(0,1.2fr)_7.5rem_minmax(0,1.3fr)_6rem_minmax(0,1fr)] md:gap-4"
                 aria-hidden="true"
               >
-                <span>Department</span>
-                <span>Status</span>
-                <span>Avg workload</span>
-                <span>Reports</span>
-                <span>Projects</span>
+                <span>{t("Department")}</span>
+                <span>{t("Status")}</span>
+                <span>{t("Avg workload")}</span>
+                <span>{t("Reports")}</span>
+                <span>{t("Projects")}</span>
               </div>
               <ul className="divide-y divide-white/10">
                 {departments.map((d) => (
@@ -190,9 +191,9 @@ export function DashboardView() {
                   >
                     <div className="flex items-center justify-between gap-3 md:block">
                       <div>
-                        <p className="text-sm font-semibold text-slate-50">{d.department}</p>
+                        <p className="text-sm font-semibold text-slate-50">{departmentLabel(d.department)}</p>
                         <p className="text-xs text-slate-400">
-                          {pluralize(d.headcount, "person", "people")}
+                          {tn(d.headcount, "{n} person", "{n} people")}
                           {d.reasons.length > 0 && <> · {d.reasons.join(", ")}</>}
                         </p>
                       </div>
@@ -205,25 +206,25 @@ export function DashboardView() {
                     </div>
                     <div className="mt-3 md:mt-0">
                       {d.avgWorkload === null ? (
-                        <span className="text-xs text-slate-400">On leave</span>
+                        <span className="text-xs text-slate-400">{t("On leave")}</span>
                       ) : (
                         <ProgressBar
                           value={d.avgWorkload}
                           tone={d.avgWorkload >= 90 ? "rose" : d.avgWorkload >= 80 ? "amber" : "emerald"}
                           showLabel
-                          label={`${d.department} average workload`}
+                          label={t("{department} average workload", { department: departmentLabel(d.department) })}
                         />
                       )}
                     </div>
                     <div className="mt-2 text-xs md:mt-0">
-                      <span className="text-slate-400 md:hidden">Reports today: </span>
+                      <span className="text-slate-400 md:hidden">{t("Reports today:")} </span>
                       <span
                         className={cn(
                           "font-semibold tabular-nums",
                           d.reportRate === null ? "text-slate-400" : d.reportRate < 70 ? "text-amber-300" : "text-slate-100",
                         )}
                       >
-                        {d.reportRate === null ? "Not required" : `${d.reportRate}%`}
+                        {d.reportRate === null ? t("Not required") : `${d.reportRate}%`}
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5 md:mt-0">
@@ -235,7 +236,7 @@ export function DashboardView() {
                             key={p.id}
                             href={`/projects#${p.id}`}
                             className="focus-ring inline-flex items-center gap-1.5 rounded-md border border-hairline bg-white/[0.03] px-1.5 py-0.5 font-mono text-[11px] text-slate-200 hover:border-white/25"
-                            title={`${p.name}: ${p.health}`}
+                            title={`${p.name}: ${HEALTH_LABEL[p.health]}`}
                           >
                             <span
                               className={cn(
@@ -253,8 +254,7 @@ export function DashboardView() {
                 ))}
               </ul>
               <p className="border-t border-hairline px-5 py-3 text-[11px] leading-relaxed text-slate-400">
-                Critical: a Delayed project or workload ≥ 90%. Watch: an At Risk project, workload ≥ 80%, or report
-                submission below 70%.
+                {t("Critical: a Delayed project or workload ≥ 90%. Watch: an At Risk project, workload ≥ 80%, or report submission below 70%.")}
               </p>
             </>
           )}
@@ -267,15 +267,15 @@ export function DashboardView() {
         <Card>
           <CardHeader
             title="Critical blockers"
-            subtitle={`${pluralize(blockers.length, "blocker")} in today's reports, most severe first`}
+            subtitle={tn(blockers.length, "{n} blocker in today's reports, most severe first", "{n} blockers in today's reports, most severe first")}
             action={
               <Link href="/daily-reports" className={LINK}>
-                Reports <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("Reports")} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             }
           />
           <CardBody className="space-y-3">
-            {blockers.length === 0 && <p className="text-sm text-slate-400">No blockers in today&apos;s reports.</p>}
+            {blockers.length === 0 && <p className="text-sm text-slate-400">{t("No blockers in today's reports.")}</p>}
             {blockers.map(({ blocker, report }) => {
               const author = people[report.authorId];
               return (
@@ -291,7 +291,7 @@ export function DashboardView() {
                     {author && <Avatar person={author} size="xs" />}
                     <span className="text-slate-200">{author?.name}</span>
                   </div>
-                  <p className="mt-1 text-xs text-slate-400">Waiting on {blocker.waitingOn}</p>
+                  <p className="mt-1 text-xs text-slate-400">{t("Waiting on {who}", { who: blocker.waitingOn })}</p>
                 </div>
               );
             })}
@@ -301,15 +301,15 @@ export function DashboardView() {
         <Card>
           <CardHeader
             title="Pending approvals"
-            subtitle={`${pluralize(open.length, "decision")}, most urgent first`}
+            subtitle={tn(open.length, "{n} decision, most urgent first", "{n} decisions, most urgent first")}
             action={
               <Link href="/approvals" className={LINK}>
-                Queue <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("Queue")} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             }
           />
           <CardBody className="space-y-2">
-            {open.length === 0 && <p className="text-sm text-slate-400">Nothing waiting on a decision.</p>}
+            {open.length === 0 && <p className="text-sm text-slate-400">{t("Nothing waiting on a decision.")}</p>}
             {open.slice(0, 5).map((a) => {
               const Icon = KIND_ICON[a.kind];
               const requester = people[a.requestedById];
@@ -327,7 +327,7 @@ export function DashboardView() {
                     <span className="mt-0.5 block truncate text-xs text-slate-400">
                       {APPROVAL_KIND_LABEL[a.kind]}
                       {a.amount !== undefined && ` · ${formatCompactCurrency(a.amount)}`}
-                      {a.headcount !== undefined && ` · ${pluralize(a.headcount, "role")}`}
+                      {a.headcount !== undefined && ` · ${tn(a.headcount, "{n} role", "{n} roles")}`}
                       {requester && ` · ${requester.name}`}
                     </span>
                   </span>
@@ -344,12 +344,12 @@ export function DashboardView() {
             subtitle="Riskiest first"
             action={
               <Link href="/projects" className={LINK}>
-                Portfolio <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("Portfolio")} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             }
           />
           <CardBody className="space-y-1">
-            {watchlist.length === 0 && <p className="text-sm text-slate-400">No projects yet.</p>}
+            {watchlist.length === 0 && <p className="text-sm text-slate-400">{t("No projects yet.")}</p>}
             {watchlist.map((p) => (
               <Link key={p.id} href={`/projects#${p.id}`} className="focus-ring -mx-2 block rounded-xl px-2 py-2.5 hover:bg-white/[0.04]">
                 <div className="flex items-center justify-between gap-3">
@@ -357,8 +357,8 @@ export function DashboardView() {
                   <HealthBadge health={p.health} />
                 </div>
                 <div className="mt-2 flex items-center gap-3">
-                  <ProgressBar value={p.progress} tone={HEALTH_TONE[p.health]} showLabel label={`${p.name} progress`} className="flex-1" />
-                  <span className="w-28 shrink-0 text-right text-xs text-slate-400">{dueLabel(p.targetDate, asOf)}</span>
+                  <ProgressBar value={p.progress} tone={HEALTH_TONE[p.health]} showLabel label={t("{name} progress", { name: p.name })} className="flex-1" />
+                  <span className="w-28 shrink-0 text-end text-xs text-slate-400">{dueLabel(p.targetDate, asOf)}</span>
                 </div>
               </Link>
             ))}
@@ -373,7 +373,7 @@ export function DashboardView() {
 function SampleBrief({ asOf }: { asOf: string }) {
   return (
     <Card className="border-violet/30 bg-violet/[0.06]">
-      <CardHeader title="AI Executive Brief" subtitle={`For ${formatLongDate(asOf)}`} action={<DemoBadge label="Preview" />} />
+      <CardHeader title="AI Executive Brief" subtitle={t("For {date}", { date: formatLongDate(asOf) })} action={<DemoBadge label="Preview" />} />
       <CardBody className="space-y-4">
         <p className="text-sm font-semibold leading-snug text-slate-50">{EXECUTIVE_BRIEF.headline}</p>
         <ul className="space-y-2">
@@ -385,11 +385,11 @@ function SampleBrief({ asOf }: { asOf: string }) {
           ))}
         </ul>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-200">Decisions this week</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-200">{t("Decisions this week")}</p>
           <ol className="mt-2 space-y-1.5">
             {EXECUTIVE_BRIEF.decisions.map((decision, i) => (
               <li key={decision} className="flex gap-2 text-sm text-slate-200">
-                <span className="w-4 shrink-0 text-right font-semibold tabular-nums text-violet-200">{i + 1}.</span>
+                <span className="w-4 shrink-0 text-end font-semibold tabular-nums text-violet-200">{i + 1}.</span>
                 {decision}
               </li>
             ))}
@@ -397,10 +397,10 @@ function SampleBrief({ asOf }: { asOf: string }) {
         </div>
         <p className="flex items-start gap-2 rounded-lg border border-hairline bg-base-900/50 px-3 py-2 text-xs text-slate-300">
           <FlaskConical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" aria-hidden="true" />
-          Hand-written preview of the brief format. No AI model is connected.
+          {t("Hand-written preview of the brief format. No AI model is connected.")}
         </p>
         <Link href="/ai-intelligence" className={LINK}>
-          Open AI Intelligence <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          {t("Open AI Intelligence")} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" aria-hidden="true" />
         </Link>
       </CardBody>
     </Card>
@@ -421,13 +421,13 @@ function TodayAtAGlance({ data, asOf }: { data: NexoraData; asOf: string }) {
 
   type Item = { label: string; count: number; href: string; tone: "rose" | "amber" };
   const all: Item[] = [
-    { label: pluralize(overdueApprovals, "approval") + " past the decision date", count: overdueApprovals, href: "/approvals", tone: "rose" },
-    { label: pluralize(overdueTasks, "task") + " overdue", count: overdueTasks, href: "/tasks", tone: "rose" },
-    { label: pluralize(delayed, "project") + " delayed", count: delayed, href: "/projects", tone: "rose" },
-    { label: pluralize(blockedTasks, "task") + " blocked", count: blockedTasks, href: "/tasks", tone: "amber" },
-    { label: pluralize(dueToday, "task") + " due today", count: dueToday, href: "/tasks", tone: "amber" },
-    { label: pluralize(atRisk, "project") + " at risk", count: atRisk, href: "/projects", tone: "amber" },
-    { label: `${pluralize(missing, "daily report")} not in yet today`, count: missing, href: "/daily-reports", tone: "amber" },
+    { label: tn(overdueApprovals, "{n} approval past the decision date", "{n} approvals past the decision date"), count: overdueApprovals, href: "/approvals", tone: "rose" },
+    { label: tn(overdueTasks, "{n} task overdue", "{n} tasks overdue"), count: overdueTasks, href: "/tasks", tone: "rose" },
+    { label: tn(delayed, "{n} project delayed", "{n} projects delayed"), count: delayed, href: "/projects", tone: "rose" },
+    { label: tn(blockedTasks, "{n} task blocked", "{n} tasks blocked"), count: blockedTasks, href: "/tasks", tone: "amber" },
+    { label: tn(dueToday, "{n} task due today", "{n} tasks due today"), count: dueToday, href: "/tasks", tone: "amber" },
+    { label: tn(atRisk, "{n} project at risk", "{n} projects at risk"), count: atRisk, href: "/projects", tone: "amber" },
+    { label: tn(missing, "{n} daily report not in yet today", "{n} daily reports not in yet today"), count: missing, href: "/daily-reports", tone: "amber" },
   ];
   const items = all.filter((i) => i.count > 0);
 
@@ -438,7 +438,7 @@ function TodayAtAGlance({ data, asOf }: { data: NexoraData; asOf: string }) {
         {items.length === 0 ? (
           <p className="flex items-start gap-2 text-sm text-slate-300">
             <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" aria-hidden="true" />
-            Nothing overdue, blocked, or delayed in your records.
+            {t("Nothing overdue, blocked, or delayed in your records.")}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -450,13 +450,13 @@ function TodayAtAGlance({ data, asOf }: { data: NexoraData; asOf: string }) {
                 >
                   <span className={cn("h-2 w-2 shrink-0 rounded-full", i.tone === "rose" ? "bg-status-rose" : "bg-status-amber")} aria-hidden="true" />
                   <span className="flex-1">{i.label}</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                  <ArrowRight className="h-3.5 w-3.5 text-slate-400 rtl:-scale-x-100" aria-hidden="true" />
                 </Link>
               </li>
             ))}
           </ul>
         )}
-        <p className="text-xs leading-relaxed text-slate-400">Counted from your records on this device.</p>
+        <p className="text-xs leading-relaxed text-slate-400">{t("Counted from your records on this device.")}</p>
       </CardBody>
     </Card>
   );
@@ -478,10 +478,10 @@ function GettingStarted({ data }: { data: NexoraData }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="getting-started" className="flex items-center gap-2 text-sm font-semibold text-slate-50">
           <ListChecks className="h-4 w-4 text-violet-300" aria-hidden="true" />
-          Set up {data.company.name}
+          {t("Set up {company}", { company: data.company.name })}
         </h2>
         <span className="text-xs text-slate-400">
-          {doneCount} of {steps.length} done
+          {t("{a} of {b} done", { a: doneCount, b: steps.length })}
         </span>
       </div>
       <ol className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -499,18 +499,17 @@ function GettingStarted({ data }: { data: NexoraData }) {
               ) : (
                 <Circle className="h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
               )}
-              <span className={cn(s.done && "line-through")}>{s.label}</span>
-              <span className="sr-only">{s.done ? "(done)" : "(to do)"}</span>
+              <span className={cn(s.done && "line-through")}>{t(s.label)}</span>
+              <span className="sr-only">{s.done ? t("(done)") : t("(to do)")}</span>
             </Link>
           </li>
         ))}
       </ol>
       <p className="mt-3 text-xs text-slate-400">
-        Everything is saved on this device.{" "}
+        {t("Everything is saved on this device.")}{" "}
         <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
-          Back up your data
-        </Link>{" "}
-        regularly.
+          {t("Back up your data regularly.")}
+        </Link>
       </p>
     </section>
   );

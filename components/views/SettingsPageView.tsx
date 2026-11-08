@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2, KeyRound, Smartphone } from "lucide-react";
+import { Building2, KeyRound, Languages, Smartphone } from "lucide-react";
 import { OrganizationForm } from "@/components/forms/OrganizationForm";
+import { LanguagePicker } from "@/components/i18n/LanguagePicker";
 import { SettingsView } from "@/components/settings/SettingsView";
 import { BackupPanel } from "@/components/store/BackupPanel";
 import { CompanySetupForm } from "@/components/store/Welcome";
@@ -12,7 +13,7 @@ import { DEMO_SEATS_INCLUDED, WORKSPACES } from "@/lib/data/meta";
 import { GOVERNANCE_POLICIES, ORGANIZATION, PERMISSIONS, ROLE_DEFINITIONS, SECURITY_CONTROLS } from "@/lib/data/settings";
 import { ACCESS_ROLE_LABEL, ACCESS_ROLE_ORDER } from "@/lib/labels";
 import { useNexora } from "@/lib/store/StoreProvider";
-import { pluralize } from "@/lib/utils";
+import { t, tn } from "@/lib/i18n/core";
 import { DataBadge } from "./shared";
 
 /**
@@ -42,6 +43,17 @@ export function SettingsPageView() {
         action={<DataBadge />}
       />
 
+      <Card className="mb-6">
+        <CardHeader
+          title="Language"
+          subtitle="The interface language on this device. Your own entries stay as you typed them."
+          action={<Languages className="h-5 w-5 text-violet-300" aria-hidden="true" />}
+        />
+        <CardBody>
+          <LanguagePicker />
+        </CardBody>
+      </Card>
+
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {sample ? (
           <StartCompanyCard />
@@ -66,7 +78,7 @@ export function SettingsPageView() {
 
       {sample && (
         <div className="mt-8">
-          <h2 className="mb-4 text-sm font-semibold text-slate-50">Sample workspace settings (preview)</h2>
+          <h2 className="mb-4 text-sm font-semibold text-slate-50">{t("Sample workspace settings (preview, in English)")}</h2>
           <SettingsView
             governance={GOVERNANCE_POLICIES}
             organization={ORGANIZATION}
@@ -92,19 +104,18 @@ function StartCompanyCard() {
         {open ? (
           <>
             <p className="rounded-lg border border-status-amber/30 bg-status-amber/10 px-3 py-2 text-sm text-amber-100">
-              This replaces the sample company on this device. Your edits to the sample are not kept.
+              {t("This replaces the sample company on this device. Your edits to the sample are not kept.")}
             </p>
             <CompanySetupForm onCancel={() => setOpen(false)} />
           </>
         ) : (
           <>
             <p className="text-sm leading-relaxed text-slate-300">
-              Start empty with your company&apos;s name and your own profile, then add your team, projects, tasks,
-              reports, and approvals. Everything stays on this device.
+              {t("Start empty with your company's name and your own profile, then add your team, projects, tasks, reports, and approvals. Everything stays on this device.")}
             </p>
             <button type="button" className="btn btn-primary mt-4 px-4 py-2 text-sm" onClick={() => setOpen(true)}>
               <Building2 className="h-4 w-4" aria-hidden="true" />
-              Set up my company
+              {t("Set up my company")}
             </button>
           </>
         )}
@@ -133,13 +144,13 @@ function RolesCard() {
         <ul className="space-y-2 text-sm text-slate-300">
           <li className="flex gap-2">
             <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
-            Roles decide who can approve requests ({pluralize(data.people.filter((p) => ["owner", "admin", "manager"].includes(p.accessRole)).length, "person", "people")} can
-            today). They do not lock anything on this device: whoever opens NEXORA here can see and edit everything.
+            {t("Roles decide who can approve requests ({people} can today). They do not lock anything on this device: whoever opens NEXORA here can see and edit everything.", {
+              people: tn(data.people.filter((p) => ["owner", "admin", "manager"].includes(p.accessRole)).length, "{n} person", "{n} people"),
+            })}
           </li>
           <li className="flex gap-2">
             <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
-            Protect the device with a screen lock. Separate sign-ins and permissions per person come with company
-            accounts.
+            {t("Protect the device with a screen lock. Separate sign-ins and permissions per person come with company accounts.")}
           </li>
         </ul>
       </CardBody>

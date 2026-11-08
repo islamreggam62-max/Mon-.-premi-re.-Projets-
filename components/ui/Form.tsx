@@ -1,21 +1,27 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 
-/** Labelled form controls sharing the `.field` look. Each keeps a stable id for its label. */
+/**
+ * Labelled form controls sharing the `.field` look. Each keeps a stable id for
+ * its label. Labels, hints, placeholders, and button names are English interface
+ * strings, translated here (lib/i18n); option labels are shown as given, since
+ * they can be people's names.
+ */
 
 function Label({ htmlFor, label, required, hint }: { htmlFor: string; label: string; required?: boolean; hint?: string }) {
   return (
     <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-semibold text-slate-300">
-      {label}
+      {t(label)}
       {required && (
         <span className="text-rose-300" aria-hidden="true">
           {" "}
           *
         </span>
       )}
-      {hint && <span className="ml-1 font-normal text-slate-400">{hint}</span>}
+      {hint && <span className="ms-1 font-normal text-slate-400">{t(hint)}</span>}
     </label>
   );
 }
@@ -54,7 +60,7 @@ export function TextField({
         type={type}
         value={value}
         required={required}
-        placeholder={placeholder}
+        placeholder={placeholder && t(placeholder)}
         autoComplete={autoComplete}
         inputMode={inputMode}
         maxLength={maxLength}
@@ -90,7 +96,7 @@ export function TextArea({
         id={id}
         value={value}
         rows={rows}
-        placeholder={placeholder}
+        placeholder={placeholder && t(placeholder)}
         onChange={(event) => onChange(event.target.value)}
         className="field resize-y leading-relaxed"
       />
@@ -158,8 +164,8 @@ export function CheckboxField({
         className="mt-0.5 h-4 w-4 accent-violet-500"
       />
       <label htmlFor={id} className="text-sm text-slate-200">
-        {label}
-        {hint && <span className="block text-xs text-slate-400">{hint}</span>}
+        {t(label)}
+        {hint && <span className="block text-xs text-slate-400">{t(hint)}</span>}
       </label>
     </div>
   );
@@ -194,11 +200,11 @@ export function FormActions({
         <div className="flex flex-wrap gap-2">
           {onCancel && (
             <button type="button" className="btn btn-secondary px-4 py-2 text-sm" onClick={onCancel}>
-              Cancel
+              {t("Cancel")}
             </button>
           )}
           <button type="submit" className="btn btn-primary px-4 py-2 text-sm">
-            {submitLabel}
+            {t(submitLabel)}
           </button>
         </div>
       </div>

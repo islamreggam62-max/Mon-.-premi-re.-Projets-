@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { AppNotification, Person, Workspace } from "@/lib/types";
@@ -92,13 +93,13 @@ export function AppShell({
     >
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-violet focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-violet focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
       >
-        Skip to content
+        {t("Skip to content")}
       </a>
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen border-r border-hairline bg-base-900/60 backdrop-blur lg:block">
+      <aside className="sticky top-0 hidden h-screen border-e border-hairline bg-base-900/60 backdrop-blur lg:block">
         <Sidebar
           variant="desktop"
           collapsed={collapsed}
@@ -128,11 +129,11 @@ export function AppShell({
           ref={drawerRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Navigation menu"
+          aria-label={t("Navigation menu")}
           data-dismiss-on-back={mobileOpen ? "" : undefined}
           className={cn(
-            "absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] border-r border-hairline bg-base-900 shadow-2xl transition-transform duration-200",
-            mobileOpen ? "translate-x-0" : "-translate-x-full",
+            "absolute inset-y-0 start-0 w-[17rem] max-w-[85vw] border-e border-hairline bg-base-900 shadow-2xl transition-transform duration-200",
+            mobileOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full",
           )}
         >
           <Sidebar

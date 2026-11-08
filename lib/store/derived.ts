@@ -2,6 +2,7 @@ import { DEMO_AS_OF, WORKSPACES } from "@/lib/data/meta";
 import { NOTIFICATIONS } from "@/lib/data/dashboard";
 import { approvalUrgency, collectBlockers, isOpenApproval } from "@/lib/metrics";
 import type { AppNotification, Person, Workspace } from "@/lib/types";
+import { t } from "@/lib/i18n/core";
 import { formatCompactCurrency } from "@/lib/utils";
 import { todayISO, type NexoraData } from "./schema";
 
@@ -16,7 +17,7 @@ export function currentUser(data: NexoraData): Person {
 
 export function workspacesFor(data: NexoraData): Workspace[] {
   if (data.mode === "sample") return WORKSPACES;
-  return [{ id: "ws-device", name: data.company.name, plan: "On this device", region: data.company.timezone, current: true, available: true }];
+  return [{ id: "ws-device", name: data.company.name, plan: t("On this device"), region: data.company.timezone, current: true, available: true }];
 }
 
 export function openApprovalCount(data: NexoraData): number {
@@ -39,7 +40,7 @@ export function notificationsFor(data: NexoraData): AppNotification[] {
       list.push({
         id: `n-appr-${a.id}`,
         tone: urgency === "overdue" ? "critical" : "warning",
-        title: urgency === "overdue" ? "Approval overdue" : "Approval due today",
+        title: urgency === "overdue" ? t("Approval overdue") : t("Approval due today"),
         detail: `${a.title}${a.amount !== undefined ? ` (${formatCompactCurrency(a.amount)})` : ""}`,
         time: at,
         href: "/approvals",
@@ -52,7 +53,7 @@ export function notificationsFor(data: NexoraData): AppNotification[] {
     list.push({
       id: `n-block-${blocker.id}`,
       tone: "critical",
-      title: "High blocker reported",
+      title: t("High blocker reported"),
       detail: `${author ? `${author.name}: ` : ""}${blocker.description}`,
       time: report.submittedAt,
       href: "/daily-reports",
@@ -60,7 +61,7 @@ export function notificationsFor(data: NexoraData): AppNotification[] {
   }
   for (const p of data.projects) {
     if (p.health !== "delayed") continue;
-    list.push({ id: `n-proj-${p.id}`, tone: "warning", title: `${p.name} is Delayed`, detail: p.summary || "Marked Delayed.", time: at, href: `/projects#${p.id}` });
+    list.push({ id: `n-proj-${p.id}`, tone: "warning", title: t("{name} is Delayed", { name: p.name }), detail: p.summary || t("Marked Delayed."), time: at, href: `/projects#${p.id}` });
   }
   return list;
 }

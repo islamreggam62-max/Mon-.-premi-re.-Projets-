@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { FormActions, FormGrid, SelectField, TextArea, TextField } from "@/components/ui/Form";
@@ -10,7 +11,6 @@ import { useNexora } from "@/lib/store/StoreProvider";
 import type { Approval, ApprovalKind } from "@/lib/types";
 import { DeleteButton, parseAmount, parseWhole, peopleOptions } from "./shared";
 
-const KIND_OPTIONS = APPROVAL_KIND_ORDER.map((k) => ({ value: k, label: APPROVAL_KIND_LABEL[k] }));
 const AMOUNT_LABEL: Record<ApprovalKind, string> = {
   budget: "Requested budget",
   contract: "Contract value",
@@ -41,28 +41,29 @@ function ApprovalForm({ approval, onDone }: { approval?: Approval; onDone: () =>
   const [summary, setSummary] = useState(approval?.summary ?? "");
   const [error, setError] = useState("");
 
-  const projectOptions = [{ value: "", label: "No project" }, ...data.projects.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` }))];
+  const kindOptions = APPROVAL_KIND_ORDER.map((k) => ({ value: k, label: APPROVAL_KIND_LABEL[k] }));
+  const projectOptions = [{ value: "", label: t("No project") }, ...data.projects.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` }))];
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (title.trim().length < 3) return setError("Give the request a title (at least 3 characters).");
-    if (approverId === requestedById) return setError("The approver must be someone other than the requester.");
-    if (!dueBy) return setError("Choose the date a decision is needed by.");
+    if (title.trim().length < 3) return setError(t("Give the request a title (at least 3 characters)."));
+    if (approverId === requestedById) return setError(t("The approver must be someone other than the requester."));
+    if (!dueBy) return setError(t("Choose the date a decision is needed by."));
     let amountValue: number | undefined;
     if (kind !== "hiring") {
       if (amount.trim()) {
         const parsed = parseAmount(amount);
-        if (parsed === null) return setError("The amount is a number in digits, e.g. 1500000.");
+        if (parsed === null) return setError(t("The amount is a number in digits, e.g. 1500000."));
         amountValue = parsed;
       } else if (kind === "budget" || kind === "contract") {
-        return setError(`${AMOUNT_LABEL[kind]} is required for this type of request.`);
+        return setError(t("{label} is required for this type of request.", { label: t(AMOUNT_LABEL[kind]) }));
       }
     }
-    if (kind === "contract" && !counterparty.trim()) return setError("Name the contract's counterparty.");
+    if (kind === "contract" && !counterparty.trim()) return setError(t("Name the contract's counterparty."));
     let headcountValue: number | undefined;
     if (kind === "hiring") {
       const parsed = parseWhole(headcount, 1, 500);
-      if (parsed === null) return setError("Headcount is the number of roles, from 1.");
+      if (parsed === null) return setError(t("Headcount is the number of roles, from 1."));
       headcountValue = parsed;
     }
     actions.saveApproval({
@@ -89,7 +90,7 @@ function ApprovalForm({ approval, onDone }: { approval?: Approval; onDone: () =>
     <form onSubmit={submit} noValidate>
       <FormGrid>
         <TextField label="Request" value={title} onChange={setTitle} required className="sm:col-span-2" />
-        <SelectField label="Type" value={kind} onChange={setKind} options={KIND_OPTIONS} />
+        <SelectField label="Type" value={kind} onChange={setKind} options={kindOptions} />
         {kind === "hiring" ? (
           <TextField label="Roles to hire" value={headcount} onChange={setHeadcount} inputMode="numeric" />
         ) : (

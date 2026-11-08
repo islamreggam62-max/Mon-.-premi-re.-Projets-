@@ -19,6 +19,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Tabs } from "@/components/ui/Tabs";
 import { ComplianceStrip } from "@/components/reports/ComplianceStrip";
+import { t, tn } from "@/lib/i18n/core";
+import { departmentLabel } from "@/lib/labels";
 import { computeCompliance, computePulse, indexById, submissionLog } from "@/lib/metrics";
 import type { DailyReport, Person, ReportBlocker } from "@/lib/types";
 import { cn, formatShortDate, formatTime, relativeDay } from "@/lib/utils";
@@ -94,26 +96,26 @@ export function ReportFeed({
   return (
     <div>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <Tabs items={dateTabs} value={date} onChange={setDate} ariaLabel="Report date" className="md:flex-1" />
+        <Tabs items={dateTabs} value={date} onChange={setDate} ariaLabel={t("Report date")} className="md:flex-1" />
         <Tabs<View>
           variant="pill"
-          ariaLabel="Choose view"
+          ariaLabel={t("Choose view")}
           value={view}
           onChange={setView}
           items={[
-            { id: "reports", label: "Reports", icon: Rows3 },
-            { id: "status", label: "Submission status", icon: ListChecks },
+            { id: "reports", label: t("Reports"), icon: Rows3 },
+            { id: "status", label: t("Submission status"), icon: ListChecks },
           ]}
         />
       </div>
 
       {/* Submission pulse */}
-      <section aria-label="Submission pulse" className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section aria-label={t("Submission pulse")} className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="glass col-span-2 p-4 lg:col-span-1">
-          <p className="text-xs text-slate-300">Submitted</p>
+          <p className="text-xs text-slate-300">{t("Submitted")}</p>
           <p className="mt-1 text-xl font-semibold tabular-nums text-slate-50">
             {pulse.submitted.length} / {pulse.expected.length}
-            <span className="ml-2 text-sm font-medium text-slate-300">{pulse.rate}%</span>
+            <span className="ms-2 text-sm font-medium text-slate-300">{pulse.rate}%</span>
           </p>
           <ProgressBar
             value={pulse.rate}
@@ -123,27 +125,27 @@ export function ReportFeed({
           />
         </div>
         <div className="glass p-4">
-          <p className="text-xs text-slate-300">Blockers raised</p>
+          <p className="text-xs text-slate-300">{t("Blockers raised")}</p>
           <p className={cn("mt-1 text-xl font-semibold tabular-nums", pulse.blockerCount ? "text-rose-300" : "text-slate-50")}>
             {pulse.blockerCount}
           </p>
         </div>
         <div className="glass p-4">
-          <p className="text-xs text-slate-300">Average energy</p>
+          <p className="text-xs text-slate-300">{t("Average energy")}</p>
           <p className="mt-1 text-xl font-semibold tabular-nums text-slate-50">
             {pulse.avgEnergy === null ? "—" : `${pulse.avgEnergy.toFixed(1)} / 5`}
           </p>
         </div>
         <div className="glass col-span-2 p-4 lg:col-span-1">
           <p className="flex items-center gap-1.5 text-xs text-slate-300">
-            <UserX className="h-3.5 w-3.5" aria-hidden="true" /> Not submitted · {pulse.missing.length}
+            <UserX className="h-3.5 w-3.5" aria-hidden="true" /> {t("Not submitted")} · {pulse.missing.length}
           </p>
           {pulse.missing.length === 0 ? (
-            <p className="mt-2 text-sm text-emerald-300">Everyone reported.</p>
+            <p className="mt-2 text-sm text-emerald-300">{t("Everyone reported.")}</p>
           ) : (
             <ul className="mt-2 flex flex-wrap gap-1.5">
               {pulse.missing.map((p) => (
-                <li key={p.id} className="flex items-center gap-1.5 rounded-full bg-white/[0.06] py-0.5 pl-0.5 pr-2.5">
+                <li key={p.id} className="flex items-center gap-1.5 rounded-full bg-white/[0.06] py-0.5 ps-0.5 pe-2.5">
                   <Avatar person={p} size="xs" />
                   <span className="text-xs text-slate-200">{p.name.split(" ")[0]}</span>
                 </li>
@@ -170,12 +172,12 @@ export function ReportFeed({
               label="Team member"
               value={authorId}
               onChange={setAuthorId}
-              options={[{ value: "all", label: "Everyone" }, ...authors.map((p) => ({ value: p.id, label: p.name }))]}
+              options={[{ value: "all", label: t("Everyone") }, ...authors.map((p) => ({ value: p.id, label: p.name }))]}
               className="md:w-56"
             />
             <div className="flex items-center gap-3 md:pb-1.5">
               <ToggleChip pressed={blockersOnly} onToggle={() => setBlockersOnly((v) => !v)}>
-                <OctagonAlert className="h-3 w-3" aria-hidden="true" /> With blockers only
+                <OctagonAlert className="h-3 w-3" aria-hidden="true" /> {t("With blockers only")}
               </ToggleChip>
               {filtersActive && (
                 <button
@@ -187,14 +189,14 @@ export function ReportFeed({
                   }}
                   className="text-xs font-semibold text-violet-300 hover:text-violet-200"
                 >
-                  Clear
+                  {t("Clear")}
                 </button>
               )}
             </div>
           </div>
 
           <p className="mt-4 text-xs text-slate-400" aria-live="polite">
-            Showing {visible.length} of {pulse.submitted.length} reports for {formatShortDate(date)}
+            {t("Showing {a} of {b} reports for {date}", { a: visible.length, b: pulse.submitted.length, date: formatShortDate(date) })}
           </p>
 
           {visible.length === 0 ? (
@@ -213,24 +215,24 @@ export function ReportFeed({
                         <div className="min-w-0">
                           <h2 className="truncate text-sm font-semibold text-slate-50">{author?.name}</h2>
                           <p className="truncate text-xs text-slate-300">
-                            {author?.title} · {author?.department}
+                            {author?.title} · {author && departmentLabel(author.department)}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge tone="emerald" dot>
-                          Submitted {formatTime(report.submittedAt)}
+                          {t("Submitted {time}", { time: formatTime(report.submittedAt) })}
                         </Badge>
-                        <Badge tone={energyTone(report.energy)}>Energy {report.energy}/5</Badge>
+                        <Badge tone={energyTone(report.energy)}>{t("Energy {n}/5", { n: report.energy })}</Badge>
                         {onEdit && (
                   <button
                     type="button"
                     onClick={() => onEdit(report)}
-                    aria-label={`Edit ${author?.name ?? "this"} report`}
+                    aria-label={t("Edit {name}'s report", { name: author?.name ?? "" })}
                     className="focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg border border-hairline px-2 py-1 text-xs font-medium text-slate-300 hover:border-white/25 hover:text-slate-100"
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    Edit
+                    {t("Edit")}
                   </button>
                         )}
                       </div>
@@ -282,14 +284,14 @@ function SubmissionTracker({
   return (
     <div className="glass mt-6 overflow-x-auto">
       <table className="w-full min-w-[46rem] border-collapse text-sm">
-        <caption className="sr-only">Daily report submission status for {formatShortDate(date)}</caption>
+        <caption className="sr-only">{t("Daily report submission status for {date}", { date: formatShortDate(date) })}</caption>
         <thead>
-          <tr className="border-b border-hairline text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-            <th scope="col" className="px-5 py-3">Member</th>
+          <tr className="border-b border-hairline text-start text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            <th scope="col" className="px-5 py-3">{t("Member")}</th>
             <th scope="col" className="px-3 py-3">{formatShortDate(date)}</th>
-            <th scope="col" className="px-3 py-3">Streak</th>
-            <th scope="col" className="px-3 py-3">Last 10 business days</th>
-            <th scope="col" className="px-5 py-3 text-right">Compliance</th>
+            <th scope="col" className="px-3 py-3">{t("Streak")}</th>
+            <th scope="col" className="px-3 py-3">{t("Last 10 business days")}</th>
+            <th scope="col" className="px-5 py-3 text-end">{t("Compliance")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-white/10">
@@ -297,43 +299,43 @@ function SubmissionTracker({
             const submittedDays = compliance.days.filter((d) => d.status === "submitted").length;
             return (
               <tr key={person.id} data-testid={`tracker-${person.id}`}>
-                <th scope="row" className="px-5 py-3 text-left font-normal">
+                <th scope="row" className="px-5 py-3 text-start font-normal">
                   <span className="flex items-center gap-3">
                     <Avatar person={person} size="sm" />
                     <span className="min-w-0">
                       <span className="block truncate font-medium text-slate-50">{person.name}</span>
-                      <span className="block truncate text-xs text-slate-400">{person.department}</span>
+                      <span className="block truncate text-xs text-slate-400">{departmentLabel(person.department)}</span>
                     </span>
                   </span>
                 </th>
                 <td className="px-3 py-3">
                   {!compliance.expected ? (
-                    <Badge tone="slate">{person.status === "on-leave" ? "Excused · on leave" : "Not required"}</Badge>
+                    <Badge tone="slate">{person.status === "on-leave" ? t("Excused · on leave") : t("Not required")}</Badge>
                   ) : report ? (
                     <Badge tone="emerald" dot>
-                      Submitted {formatTime(report.submittedAt)}
+                      {t("Submitted {time}", { time: formatTime(report.submittedAt) })}
                     </Badge>
                   ) : (
                     <Badge tone={date === asOf ? "amber" : "rose"} dot>
-                      {date === asOf ? "Not yet submitted" : "Missing"}
+                      {date === asOf ? t("Not yet submitted") : t("Missing")}
                     </Badge>
                   )}
                 </td>
                 <td className="px-3 py-3 tabular-nums text-slate-100">
-                  {compliance.expected ? `${compliance.streak} ${compliance.streak === 1 ? "day" : "days"}` : "—"}
+                  {compliance.expected ? tn(compliance.streak, "{n} day", "{n} days") : "—"}
                 </td>
                 <td className="px-3 py-3">
                   {compliance.expected ? (
                     <ComplianceStrip
                       days={compliance.days}
                       asOf={asOf}
-                      label={`${person.name}: submitted ${submittedDays} of the last ${compliance.days.length} business days`}
+                      label={t("{name}: submitted {a} of the last {b} business days", { name: person.name, a: submittedDays, b: compliance.days.length })}
                     />
                   ) : (
                     <span className="text-xs text-slate-400">—</span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-right tabular-nums">
+                <td className="px-5 py-3 text-end tabular-nums">
                   {compliance.expected ? (
                     <span className={cn("font-semibold", compliance.rate < 70 ? "text-amber-300" : "text-slate-100")}>
                       {compliance.rate}%
@@ -349,15 +351,15 @@ function SubmissionTracker({
       </table>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-hairline px-5 py-3 text-[11px] text-slate-300">
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-[3px] bg-status-emerald" aria-hidden="true" /> Submitted
+          <span className="h-3 w-3 rounded-[3px] bg-status-emerald" aria-hidden="true" /> {t("Submitted")}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-[3px] border border-status-rose/70" aria-hidden="true" /> Missing
+          <span className="h-3 w-3 rounded-[3px] border border-status-rose/70" aria-hidden="true" /> {t("Missing")}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-[3px] border border-dashed border-slate-400" aria-hidden="true" /> Today, still open
+          <span className="h-3 w-3 rounded-[3px] border border-dashed border-slate-400" aria-hidden="true" /> {t("Today, still open")}
         </span>
-        <span className="text-slate-400">Streak counts consecutive business days; today counts once submitted.</span>
+        <span className="text-slate-400">{t("Streak counts consecutive business days; today counts once submitted.")}</span>
       </div>
     </div>
   );
@@ -390,13 +392,13 @@ function SectionShell({
   return (
     <section
       className={cn(
-        "relative bg-base-900 px-5 py-4 before:absolute before:inset-y-4 before:left-0 before:w-0.5 before:rounded-r-full",
+        "relative bg-base-900 px-5 py-4 before:absolute before:inset-y-4 before:start-0 before:w-0.5 before:rounded-e-full",
         a.bar,
       )}
     >
       <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-200">
         <Icon className={cn("h-4 w-4", a.icon)} aria-hidden="true" />
-        {title}
+        {t(title)}
         <span className="font-normal text-slate-400">· {count}</span>
       </h3>
       <div className="mt-2.5">{children}</div>
@@ -418,7 +420,7 @@ function ReportSection({
   return (
     <SectionShell icon={icon} title={title} accent={accent} count={items.length}>
       {items.length === 0 ? (
-        <p className="text-sm italic text-slate-400">Nothing reported</p>
+        <p className="text-sm italic text-slate-400">{t("Nothing reported")}</p>
       ) : (
         <ul className="space-y-1.5">
           {items.map((item) => (
@@ -438,7 +440,7 @@ function BlockerSection({ blockers }: { blockers: ReportBlocker[] }) {
     <SectionShell icon={OctagonAlert} title="Blockers" accent="rose" count={blockers.length}>
       {blockers.length === 0 ? (
         <p className="flex items-center gap-1.5 text-sm text-emerald-300">
-          <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> No blockers
+          <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> {t("No blockers")}
         </p>
       ) : (
         <ul className="space-y-2.5">
@@ -448,7 +450,7 @@ function BlockerSection({ blockers }: { blockers: ReportBlocker[] }) {
                 <p className="text-sm text-slate-50">{b.description}</p>
                 <SeverityBadge severity={b.severity} />
               </div>
-              <p className="mt-1.5 text-xs text-slate-300">Waiting on {b.waitingOn}</p>
+              <p className="mt-1.5 text-xs text-slate-300">{t("Waiting on {who}", { who: b.waitingOn })}</p>
             </li>
           ))}
         </ul>

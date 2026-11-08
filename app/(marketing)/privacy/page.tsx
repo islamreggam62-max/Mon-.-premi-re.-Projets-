@@ -57,6 +57,10 @@ export default function PrivacyPage() {
             It is not sent to us or to anyone else.
           </li>
           <li>
+            Your interface language (English, French, Arabic, or Chinese), under the key{" "}
+            <code className="text-slate-200">nexora:language</code>.
+          </li>
+          <li>
             Backups you download or copy from Settings are files or text that you control and keep where you choose.
           </li>
         </ul>
