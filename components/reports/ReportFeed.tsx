@@ -6,6 +6,7 @@ import {
   ClipboardList,
   ListChecks,
   OctagonAlert,
+  Pencil,
   Rows3,
   Target,
   UserX,
@@ -45,11 +46,14 @@ export function ReportFeed({
   history,
   people,
   asOf,
+  onEdit,
 }: {
   reports: DailyReport[];
   history: Record<string, string[]>;
   people: Person[];
   asOf: string;
+  /** When given, each report has an Edit button. */
+  onEdit?: (report: DailyReport) => void;
 }) {
   const dates = useMemo(
     () => [...new Set(reports.map((r) => r.date))].sort((a, b) => b.localeCompare(a)),
@@ -218,6 +222,17 @@ export function ReportFeed({
                           Submitted {formatTime(report.submittedAt)}
                         </Badge>
                         <Badge tone={energyTone(report.energy)}>Energy {report.energy}/5</Badge>
+                        {onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(report)}
+                    aria-label={`Edit ${author?.name ?? "this"} report`}
+                    className="focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg border border-hairline px-2 py-1 text-xs font-medium text-slate-300 hover:border-white/25 hover:text-slate-100"
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                    Edit
+                  </button>
+                        )}
                       </div>
                     </header>
                     <div className="grid grid-cols-1 gap-px bg-white/10 md:grid-cols-3">

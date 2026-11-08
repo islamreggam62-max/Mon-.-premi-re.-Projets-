@@ -12,14 +12,16 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
+  Smartphone,
   Sparkles,
+  type LucideIcon,
   Users,
   X,
-  type LucideIcon,
 } from "lucide-react";
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { APP_HOME } from "@/lib/basePath";
 import { NAV_ITEMS, isActivePath } from "@/lib/nav";
+import { useStore } from "@/lib/store/StoreProvider";
 import type { NavIcon, Workspace } from "@/lib/types";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
@@ -169,17 +171,7 @@ export function Sidebar({
 
       <div className="shrink-0 space-y-2 border-t border-hairline p-3">
         <InstallAppButton collapsed={collapsed} />
-        {!collapsed && (
-          <div className="rounded-xl border border-violet/20 bg-violet/[0.06] p-3">
-            <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">
-              <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
-              Demo mode
-            </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
-              Static demonstration data as of {formatDate(DEMO_AS_OF)}. Nothing is saved.
-            </p>
-          </div>
-        )}
+        {!collapsed && <DataModeNote />}
         {variant === "desktop" && onToggleCollapse && (
           <button
             type="button"
@@ -202,6 +194,41 @@ export function Sidebar({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Footer note: sample company, or own company saved on the device. */
+function DataModeNote() {
+  const { data } = useStore();
+  if (data?.mode === "company") {
+    return (
+      <div className="rounded-xl border border-hairline bg-white/[0.03] p-3">
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+          <Smartphone className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
+          Saved on this device
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+          <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+            Back up your data
+          </Link>{" "}
+          to keep it safe.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-xl border border-violet/20 bg-violet/[0.06] p-3">
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">
+        <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
+        Sample company
+      </p>
+      <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+        Fictional data as of {formatDate(DEMO_AS_OF)}. Your changes are saved on this device.{" "}
+        <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+          Start your company
+        </Link>
+      </p>
     </div>
   );
 }

@@ -126,18 +126,32 @@ function groupThousands(n: number): string {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-/** "$85,000" */
-export function formatCurrency(value: number): string {
-  return `${value < 0 ? "-" : ""}$${groupThousands(Math.abs(value))}`;
+/**
+ * Currency of the amounts on screen: the company's (set by the app shell from
+ * the device data), "USD" for the sample. USD shows as "$85K"; any other code
+ * after the number, "85K DZD".
+ */
+let displayCurrency = "USD";
+export function setDisplayCurrency(code: string): void {
+  displayCurrency = /^[A-Z]{3}$/.test(code) ? code : "USD";
 }
 
-/** "$85K", "$1.2M" */
+function withCurrency(sign: string, amount: string): string {
+  return displayCurrency === "USD" ? `${sign}$${amount}` : `${sign}${amount} ${displayCurrency}`;
+}
+
+/** "$85,000" or "85,000 DZD" */
+export function formatCurrency(value: number): string {
+  return withCurrency(value < 0 ? "-" : "", groupThousands(Math.abs(value)));
+}
+
+/** "$85K", "$1.2M" or "85K DZD" */
 export function formatCompactCurrency(value: number): string {
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
-  if (abs >= 1_000) return `${sign}$${Math.round(abs / 1_000)}K`;
-  return `${sign}$${Math.round(abs)}`;
+  if (abs >= 1_000_000) return withCurrency(sign, `${(abs / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`);
+  if (abs >= 1_000) return withCurrency(sign, `${Math.round(abs / 1_000)}K`);
+  return withCurrency(sign, `${Math.round(abs)}`);
 }
 
 export function percent(part: number, whole: number): number {

@@ -3,7 +3,7 @@ import { ArrowDownRight, ArrowUpRight, Minus, type LucideIcon } from "lucide-rea
 import { cn } from "@/lib/utils";
 import type { Kpi } from "@/lib/types";
 
-/** KPI tile: label, value, signed delta (colored by whether the move is good), basis. */
+/** KPI tile: label, value, signed delta (colored by whether the move is good; hidden when empty), basis. */
 export function StatCard({ kpi, icon: Icon }: { kpi: Kpi; icon?: LucideIcon }) {
   const good = kpi.trend === "flat" ? null : (kpi.trend === "up") === kpi.positiveWhenUp;
   const TrendIcon = kpi.trend === "up" ? ArrowUpRight : kpi.trend === "down" ? ArrowDownRight : Minus;
@@ -20,6 +20,7 @@ export function StatCard({ kpi, icon: Icon }: { kpi: Kpi; icon?: LucideIcon }) {
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <span className="text-3xl font-semibold tracking-tight text-slate-50">{kpi.value}</span>
+        {kpi.delta && (
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset",
@@ -34,6 +35,7 @@ export function StatCard({ kpi, icon: Icon }: { kpi: Kpi; icon?: LucideIcon }) {
             {good === null ? "(unchanged)" : good ? "(favorable)" : "(unfavorable)"}
           </span>
         </span>
+        )}
       </div>
       <p className="mt-2 text-xs text-slate-400">{kpi.hint}</p>
     </>

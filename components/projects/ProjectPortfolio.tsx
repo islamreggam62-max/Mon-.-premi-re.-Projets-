@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, CalendarRange, FolderKanban, LayoutGrid, Rows3, Target } from "lucide-react";
+import { CalendarDays, CalendarRange, FolderKanban, LayoutGrid, Pencil, Rows3, Target } from "lucide-react";
 import { Avatar, AvatarStack } from "@/components/ui/Avatar";
 import { HEALTH_TONE, HealthBadge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Controls";
@@ -32,10 +32,13 @@ export function ProjectPortfolio({
   projects,
   people,
   asOf,
+  onEdit,
 }: {
   projects: Project[];
   people: Person[];
   asOf: string;
+  /** When given, each project card has an Edit button. */
+  onEdit?: (project: Project) => void;
 }) {
   const [health, setHealth] = useState<HealthFilter>("all");
   const [view, setView] = useState<View>("cards");
@@ -127,7 +130,20 @@ export function ProjectPortfolio({
                       <h2 className="mt-0.5 text-base font-semibold text-slate-50">{p.name}</h2>
                       <p className="mt-1 text-sm text-slate-300">{p.summary}</p>
                     </div>
-                    <HealthBadge health={p.health} />
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <HealthBadge health={p.health} />
+                      {onEdit && (
+                        <button
+                          type="button"
+                          onClick={() => onEdit(p)}
+                          aria-label={`Edit ${p.name}`}
+                          className="focus-ring inline-flex items-center gap-1 rounded-lg border border-hairline px-2 py-1 text-xs font-medium text-slate-300 hover:border-white/25 hover:text-slate-100"
+                        >
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                          Edit
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mt-5">

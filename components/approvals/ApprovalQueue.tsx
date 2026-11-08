@@ -9,6 +9,7 @@ import {
   Info,
   FileSignature,
   MessageSquareWarning,
+  Pencil,
   RotateCcw,
   Shuffle,
   Stamp,
@@ -68,13 +69,21 @@ export function ApprovalQueue({
   people,
   projects,
   asOf,
+  onDecide,
+  onEdit,
 }: {
   approvals: Approval[];
   people: Person[];
   projects: Project[];
   asOf: string;
+  /** When given, decisions are saved by the caller instead of living in this tab only. */
+  onDecide?: (approval: Approval, status: ApprovalStatus) => void;
+  /** When given, open requests have an Edit button. */
+  onEdit?: (approval: Approval) => void;
 }) {
   const [decisions, setDecisions] = useState<Record<string, LocalDecision>>({});
+  /** Saved decisions taken on this screen: the status to go back to on Undo. */
+  const [undoTo, setUndoTo] = useState<Record<string, ApprovalStatus>>({});
   const [stateFilter, setStateFilter] = useState<StateFilter>("open");
   const [kindFilter, setKindFilter] = useState<KindFilter>("all");
   const [announcement, setAnnouncement] = useState("");
@@ -122,6 +131,12 @@ export function ApprovalQueue({
   }, [ofKind, stateFilter, asOf]);
 
   function decide(approval: Approval, status: ApprovalStatus) {
+    if (onDecide) {
+      setUndoTo((prev) => (approval.id in prev ? prev : { ...prev, [approval.id]: approval.status }));
+      onDecide(approval, status);
+      setAnnouncement(`${APPROVAL_STATUS_LABEL[status]}: ${approval.title}`);
+      return;
+    }
     setDecisions((prev) => ({
       ...prev,
       [approval.id]: {
@@ -134,6 +149,17 @@ export function ApprovalQueue({
   }
 
   function undo(approval: Approval) {
+    if (onDecide) {
+      const previous = undoTo[approval.id];
+      if (previous) onDecide(approval, previous);
+      setUndoTo((prev) => {
+        const next = { ...prev };
+        delete next[approval.id];
+        return next;
+      });
+      setAnnouncement(`Decision undone: ${approval.title}`);
+      return;
+    }
     setDecisions((prev) => {
       const next = { ...prev };
       delete next[approval.id];
@@ -171,8 +197,9 @@ export function ApprovalQueue({
 
       <p className="mt-4 flex items-start gap-2 rounded-xl border border-hairline bg-white/[0.02] px-3 py-2 text-xs text-slate-300">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" aria-hidden="true" />
-        Decisions update this browser tab only — nothing is sent or stored, and the queue resets on reload.
-        Persistence arrives with Supabase in Phase 2.
+        {onDecide
+          ? "Decisions are saved on this device as soon as you take them."
+          : "Decisions update this browser tab only — nothing is sent or stored, and the queue resets on reload."}
       </p>
       <p className="sr-only" aria-live="polite">
         {announcement}
@@ -190,7 +217,7 @@ export function ApprovalQueue({
               const project = a.projectId ? projectsById[a.projectId] : undefined;
               const isOpen = isOpenApproval(a.status);
               const urgency = approvalUrgency(a.dueBy, asOf);
-              const changedHere = Boolean(decisions[a.id]);
+              const changedHere = Boolean(decisions[a.id]) || a.id in undoTo;
               return (
                 <li key={a.id} className="glass p-5 motion-safe:animate-fade-in">
                   <div className="flex flex-wrap items-center gap-2">
@@ -200,7 +227,7 @@ export function ApprovalQueue({
                     </Badge>
                     <ApprovalStatusBadge status={a.status} />
                     {isOpen && <UrgencyBadge urgency={urgency} />}
-                    {changedHere && <Badge tone="slate">Changed in this session</Badge>}
+                    {changedHere && <Badge tone="slate">{onDecide ? "Decided just now" : "Changed in this session"}</Badge>}
                   </div>
 
                   <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -301,6 +328,11 @@ export function ApprovalQueue({
                             <Check className="h-3.5 w-3.5" aria-hidden="true" /> Approve
                           </button>
                         </>
+                      )}
+                      {onEdit && isOpen && (
+                        <button type="button" className="btn btn-secondary" onClick={() => onEdit(a)}>
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit
+                        </button>
                       )}
                       {changedHere && (
                         <button type="button" className="btn btn-secondary" onClick={() => undo(a)}>

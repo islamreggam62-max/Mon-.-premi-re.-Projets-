@@ -15,6 +15,7 @@ import {
   Menu,
   Search,
   Settings,
+  Smartphone,
   Users,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
@@ -24,6 +25,7 @@ import { DEMO_AS_OF } from "@/lib/data/meta";
 import { ACCESS_ROLE_LABEL } from "@/lib/labels";
 import { APP_HOME } from "@/lib/basePath";
 import { findNavItem, normalizePath } from "@/lib/nav";
+import { useStore } from "@/lib/store/StoreProvider";
 import type { AppNotification, NotificationTone, Person, Workspace } from "@/lib/types";
 import { cn, formatLongDate, formatShortDate, formatTime } from "@/lib/utils";
 
@@ -118,6 +120,8 @@ function SearchPlaceholder() {
  * ------------------------------------------------------------------------- */
 
 function DemoModeBadge() {
+  const { data } = useStore();
+  if (data?.mode === "company") return <DeviceModeBadge />;
   return (
     <Popover
       panelLabel="About demo data mode"
@@ -135,15 +139,51 @@ function DemoModeBadge() {
       <div className="p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-slate-100">
           <FlaskConical className="h-4 w-4 text-violet-300" aria-hidden="true" />
-          You are viewing demo data
+          You are viewing a sample company
         </p>
         <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-300">
           <li>
-            All figures are static demonstration data as of{" "}
+            People, projects, and figures are fictional, dated{" "}
             <span className="text-slate-200">{formatLongDate(DEMO_AS_OF)}</span>.
           </li>
-          <li>No backend, database, or AI model is connected.</li>
-          <li>Decisions and edits only change this browser tab and reset on reload.</li>
+          <li>Your edits are saved on this device only. No server, database, or AI model is connected.</li>
+          <li>
+            <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+              Set up your own company
+            </Link>{" "}
+            when you are ready.
+          </li>
+        </ul>
+      </div>
+    </Popover>
+  );
+}
+
+/** Own company: where the data lives, and the reminder to back it up. */
+function DeviceModeBadge() {
+  return (
+    <Popover
+      panelLabel="Where your data is saved"
+      panelClassName="w-80"
+      trigger={() => (
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-slate-200 ring-1 ring-inset ring-white/15">
+          <Smartphone className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
+          <span className="hidden sm:inline">On this device</span>
+        </span>
+      )}
+    >
+      <div className="p-4">
+        <p className="text-sm font-semibold text-slate-100">Saved on this device</p>
+        <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-300">
+          <li>Every change is saved here at once, and NEXORA works offline.</li>
+          <li>Nothing is sent anywhere. Company accounts shared with your team come in a later version.</li>
+          <li>
+            Uninstalling the app or clearing its storage erases the data:{" "}
+            <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+              keep a backup
+            </Link>
+            .
+          </li>
         </ul>
       </div>
     </Popover>
@@ -161,6 +201,8 @@ const TONE_ICON: Record<NotificationTone, { icon: typeof Info; className: string
 };
 
 function NotificationsMenu({ items }: { items: AppNotification[] }) {
+  const { data } = useStore();
+  const sample = data?.mode !== "company";
   return (
     <Popover
       panelLabel="Notifications"
@@ -183,8 +225,13 @@ function NotificationsMenu({ items }: { items: AppNotification[] }) {
         <>
           <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
             <p className="text-sm font-semibold text-slate-100">Notifications</p>
-            <Badge tone="violet">Demo</Badge>
+            {sample && <Badge tone="violet">Demo</Badge>}
           </div>
+          {items.length === 0 && (
+            <p className="px-4 py-6 text-sm text-slate-400">
+              No alerts. Overdue approvals, high blockers in today&apos;s reports, and delayed projects show up here.
+            </p>
+          )}
           <ul className="max-h-[60vh] divide-y divide-white/5 overflow-y-auto">
             {items.map((n) => {
               const tone = TONE_ICON[n.tone];

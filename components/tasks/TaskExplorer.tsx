@@ -35,11 +35,17 @@ export function TaskExplorer({
   projects,
   people,
   asOf,
+  onEdit,
+  onStatusChange,
 }: {
   tasks: Task[];
   projects: Project[];
   people: Person[];
   asOf: string;
+  /** When given, task titles open the task for editing. */
+  onEdit?: (task: Task) => void;
+  /** When given, the list's status column is a picker. */
+  onStatusChange?: (task: Task, status: TaskStatus) => void;
 }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -233,9 +239,22 @@ export function TaskExplorer({
                 >
                   <div className="min-w-0">
                     <p className="font-mono text-[11px] text-slate-400">{t.key}</p>
-                    <p className={cn("text-sm font-medium", t.status === "done" ? "text-slate-400 line-through" : "text-slate-100")}>
-                      {t.title}
-                    </p>
+                    {onEdit ? (
+                      <button
+                        type="button"
+                        onClick={() => onEdit(t)}
+                        className={cn(
+                          "focus-ring rounded text-left text-sm font-medium hover:underline",
+                          t.status === "done" ? "text-slate-400 line-through" : "text-slate-100",
+                        )}
+                      >
+                        {t.title}
+                      </button>
+                    ) : (
+                      <p className={cn("text-sm font-medium", t.status === "done" ? "text-slate-400 line-through" : "text-slate-100")}>
+                        {t.title}
+                      </p>
+                    )}
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 md:contents">
                     <div className="min-w-0 text-sm">
@@ -256,7 +275,22 @@ export function TaskExplorer({
                       <PriorityBadge priority={t.priority} />
                     </div>
                     <div>
-                      <TaskStatusBadge status={t.status} />
+                      {onStatusChange ? (
+                        <select
+                          value={t.status}
+                          onChange={(event) => onStatusChange(t, event.target.value as TaskStatus)}
+                          aria-label={`Status of ${t.title}`}
+                          className="field w-auto py-1 text-xs"
+                        >
+                          {TASK_STATUS_ORDER.map((st) => (
+                            <option key={st} value={st}>
+                              {TASK_STATUS_LABEL[st]}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <TaskStatusBadge status={t.status} />
+                      )}
                     </div>
                     <div className={cn("text-xs tabular-nums", overdue ? "text-rose-300" : "text-slate-300")}>
                       <span className="text-slate-200">{formatShortDate(t.due)}</span>
@@ -298,7 +332,17 @@ export function TaskExplorer({
                           )}
                         >
                           <p className="font-mono text-[11px] text-slate-400">{t.key}</p>
-                          <p className="mt-0.5 text-sm font-medium leading-snug text-slate-100">{t.title}</p>
+                          {onEdit ? (
+                            <button
+                              type="button"
+                              onClick={() => onEdit(t)}
+                              className="focus-ring mt-0.5 rounded text-left text-sm font-medium leading-snug text-slate-100 hover:underline"
+                            >
+                              {t.title}
+                            </button>
+                          ) : (
+                            <p className="mt-0.5 text-sm font-medium leading-snug text-slate-100">{t.title}</p>
+                          )}
                           {project && (
                             <Link
                               href={`/projects#${project.id}`}

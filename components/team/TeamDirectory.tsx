@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Mail, MapPin, Users } from "lucide-react";
+import { Mail, MapPin, Pencil, Users } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { PRESENCE_DOT, PresenceBadge } from "@/components/ui/Badge";
 import { SearchInput, Select } from "@/components/ui/Controls";
@@ -43,10 +43,13 @@ export function TeamDirectory({
   people,
   compliance,
   asOf,
+  onEdit,
 }: {
   people: Person[];
   compliance: Record<string, Compliance>;
   asOf: string;
+  /** When given, each card has an Edit button. */
+  onEdit?: (person: Person) => void;
 }) {
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState<DepartmentFilter>("all");
@@ -183,16 +186,33 @@ export function TeamDirectory({
                 </div>
 
                 <div className="mt-4 space-y-1.5 text-xs text-slate-300">
-                  <p className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-                    {p.location}
-                  </p>
-                  <p className="flex min-w-0 items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
-                    <a href={`mailto:${p.email}`} className="focus-ring truncate rounded text-violet-300 hover:underline">
-                      {p.email}
-                    </a>
-                  </p>
+                  {p.location && (
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                      {p.location}
+                    </p>
+                  )}
+                  {p.email && (
+                    <p className="flex min-w-0 items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
+                      <a href={`mailto:${p.email}`} className="focus-ring truncate rounded text-violet-300 hover:underline">
+                        {p.email}
+                      </a>
+                    </p>
+                  )}
+                  {onEdit && (
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => onEdit(p)}
+                        aria-label={`Edit ${p.name}`}
+                        className="focus-ring inline-flex items-center gap-1 rounded-lg border border-hairline px-2 py-1 text-xs font-medium text-slate-300 hover:border-white/25 hover:text-slate-100"
+                      >
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 border-t border-hairline pt-4">
