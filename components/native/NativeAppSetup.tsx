@@ -8,6 +8,11 @@ import { isNativeApp, PAGE_FILE, pageFileFor } from "@/lib/native";
  * lib/native.ts); once the page is up, the address drops the file name so the
  * active menu item and later navigation see the clean route (`/dashboard/`).
  * Next.js keeps usePathname() in sync with history.replaceState.
+ *
+ * It also gives the Android back button its expected behavior (without a
+ * listener, Capacitor closes the app on the first press): close the open form,
+ * menu, or panel first, then go back a page, and on the first page send the app
+ * to the background.
  */
 export function NativeAppSetup() {
   useEffect(() => {
@@ -17,9 +22,46 @@ export function NativeAppSetup() {
     if (pathname.endsWith(`/${PAGE_FILE}`)) {
       window.history.replaceState(null, "", pathname.slice(0, -PAGE_FILE.length) + search + hash);
     }
+
+    let cancelled = false;
+    let removeListener: (() => void) | undefined;
+    import("@capacitor/app")
+      .then(({ App }) =>
+        App.addListener("backButton", ({ canGoBack }) => {
+          if (closeTopLayer()) return;
+          if (canGoBack) window.history.back();
+          else void App.minimizeApp();
+        }),
+      )
+      .then((handle) => {
+        if (cancelled) void handle.remove();
+        else removeListener = () => void handle.remove();
+      })
+      .catch(() => {
+        // Plugin missing from an older native build: Android keeps its default back behavior.
+      });
+    return () => {
+      cancelled = true;
+      removeListener?.();
+    };
   }, []);
 
   return null;
+}
+
+/** Closes the top open layer (a form dialog, then a menu or panel). Returns whether one was open. */
+function closeTopLayer(): boolean {
+  const dialogs = document.querySelectorAll<HTMLDialogElement>("dialog[open]");
+  const top = dialogs[dialogs.length - 1];
+  if (top) {
+    top.close();
+    return true;
+  }
+  if (document.querySelector("[data-dismiss-on-back]")) {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    return true;
+  }
+  return false;
 }
 
 /**

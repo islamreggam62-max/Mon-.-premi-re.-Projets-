@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { ClipboardCopy, Download, FileUp, Trash2 } from "lucide-react";
-import { isNativeApp } from "@/lib/native";
+import { ClipboardCopy, Download, FileUp, Share2, Trash2 } from "lucide-react";
+import { isNativeApp, shareBackupFile } from "@/lib/native";
 import type { NexoraData } from "@/lib/store/schema";
 import { todayISO } from "@/lib/store/schema";
 import { validateData } from "@/lib/store/storage";
 import { useStore } from "@/lib/store/StoreProvider";
 
 /**
- * Backup and restore of the device data. A file download does nothing inside
- * the Android app's web view, so there the backup is copied as text instead
- * (paste it in a note or an email to yourself).
+ * Backup and restore of the device data. On the web the backup downloads as a
+ * file. A download does nothing inside the Android app's web view, so there the
+ * file goes through the Android share menu (Drive, email, chat, Files). Copying
+ * as text works everywhere.
  */
 export function BackupPanel() {
   const { data, actions } = useStore();
@@ -37,6 +38,18 @@ export function BackupPanel() {
     setMessage(`Backup saved as ${fileName}.`);
   }
 
+  async function share() {
+    setFallbackText("");
+    setMessage("");
+    try {
+      const result = await shareBackupFile(fileName, json);
+      // Android reports some share targets as a cancel, so a closed menu is not called a failure.
+      setMessage(result === "shared" ? `Backup ${fileName} shared. Keep it somewhere safe.` : "The share menu was closed.");
+    } catch {
+      setMessage("The backup could not be shared. Use “Copy backup as text” instead.");
+    }
+  }
+
   async function copy() {
     setFallbackText("");
     try {
@@ -57,7 +70,12 @@ export function BackupPanel() {
           {data.approvals.length} approvals. Last change {new Date(data.updatedAt).toLocaleString()}.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {!native && (
+          {native ? (
+            <button type="button" className="btn btn-primary px-4 py-2 text-sm" onClick={share}>
+              <Share2 className="h-4 w-4" aria-hidden="true" />
+              Share backup file
+            </button>
+          ) : (
             <button type="button" className="btn btn-primary px-4 py-2 text-sm" onClick={download}>
               <Download className="h-4 w-4" aria-hidden="true" />
               Download backup file

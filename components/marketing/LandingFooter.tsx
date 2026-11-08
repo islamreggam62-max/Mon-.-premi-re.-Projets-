@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { APP_HOME, pageUrl } from "@/lib/basePath";
+import { DEMO_HOME, pageUrl } from "@/lib/basePath";
 
 /**
  * Footer for the public pages. `onLanding` keeps the section links in-page;
@@ -14,7 +14,7 @@ export function LandingFooter({ onLanding = false }: { onLanding?: boolean }) {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-xs text-slate-400 sm:flex-row sm:px-6">
         <p>© 2026 NEXORA. All rights reserved.</p>
         <nav aria-label="Footer" className="flex flex-wrap justify-center gap-x-4 gap-y-2">
-          <Link href={APP_HOME} className={linkClass}>
+          <Link href={DEMO_HOME} className={linkClass}>
             Live demo
           </Link>
           <a href={`${home}#pricing`} className={linkClass}>

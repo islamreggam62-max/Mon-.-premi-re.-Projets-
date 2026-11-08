@@ -129,6 +129,7 @@ export function AppShell({
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
+          data-dismiss-on-back={mobileOpen ? "" : undefined}
           className={cn(
             "absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] border-r border-hairline bg-base-900 shadow-2xl transition-transform duration-200",
             mobileOpen ? "translate-x-0" : "-translate-x-full",

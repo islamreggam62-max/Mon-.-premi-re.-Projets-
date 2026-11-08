@@ -97,8 +97,10 @@ export default function PrivacyPage() {
         <p>
           The NEXORA Android app contains these same pages and files and opens them from your device. It has no
           account, no analytics, and no advertising, and it sends nothing on its own. Links to our website, and the
-          email you may choose to send us, open in your browser or email app. If backup is turned on for your Android
-          device, Android may include the app&apos;s data in your device backup to your own Google account.
+          email you may choose to send us, open in your browser or email app. When you share a backup from Settings, the
+          app saves the file in its private cache and Android&apos;s share menu sends it only to the app you choose. If
+          backup is turned on for your Android device, Android may include the app&apos;s data in your device backup to
+          your own Google account.
         </p>
       </LegalSection>
 

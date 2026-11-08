@@ -21,3 +21,23 @@ export const PAGE_FILE = "index.html";
 export function pageFileFor(pathname: string): string {
   return `${pathname.endsWith("/") ? pathname : `${pathname}/`}${PAGE_FILE}`;
 }
+
+/**
+ * Android app only: saves a backup in the app's private cache and opens the
+ * Android share menu, so the user sends it to Drive, email, a chat, or Files.
+ * Resolves "cancelled" when the menu is closed without choosing an app.
+ */
+export async function shareBackupFile(fileName: string, json: string): Promise<"shared" | "cancelled"> {
+  const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
+    import("@capacitor/filesystem"),
+    import("@capacitor/share"),
+  ]);
+  const { uri } = await Filesystem.writeFile({ path: fileName, data: json, directory: Directory.Cache, encoding: Encoding.UTF8 });
+  try {
+    await Share.share({ title: fileName, files: [uri], dialogTitle: "Save or send your NEXORA backup" });
+    return "shared";
+  } catch (error) {
+    if (error instanceof Error && /cancel/i.test(error.message)) return "cancelled";
+    throw error;
+  }
+}

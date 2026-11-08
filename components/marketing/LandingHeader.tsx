@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { LogoMark } from "@/components/layout/Sidebar";
-import { APP_HOME, pageUrl } from "@/lib/basePath";
+import { DEMO_HOME, pageUrl } from "@/lib/basePath";
 
 const LINKS = [
   { hash: "#features", label: "Features" },
@@ -46,7 +46,7 @@ export function LandingHeader({ onLanding = false }: { onLanding?: boolean }) {
         >
           Pricing
         </a>
-        <Link href={APP_HOME} className="btn btn-primary px-4 py-2 text-sm">
+        <Link href={DEMO_HOME} className="btn btn-primary px-4 py-2 text-sm">
           Live demo <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>

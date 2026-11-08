@@ -20,7 +20,7 @@ import {
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { NativeRouteGuard } from "@/components/native/NativeAppSetup";
-import { APP_HOME } from "@/lib/basePath";
+import { DEMO_HOME } from "@/lib/basePath";
 import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
 import { SalesEmailLink } from "@/components/marketing/SalesEmailLink";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/site";
@@ -45,9 +45,6 @@ const MODULES: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: Sparkles, title: "AI Intelligence", body: "Risk radar, bottleneck detection, and executive synthesis (preview in this release)." },
   { icon: Settings, title: "Settings & Data", body: "Company profile, roles, and backup and restore of your data (governance and access control previewed)." },
 ];
-
-/** Opens the sample company directly when the device has no NEXORA data yet. */
-const DEMO_HREF = `${APP_HOME}?demo=1`;
 
 const FAQ: { q: string; a: string }[] = [
   {
@@ -129,7 +126,7 @@ export default function LandingPage() {
             one place, with AI intelligence on top.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href={DEMO_HREF} className="btn btn-primary px-5 py-3 text-sm">
+            <Link href={DEMO_HOME} className="btn btn-primary px-5 py-3 text-sm">
               Try the live demo <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <a href="#pricing" className="btn btn-secondary px-5 py-3 text-sm">
@@ -257,13 +254,13 @@ export default function LandingPage() {
                           <Mail className="h-4 w-4" aria-hidden="true" />
                           Request the {plan.name} plan
                         </SalesEmailLink>
-                        <Link href={DEMO_HREF} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
+                        <Link href={DEMO_HOME} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
                           or try the live demo first
                         </Link>
                       </div>
                     ) : (
                       <Link
-                        href={DEMO_HREF}
+                        href={DEMO_HOME}
                         className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
                       >
                         Start with the live demo
@@ -319,7 +316,7 @@ export default function LandingPage() {
             <p className="mx-auto mt-3 max-w-xl text-slate-300">
               Open the live demo — no account needed — and install it on your phone in one tap.
             </p>
-            <Link href={DEMO_HREF} className="btn btn-primary mt-7 px-5 py-3 text-sm">
+            <Link href={DEMO_HOME} className="btn btn-primary mt-7 px-5 py-3 text-sm">
               Open the live demo <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>

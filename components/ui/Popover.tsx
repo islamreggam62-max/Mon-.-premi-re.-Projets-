@@ -46,6 +46,7 @@ export function Popover({
           id={panelId}
           role="dialog"
           aria-label={panelLabel}
+          data-dismiss-on-back=""
           className={cn(
             "absolute top-full z-50 mt-2 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-hairline bg-base-800/95 shadow-2xl shadow-black/50 backdrop-blur-xl motion-safe:animate-fade-in",
             align === "right" ? "right-0" : "left-0",
