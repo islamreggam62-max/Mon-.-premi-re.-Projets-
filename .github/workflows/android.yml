@@ -47,6 +47,18 @@ jobs:
           java-version: "21"
           cache: gradle
 
+      # The Gradle download (services.gradle.org, served from github.com) sometimes
+      # times out; try it a few times before building instead of failing the job.
+      - name: Download Gradle
+        working-directory: android
+        run: |
+          for attempt in 1 2 3 4; do
+            ./gradlew --no-daemon --version && exit 0
+            echo "Gradle download failed (attempt $attempt of 4)"
+            sleep $((attempt * 30))
+          done
+          exit 1
+
       - name: Build the debug APK and the release bundle
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug bundleRelease
