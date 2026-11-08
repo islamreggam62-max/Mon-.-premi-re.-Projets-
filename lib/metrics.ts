@@ -3,7 +3,8 @@
  * No data imports: callers pass the records in, so the same functions work on
  * static demo data today and Supabase results in Phase 2.
  */
-import { HEALTH_RANK, PRIORITY_RANK, SEVERITY_RANK, URGENCY_RANK } from "@/lib/labels";
+import { t } from "@/lib/i18n/core";
+import { HEALTH_RANK, PRIORITY_RANK, SEVERITY_RANK, URGENCY_RANK, translated } from "@/lib/labels";
 import type {
   Approval,
   ApprovalStatus,
@@ -160,12 +161,12 @@ export function workloadBand(person: Person): WorkloadBand {
   return "healthy";
 }
 
-export const WORKLOAD_BAND_LABEL: Record<WorkloadBand, string> = {
+export const WORKLOAD_BAND_LABEL: Record<WorkloadBand, string> = translated({
   healthy: "Healthy",
   stretched: "Stretched",
   overloaded: "Overloaded",
   unavailable: "Unavailable",
-};
+});
 
 /* ----------------------------------------------------------------------------
  * Daily report compliance
@@ -287,14 +288,14 @@ export function departmentHealth(
       let status: DepartmentHealthStatus = "healthy";
       const delayed = owned.filter((p) => p.health === "delayed");
       const atRisk = owned.filter((p) => p.health === "at-risk");
-      if (delayed.length) reasons.push(`${delayed.map((p) => p.code).join(", ")} delayed`);
-      if (avgWorkload !== null && avgWorkload >= 90) reasons.push(`workload ${avgWorkload}%`);
+      if (delayed.length) reasons.push(t("{codes} delayed", { codes: delayed.map((p) => p.code).join(", ") }));
+      if (avgWorkload !== null && avgWorkload >= 90) reasons.push(t("workload {n}%", { n: avgWorkload }));
       if (reasons.length) status = "critical";
 
       if (status !== "critical") {
-        if (atRisk.length) reasons.push(`${atRisk.map((p) => p.code).join(", ")} at risk`);
-        if (avgWorkload !== null && avgWorkload >= 80) reasons.push(`workload ${avgWorkload}%`);
-        if (reportRate !== null && reportRate < 70) reasons.push(`reports ${reportRate}%`);
+        if (atRisk.length) reasons.push(t("{codes} at risk", { codes: atRisk.map((p) => p.code).join(", ") }));
+        if (avgWorkload !== null && avgWorkload >= 80) reasons.push(t("workload {n}%", { n: avgWorkload }));
+        if (reportRate !== null && reportRate < 70) reasons.push(t("reports {n}%", { n: reportRate }));
         if (reasons.length) status = "watch";
       }
 

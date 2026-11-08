@@ -1,0 +1,102 @@
+# Builds the NEXORA Android app (Capacitor) to prove the native project
+# compiles, and keeps the result for testing on a phone:
+# - app-debug.apk: install it directly on an Android phone;
+# - app-release.aab: the Google Play bundle, signed with the upload key when the
+#   repository secrets are set (see "Use the upload key" below), otherwise unsigned.
+name: Android build
+
+on:
+  pull_request:
+    paths-ignore: ["supabase/**", "docs/**", "orchestrator/**", "store/**", "**/*.md"]
+  push:
+    branches: ["main", "claude/orchestrater-cyber-offensive-4do8x6"]
+    paths-ignore: ["supabase/**", "docs/**", "orchestrator/**", "store/**", "**/*.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the web app (static export in out/)
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Copy it into the Android project
+        run: npx cap sync android
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      # The Gradle download (services.gradle.org, served from github.com) sometimes
+      # times out; try it a few times before building instead of failing the job.
+      - name: Download Gradle
+        working-directory: android
+        run: |
+          for attempt in 1 2 3 4; do
+            ./gradlew --no-daemon --version && exit 0
+            echo "Gradle download failed (attempt $attempt of 4)"
+            sleep $((attempt * 30))
+          done
+          exit 1
+
+      # Google Play upload key, from four repository secrets (Settings → Secrets and
+      # variables → Actions): ANDROID_UPLOAD_KEYSTORE_BASE64 (the .jks file in
+      # base64), ANDROID_UPLOAD_STORE_PASSWORD, ANDROID_UPLOAD_KEY_ALIAS and
+      # ANDROID_UPLOAD_KEY_PASSWORD. Without them (and on pull requests from forks)
+      # the release bundle is built unsigned.
+      - name: Use the upload key when it is configured
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "No upload key configured: app-release.aab will be unsigned."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          echo "NEXORA_UPLOAD_KEYSTORE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+          echo "Upload key found: app-release.aab will be signed."
+
+      # Dependencies come from Maven hosts that sometimes redirect to github.com
+      # release downloads, which can time out. Downloads already finished stay in
+      # ~/.gradle, so a retry only fetches what is missing.
+      - name: Build the debug APK and the release bundle
+        working-directory: android
+        env:
+          NEXORA_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          NEXORA_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          NEXORA_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          for attempt in 1 2 3; do
+            ./gradlew --no-daemon assembleDebug bundleRelease && exit 0
+            echo "Build failed (attempt $attempt of 3)"
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 60)); fi
+          done
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nexora-android
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14

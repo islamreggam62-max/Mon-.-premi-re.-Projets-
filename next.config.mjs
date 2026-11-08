@@ -1,13 +1,19 @@
 import { execSync } from "node:child_process";
 
 /**
- * Two build targets share this config:
- * - default: a Node server (`next start`, Vercel) with security headers;
- * - GITHUB_PAGES=true: a static export served from
- *   https://<owner>.github.io/<repo>/ — so it needs a basePath and trailing
- *   slashes, and cannot use server redirects or headers.
+ * Three build targets share this config:
+ * - default: a static export at the root of `out/`, with trailing slashes and
+ *   unoptimized images. Capacitor packages it into the Android app (webDir "out"),
+ *   and any static host can serve it.
+ * - GITHUB_PAGES=true: the same export served from https://<owner>.github.io/<repo>/,
+ *   so it also needs a basePath.
+ * - BUILD_TARGET=server: a Node server (`next start`, Vercel) with security
+ *   headers, which a static export cannot send.
  */
-const isPages = process.env.GITHUB_PAGES === "true";
+const target =
+  process.env.GITHUB_PAGES === "true" ? "pages" : process.env.BUILD_TARGET === "server" ? "server" : "static";
+const isPages = target === "pages";
+const isExport = target !== "server";
 const basePath = isPages ? process.env.PAGES_BASE_PATH ?? "/Mon-.-premi-re.-Projets-" : "";
 
 /**
@@ -39,20 +45,20 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion(),
     NEXT_PUBLIC_BASE_PATH: basePath,
-    NEXT_PUBLIC_TRAILING_SLASH: isPages ? "1" : "0",
+    NEXT_PUBLIC_TRAILING_SLASH: isExport ? "1" : "0",
     NEXT_PUBLIC_SITE_ORIGIN: siteOrigin(),
     // The privacy policy names the host, so it must know which build this is.
-    NEXT_PUBLIC_HOSTING: isPages ? "github-pages" : "server",
+    NEXT_PUBLIC_HOSTING: target === "pages" ? "github-pages" : target,
   },
   // The dev-only Next.js indicator defaults to bottom-left, where it covers the
   // collapsed sidebar's "Expand sidebar" control. Production is unaffected.
   devIndicators: {
     position: "bottom-right",
   },
-  ...(isPages
+  ...(isExport
     ? {
         output: "export",
-        basePath,
+        ...(basePath ? { basePath } : {}),
         trailingSlash: true,
         images: { unoptimized: true },
       }

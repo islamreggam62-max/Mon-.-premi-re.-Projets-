@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { NativeAppSetup } from "@/components/native/NativeAppSetup";
 
 /**
- * Root layout: document, metadata, and the offline worker. The product UI
+ * Root layout: document, metadata, the offline worker (web), and the Android
+ * app setup (components/native). The product UI
  * (sidebar + top bar) lives in app/(app)/layout.tsx; the public landing page
  * in app/(marketing) has its own header and footer.
  */
@@ -35,11 +37,20 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
+/**
+ * Mobile viewport. Dark navy paints the browser and system bars to match the
+ * page; the violet accent (#7C3AED) is the Android theme accent and the icon's.
+ * viewport-fit stays "auto": the UI has no safe-area padding, so Capacitor keeps
+ * the Android WebView inside the status and navigation bars. Zoom stays allowed.
+ */
 export const viewport: Viewport = {
   themeColor: "#060913",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "auto",
+  // The on-screen keyboard resizes the page, so focused fields stay visible.
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -48,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans">
         {children}
         <ServiceWorkerRegister />
+        <NativeAppSetup />
       </body>
     </html>
   );

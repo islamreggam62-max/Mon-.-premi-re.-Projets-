@@ -1,8 +1,10 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CircleHelp,
   BadgeCheck,
   ClipboardList,
   FlaskConical,
@@ -12,14 +14,16 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
+  Smartphone,
   Sparkles,
+  type LucideIcon,
   Users,
   X,
-  type LucideIcon,
 } from "lucide-react";
 import { DEMO_AS_OF } from "@/lib/data/meta";
 import { APP_HOME } from "@/lib/basePath";
 import { NAV_ITEMS, isActivePath } from "@/lib/nav";
+import { useStore } from "@/lib/store/StoreProvider";
 import type { NavIcon, Workspace } from "@/lib/types";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
@@ -80,7 +84,7 @@ export function Sidebar({
           href={APP_HOME}
           onClick={onClose}
           className="focus-ring flex items-center gap-2.5 rounded-xl"
-          aria-label="NEXORA — go to Dashboard"
+          aria-label={t("NEXORA — go to Dashboard")}
         >
           <LogoMark />
           {!collapsed && (
@@ -93,7 +97,7 @@ export function Sidebar({
             onClick={onClose}
             data-autofocus
             className="focus-ring rounded-lg p-1.5 text-slate-300 hover:bg-white/5 hover:text-slate-200"
-            aria-label="Close navigation menu"
+            aria-label={t("Close navigation menu")}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -104,10 +108,10 @@ export function Sidebar({
         <WorkspaceSwitcher workspaces={workspaces} collapsed={collapsed} />
       </div>
 
-      <nav aria-label="Primary" className="flex-1 overflow-y-auto px-3 py-4">
+      <nav aria-label={t("Primary")} className="flex-1 overflow-y-auto px-3 py-4">
         {!collapsed && (
           <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-wider text-slate-400">
-            Modules
+            {t("Modules")}
           </p>
         )}
         <ul className="space-y-1">
@@ -121,7 +125,7 @@ export function Sidebar({
                   href={item.href}
                   onClick={onClose}
                   aria-current={active ? "page" : undefined}
-                  title={collapsed ? item.label : undefined}
+                  title={collapsed ? t(item.label) : undefined}
                   className={cn(
                     "focus-ring group relative flex items-center gap-3 rounded-xl py-2.5 text-sm transition-colors",
                     collapsed ? "justify-center px-0" : "px-3",
@@ -132,7 +136,7 @@ export function Sidebar({
                 >
                   {active && !collapsed && (
                     <span
-                      className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-violet-soft"
+                      className="absolute -start-3 top-2 bottom-2 w-1 rounded-e-full bg-violet-soft"
                       aria-hidden="true"
                     />
                   )}
@@ -144,14 +148,14 @@ export function Sidebar({
                     aria-hidden="true"
                   />
                   {collapsed ? (
-                    <span className="sr-only">{item.label}</span>
+                    <span className="sr-only">{t(item.label)}</span>
                   ) : (
-                    <span className="flex-1 truncate font-medium">{item.label}</span>
+                    <span className="flex-1 truncate font-medium">{t(item.label)}</span>
                   )}
                   {badge !== undefined && badge > 0 &&
                     (collapsed ? (
                       <span
-                        className="absolute right-3 top-2 h-2 w-2 rounded-full bg-status-amber ring-2 ring-base-900"
+                        className="absolute end-3 top-2 h-2 w-2 rounded-full bg-status-amber ring-2 ring-base-900"
                         aria-hidden="true"
                       />
                     ) : (
@@ -159,49 +163,95 @@ export function Sidebar({
                         {badge}
                       </span>
                     ))}
-                  {badge !== undefined && badge > 0 && <span className="sr-only">({badge} open)</span>}
+                  {badge !== undefined && badge > 0 && <span className="sr-only">({t("{n} open", { n: badge })})</span>}
                 </Link>
               </li>
             );
           })}
         </ul>
+        <HelpLink pathname={pathname} collapsed={collapsed} onClose={onClose} />
       </nav>
 
       <div className="shrink-0 space-y-2 border-t border-hairline p-3">
         <InstallAppButton collapsed={collapsed} />
-        {!collapsed && (
-          <div className="rounded-xl border border-violet/20 bg-violet/[0.06] p-3">
-            <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">
-              <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
-              Demo mode
-            </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
-              Static demonstration data as of {formatDate(DEMO_AS_OF)}. Nothing is saved.
-            </p>
-          </div>
-        )}
+        {!collapsed && <DataModeNote />}
         {variant === "desktop" && onToggleCollapse && (
           <button
             type="button"
             onClick={onToggleCollapse}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? t("Expand sidebar") : t("Collapse sidebar")}
+            title={collapsed ? t("Expand sidebar") : t("Collapse sidebar")}
             className={cn(
               "focus-ring flex w-full items-center gap-2 rounded-xl py-2 text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-slate-200",
               collapsed ? "justify-center" : "px-3",
             )}
           >
             {collapsed ? (
-              <PanelLeftOpen className="h-[18px] w-[18px]" aria-hidden="true" />
+              <PanelLeftOpen className="h-[18px] w-[18px] rtl:-scale-x-100" aria-hidden="true" />
             ) : (
               <>
-                <PanelLeftClose className="h-[18px] w-[18px]" aria-hidden="true" />
-                Collapse sidebar
+                <PanelLeftClose className="h-[18px] w-[18px] rtl:-scale-x-100" aria-hidden="true" />
+                {t("Collapse sidebar")}
               </>
             )}
           </button>
         )}
       </div>
     </div>
+  );
+}
+
+/** Footer note: sample company, or own company saved on the device. */
+function DataModeNote() {
+  const { data } = useStore();
+  if (data?.mode === "company") {
+    return (
+      <div className="rounded-xl border border-hairline bg-white/[0.03] p-3">
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+          <Smartphone className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
+          {t("Saved on this device")}
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+          <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+            {t("Back up your data to keep it safe.")}
+          </Link>
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-xl border border-violet/20 bg-violet/[0.06] p-3">
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-200">
+        <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
+        {t("Sample company")}
+      </p>
+      <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+        {t("Fictional data as of {date}. Your changes are saved on this device.", { date: formatDate(DEMO_AS_OF) })}{" "}
+        <Link href="/settings#data" className="text-violet-300 underline-offset-2 hover:underline">
+          {t("Start your company")}
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+/** The user guide, under the modules. */
+function HelpLink({ pathname, collapsed, onClose }: { pathname: string; collapsed: boolean; onClose?: () => void }) {
+  const active = isActivePath(pathname, "/help");
+  return (
+    <Link
+      href="/help"
+      onClick={onClose}
+      aria-current={active ? "page" : undefined}
+      title={collapsed ? t("How NEXORA works") : undefined}
+      className={cn(
+        "focus-ring mt-4 flex items-center gap-3 rounded-xl border-t border-hairline py-2.5 pt-3 text-sm transition-colors",
+        collapsed ? "justify-center px-0" : "px-3",
+        active ? "text-slate-50" : "text-slate-300 hover:bg-white/5 hover:text-slate-100",
+      )}
+    >
+      <CircleHelp className={cn("h-[18px] w-[18px] shrink-0", active ? "text-violet-300" : "text-slate-400")} aria-hidden="true" />
+      {collapsed ? <span className="sr-only">{t("How NEXORA works")}</span> : <span className="flex-1 truncate font-medium">{t("How NEXORA works")}</span>}
+    </Link>
   );
 }

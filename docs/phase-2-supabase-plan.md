@@ -1,6 +1,87 @@
 # NEXORA — Phase 2 plan: Supabase integration
 
-> Planning document only. Nothing in this file is implemented in Phase 1.
+> **Status (step 1 done):** the core schema, row-level security, and the
+> multi-step functions are implemented in `supabase/migrations/20261102000000_core.sql`;
+> owner-issued activation codes in `supabase/migrations/20261103000000_activation_codes.sql`.
+> They are covered by `supabase/tests/10_tenancy.test.sql` (67 checks: tenant isolation,
+> roles, invites, approvals and their audit trail, separation of duties: nobody decides
+> their own request, only the owner manages admins, a viewer writes nothing) and `supabase/tests/20_activation_codes.test.sql`
+> (47 checks: who may issue and use a code, single use, expiry, email binding,
+> nothing stored in clear). Run them with `DATABASE_URL=… scripts/test-db.sh`; CI runs
+> them in `.github/workflows/database.yml`. The app does not use the database yet
+> (next steps below).
+
+## Architecture decision: static site + database security
+
+The site is a static export on GitHub Pages, so there is no Node server for Server
+Actions or middleware. The browser uses the Supabase client with the public anon key,
+and **Row-Level Security is the security boundary**: every table is protected in the
+database, and multi-step changes run in `security definer` functions that check the
+caller themselves (`create_workspace`, `accept_invite`, `decide_approval`,
+`set_member_role`). Work that needs a secret (AI calls, Google/Microsoft
+integrations, payment webhooks) goes in Supabase Edge Functions, never in the browser.
+
+Implemented in step 1 (a leaner cut of the schema below): `profiles`, `workspaces`
+(one company = one workspace), `departments`, `workspace_members`,
+`workspace_invites`, `projects`, `tasks`, `daily_reports` (completed work and
+priorities as arrays), `report_blockers`, `approvals`, `approval_events`. Composite
+foreign keys stop a row from pointing at another company's project or at a
+non-member.
+
+## Activation codes: only the owner opens companies
+
+A customer cannot create a company on their own. The NEXORA owner issues an
+activation code (`NEXORA-XXXX-XXXX-XXXX-XXXX`, 80 random bits) for one customer;
+the customer types it once when creating their company. The code sets the plan
+(`trial`, `monthly`, `annual`), can be tied to the customer's email, expires (1 to
+365 days, 30 by default) and works once. The database keeps only its SHA-256 hash
+and last four characters, so the code is shown once, to the owner, and appears
+nowhere in the site's public source code. A company's own owner and admins cannot
+change its plan.
+
+Owner steps in the Supabase SQL editor, once the owner's account exists
+(Authentication → Users):
+
+```sql
+-- Once: make your account the NEXORA owner.
+insert into public.platform_admins (user_id)
+select id from auth.users where email = 'islamreggam62@gmail.com';
+
+-- For each customer: issue a code (run the block as one query).
+begin;
+select set_config('request.jwt.claims', json_build_object('sub', id, 'role', 'authenticated')::text, true)
+  from auth.users where email = 'islamreggam62@gmail.com';
+select * from public.issue_activation_code('annual', 'directeur@entreprise.dz', 'Entreprise X', 30);
+commit;
+
+-- Your codes (hints only) and who used them.
+select hint, plan, email, label, expires_at, used_at, revoked_at
+from public.activation_codes order by created_at desc;
+
+-- Cancel an unused code.
+update public.activation_codes set revoked_at = now()
+where hint = 'XXXX' and used_at is null and revoked_at is null;
+```
+
+The editor runs as a database administrator with no signed-in user, hence the
+`set_config` line, which states the owner's identity for that transaction only.
+Keep Supabase's "Confirm email" setting on: an email-bound code trusts the email
+of the signed-in account. A screen for issuing codes belongs to step 2.
+
+## Next steps
+
+1. Supabase project (owner): create it, run the migration in the SQL editor, add
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as repository
+   variables, set the Auth site URL and redirect URLs to the site.
+2. Sign-up / sign-in, company creation with an activation code and onboarding,
+   team invites, roles, and an owner screen to issue codes.
+3. Projects, tasks, daily reports, and approvals on real data (the demo stays as is).
+4. Dashboard computed from real records.
+5. Then: AI brief (Edge Function, usage tracking), data import, payments.
+
+---
+
+Original plan (kept for reference):
 
 ## Goal
 

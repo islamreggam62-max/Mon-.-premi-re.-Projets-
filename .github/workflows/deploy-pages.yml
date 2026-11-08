@@ -44,6 +44,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Check translations
+        run: npm run i18n:check
+
       - name: Choose the site address
         env:
           CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}

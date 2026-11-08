@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n/core";
 import { SearchX, type LucideIcon } from "lucide-react";
 
 export function EmptyState({
@@ -16,8 +17,8 @@ export function EmptyState({
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 ring-1 ring-inset ring-white/10">
         <Icon className="h-5 w-5 text-slate-300" aria-hidden="true" />
       </span>
-      <p className="mt-4 text-sm font-medium text-slate-200">{title}</p>
-      {description && <p className="mt-1 max-w-sm text-sm text-slate-400">{description}</p>}
+      <p className="mt-4 text-sm font-medium text-slate-200">{t(title)}</p>
+      {description && <p className="mt-1 max-w-sm text-sm text-slate-400">{t(description)}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   );

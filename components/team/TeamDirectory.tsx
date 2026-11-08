@@ -1,14 +1,15 @@
 "use client";
 
+import { t, tn } from "@/lib/i18n/core";
 import { useMemo, useState } from "react";
-import { Mail, MapPin, Users } from "lucide-react";
+import { Mail, MapPin, Pencil, Users } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { PRESENCE_DOT, PresenceBadge } from "@/components/ui/Badge";
 import { SearchInput, Select } from "@/components/ui/Controls";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressBar, type ProgressTone } from "@/components/ui/ProgressBar";
 import { Tabs } from "@/components/ui/Tabs";
-import { ACCESS_ROLE_LABEL, DEPARTMENT_ORDER, PRESENCE_LABEL } from "@/lib/labels";
+import { ACCESS_ROLE_LABEL, DEPARTMENT_ORDER, PRESENCE_LABEL, departmentLabel } from "@/lib/labels";
 import { ComplianceStrip } from "@/components/reports/ComplianceStrip";
 import { WORKLOAD_BAND_LABEL, workloadBand, type Compliance, type WorkloadBand } from "@/lib/metrics";
 import type { Department, Person, PresenceStatus } from "@/lib/types";
@@ -43,10 +44,13 @@ export function TeamDirectory({
   people,
   compliance,
   asOf,
+  onEdit,
 }: {
   people: Person[];
   compliance: Record<string, Compliance>;
   asOf: string;
+  /** When given, each card has an Edit button. */
+  onEdit?: (person: Person) => void;
 }) {
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState<DepartmentFilter>("all");
@@ -62,10 +66,10 @@ export function TeamDirectory({
   const departmentTabs = useMemo(() => {
     const present = DEPARTMENT_ORDER.filter((d) => people.some((p) => p.department === d));
     return [
-      { id: "all" as DepartmentFilter, label: "All", count: base.length },
+      { id: "all" as DepartmentFilter, label: t("All"), count: base.length },
       ...present.map((d) => ({
         id: d as DepartmentFilter,
-        label: d,
+        label: departmentLabel(d),
         count: base.filter((p) => p.department === d).length,
       })),
     ];
@@ -103,13 +107,13 @@ export function TeamDirectory({
           placeholder="Search name, title, email, location…"
           className="md:max-w-sm md:flex-1"
         />
-        <div className="grid grid-cols-2 gap-3 md:ml-auto md:flex">
+        <div className="grid grid-cols-2 gap-3 md:ms-auto md:flex">
           <Select<StatusFilter>
             label="Status"
             value={status}
             onChange={setStatus}
             options={[
-              { value: "all", label: "All statuses" },
+              { value: "all", label: t("All statuses") },
               ...(["active", "away", "offline", "on-leave"] as PresenceStatus[]).map((s) => ({
                 value: s,
                 label: PRESENCE_LABEL[s],
@@ -122,10 +126,10 @@ export function TeamDirectory({
             value={sort}
             onChange={setSort}
             options={[
-              { value: "name", label: "Name (A–Z)" },
-              { value: "workload-desc", label: "Workload (high → low)" },
-              { value: "workload-asc", label: "Workload (low → high)" },
-              { value: "streak-desc", label: "Report streak (longest)" },
+              { value: "name", label: t("Name (A–Z)") },
+              { value: "workload-desc", label: t("Workload (high → low)") },
+              { value: "workload-asc", label: t("Workload (low → high)") },
+              { value: "streak-desc", label: t("Report streak (longest)") },
             ]}
             className="md:w-52"
           />
@@ -136,7 +140,7 @@ export function TeamDirectory({
         items={departmentTabs}
         value={department}
         onChange={setDepartment}
-        ariaLabel="Filter by department"
+        ariaLabel={t("Filter by department")}
         className="mt-5"
       />
 
@@ -152,7 +156,7 @@ export function TeamDirectory({
             description="Try a different search term, department, or status."
             action={
               <button type="button" onClick={reset} className="btn btn-secondary">
-                Clear filters
+                {t("Clear filters")}
               </button>
             }
           />
@@ -168,7 +172,7 @@ export function TeamDirectory({
                     <Avatar person={p} size="lg" />
                     <span
                       className={cn(
-                        "absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-base-900",
+                        "absolute -bottom-0.5 -end-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-base-900",
                         PRESENCE_DOT[p.status],
                       )}
                       aria-hidden="true"
@@ -177,35 +181,52 @@ export function TeamDirectory({
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-slate-50">{p.name}</p>
                     <p className="truncate text-sm text-slate-300">{p.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-400">{p.department}</p>
+                    <p className="mt-0.5 text-xs text-slate-400">{departmentLabel(p.department)}</p>
                   </div>
                   <PresenceBadge status={p.status} />
                 </div>
 
                 <div className="mt-4 space-y-1.5 text-xs text-slate-300">
-                  <p className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-                    {p.location}
-                  </p>
-                  <p className="flex min-w-0 items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
-                    <a href={`mailto:${p.email}`} className="focus-ring truncate rounded text-violet-300 hover:underline">
-                      {p.email}
-                    </a>
-                  </p>
+                  {p.location && (
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                      {p.location}
+                    </p>
+                  )}
+                  {p.email && (
+                    <p className="flex min-w-0 items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
+                      <a href={`mailto:${p.email}`} className="focus-ring truncate rounded text-violet-300 hover:underline">
+                        {p.email}
+                      </a>
+                    </p>
+                  )}
+                  {onEdit && (
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => onEdit(p)}
+                        aria-label={t("Edit {name}", { name: p.name })}
+                        className="focus-ring inline-flex items-center gap-1 rounded-lg border border-hairline px-2 py-1 text-xs font-medium text-slate-300 hover:border-white/25 hover:text-slate-100"
+                      >
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t("Edit")}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 border-t border-hairline pt-4">
                   <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="text-slate-300">Workload</span>
+                    <span className="text-slate-300">{t("Workload")}</span>
                     <span className={cn("font-medium tabular-nums", BAND_TEXT[band])}>
-                      {band === "unavailable" ? "On leave" : `${p.workload}% · ${WORKLOAD_BAND_LABEL[band]}`}
+                      {band === "unavailable" ? t("On leave") : `${p.workload}% · ${WORKLOAD_BAND_LABEL[band]}`}
                     </span>
                   </div>
-                  <ProgressBar value={p.workload} tone={BAND_TONE[band]} label={`${p.name} workload`} />
+                  <ProgressBar value={p.workload} tone={BAND_TONE[band]} label={t("{name} workload", { name: p.name })} />
                   {band !== "unavailable" && (
                     <p className="mt-1.5 text-[11px] text-slate-400">
-                      Capacity left: <span className="font-semibold tabular-nums text-slate-200">{Math.max(0, 100 - p.workload)}%</span>
+                      {t("Capacity left:")} <span className="font-semibold tabular-nums text-slate-200">{Math.max(0, 100 - p.workload)}%</span>
                     </p>
                   )}
                 </div>
@@ -215,7 +236,7 @@ export function TeamDirectory({
                 </div>
 
                 <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Joined {formatDate(p.joined)}</span>
+                  <span>{t("Joined {date}", { date: formatDate(p.joined) })}</span>
                   <span className="rounded-md bg-white/[0.05] px-1.5 py-0.5 font-medium text-slate-300">
                     {ACCESS_ROLE_LABEL[p.accessRole]}
                   </span>
@@ -229,7 +250,7 @@ export function TeamDirectory({
       {filtersActive && visible.length > 0 && (
         <div className="mt-4">
           <button type="button" onClick={reset} className="btn btn-secondary">
-            Clear filters
+            {t("Clear filters")}
           </button>
         </div>
       )}
@@ -249,7 +270,7 @@ function ReportCompliance({
   if (!compliance || !compliance.expected) {
     return (
       <p className="text-xs text-slate-400">
-        Daily reports: {person.status === "on-leave" ? "excused while on leave" : "not required for this role"}
+        {person.status === "on-leave" ? t("Daily reports: excused while on leave") : t("Daily reports: not required for this role")}
       </p>
     );
   }
@@ -257,19 +278,19 @@ function ReportCompliance({
   return (
     <>
       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
-        <span className="text-slate-300">Report streak</span>
+        <span className="text-slate-300">{t("Report streak")}</span>
         <span className="font-semibold tabular-nums text-slate-50" data-testid={`streak-${person.id}`}>
-          {compliance.streak} {compliance.streak === 1 ? "day" : "days"}
-          {!compliance.submittedToday && <span className="ml-1.5 font-medium text-amber-300">· due today</span>}
+          {tn(compliance.streak, "{n} day", "{n} days")}
+          {!compliance.submittedToday && <span className="ms-1.5 font-medium text-amber-300">· {t("due today")}</span>}
         </span>
       </div>
       <div className="flex items-center justify-between gap-3">
         <ComplianceStrip
           days={compliance.days}
           asOf={asOf}
-          label={`${person.name}: submitted ${submittedDays} of the last ${compliance.days.length} business days`}
+          label={t("{name}: submitted {a} of the last {b} business days", { name: person.name, a: submittedDays, b: compliance.days.length })}
         />
-        <span className="text-[11px] tabular-nums text-slate-400">{compliance.rate}% / 10 days</span>
+        <span className="text-[11px] tabular-nums text-slate-400">{t("{n}% / 10 days", { n: compliance.rate })}</span>
       </div>
     </>
   );

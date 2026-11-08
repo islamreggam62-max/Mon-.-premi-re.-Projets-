@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { useId } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,10 +27,10 @@ export function SearchInput({
   return (
     <div className={cn("relative", className)}>
       <label htmlFor={id} className="sr-only">
-        {label}
+        {t(label)}
       </label>
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         aria-hidden="true"
       />
       <input
@@ -37,16 +38,16 @@ export function SearchInput({
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
+        placeholder={t(placeholder)}
         autoComplete="off"
-        className="field pl-9 pr-9"
+        className="field ps-9 pe-9"
       />
       {value && (
         <button
           type="button"
           onClick={() => onChange("")}
-          aria-label="Clear search"
-          className="focus-ring absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-slate-200"
+          aria-label={t("Clear search")}
+          className="focus-ring absolute end-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-slate-200"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
@@ -83,7 +84,7 @@ export function Select<T extends string>({
         htmlFor={id}
         className={cn("text-xs font-medium text-slate-300", hideLabel && "sr-only")}
       >
-        {label}
+        {t(label)}
       </label>
       <div className="relative">
         <select
@@ -91,7 +92,7 @@ export function Select<T extends string>({
           value={value}
           disabled={disabled}
           onChange={(event) => onChange(event.target.value as T)}
-          className="field cursor-pointer appearance-none pr-9"
+          className="field cursor-pointer appearance-none pe-9"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value} className="bg-base-800 text-slate-100">
@@ -100,7 +101,7 @@ export function Select<T extends string>({
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
           aria-hidden="true"
         />
       </div>
@@ -158,7 +159,7 @@ export function Switch({
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-label={label}
+      aria-label={t(label)}
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
       className={cn(
@@ -168,8 +169,8 @@ export function Switch({
     >
       <span
         className={cn(
-          "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
-          checked ? "translate-x-[22px]" : "translate-x-0.5",
+          "absolute start-0 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
+          checked ? "translate-x-[22px] rtl:-translate-x-[22px]" : "translate-x-0.5 rtl:-translate-x-0.5",
         )}
       />
     </button>

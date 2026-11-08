@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n/core";
 import type { ComplianceDay } from "@/lib/metrics";
 import { cn, formatShortDate, formatWeekdayShort } from "@/lib/utils";
 
@@ -19,9 +20,8 @@ export function ComplianceStrip({
     <div role="img" aria-label={label} className="flex items-center gap-1">
       {days.map((d) => {
         const today = d.date === asOf;
-        const title = `${formatWeekdayShort(d.date)} ${formatShortDate(d.date)}: ${
-          d.status === "submitted" ? "submitted" : d.status === "excused" ? "excused" : today ? "not yet submitted" : "missing"
-        }`;
+        const state = d.status === "submitted" ? t("submitted") : d.status === "excused" ? t("excused") : today ? t("not yet submitted") : t("missing");
+        const title = `${formatWeekdayShort(d.date)} ${formatShortDate(d.date)}: ${state}`;
         return (
           <span
             key={d.date}

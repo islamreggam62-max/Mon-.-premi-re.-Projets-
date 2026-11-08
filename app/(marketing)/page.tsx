@@ -19,9 +19,11 @@ import {
 } from "lucide-react";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
-import { APP_HOME } from "@/lib/basePath";
+import { NativeRouteGuard } from "@/components/native/NativeAppSetup";
+import { DEMO_HOME } from "@/lib/basePath";
 import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
-import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl, salesMailto } from "@/lib/site";
+import { SalesEmailLink } from "@/components/marketing/SalesEmailLink";
+import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/site";
 import { cn, formatCurrency, percent } from "@/lib/utils";
 import productShot from "@/public/screenshots/wide.png";
 
@@ -41,17 +43,21 @@ const MODULES: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: ClipboardList, title: "Daily Reports", body: "Structured logs — Completed Work, Priorities, Blockers — with submission tracking." },
   { icon: BadgeCheck, title: "Approvals", body: "Decision queue for budgets, contracts, hiring, and exceptions, ordered by urgency." },
   { icon: Sparkles, title: "AI Intelligence", body: "Risk radar, bottleneck detection, and executive synthesis (preview in this release)." },
-  { icon: Settings, title: "Settings & Governance", body: "Organization profile, approval policies, and role-based access control." },
+  { icon: Settings, title: "Settings & Data", body: "Company profile, roles, and backup and restore of your data (governance and access control previewed)." },
 ];
 
 const FAQ: { q: string; a: string }[] = [
   {
     q: "What do I get today?",
-    a: "The full NEXORA interface — all eight modules — running on sample company data. Connecting your own company's data arrives with the next release.",
+    a: "All eight modules. Explore them with a sample company, or set up your own: your team, projects, tasks, daily reports, and approvals, saved on your device with backup and restore. Shared workspaces, with a sign-in for each person, come in a later release.",
   },
   {
     q: "Can I install NEXORA like an app?",
     a: "Yes. Open the live demo and use “Install NEXORA app” in the sidebar (Chrome, Edge, Android), or Share → Add to Home Screen on iPhone.",
+  },
+  {
+    q: "Where is my company's data stored?",
+    a: "Only on your device, in the browser or the Android app. We never receive it. Make a backup from Settings: clearing the browser's data or uninstalling the app erases it.",
   },
   {
     q: "Does it work offline?",
@@ -102,6 +108,7 @@ export default function LandingPage() {
         // JSON.stringify output with "<" escaped cannot close the script tag.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      <NativeRouteGuard />
       <LandingHeader onLanding />
 
       <main>
@@ -109,7 +116,7 @@ export default function LandingPage() {
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 text-center sm:px-6 sm:pt-20">
           <span className="inline-flex items-center gap-2 rounded-full border border-violet/40 bg-violet/10 px-3 py-1 text-xs font-semibold text-violet-100">
             <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
-            Early access · live demo with sample data
+            Early access · free · your data stays on your device
           </span>
           <h1 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
             Run your company from one executive command center
@@ -119,7 +126,7 @@ export default function LandingPage() {
             one place, with AI intelligence on top.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href={APP_HOME} className="btn btn-primary px-5 py-3 text-sm">
+            <Link href={DEMO_HOME} className="btn btn-primary px-5 py-3 text-sm">
               Try the live demo <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <a href="#pricing" className="btn btn-secondary px-5 py-3 text-sm">
@@ -239,21 +246,21 @@ export default function LandingPage() {
                     </ul>
                     {CONTACT_EMAIL ? (
                       <div className="mt-8 flex flex-col items-center gap-3">
-                        <a
-                          href={salesMailto(plan.name)}
+                        <SalesEmailLink
+                          plan={plan.name}
                           className={cn("btn w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
-                          data-testid={`request-${plan.id}`}
+                          testId={`request-${plan.id}`}
                         >
                           <Mail className="h-4 w-4" aria-hidden="true" />
                           Request the {plan.name} plan
-                        </a>
-                        <Link href={APP_HOME} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
+                        </SalesEmailLink>
+                        <Link href={DEMO_HOME} className="text-sm text-slate-300 underline-offset-4 hover:text-slate-50 hover:underline">
                           or try the live demo first
                         </Link>
                       </div>
                     ) : (
                       <Link
-                        href={APP_HOME}
+                        href={DEMO_HOME}
                         className={cn("btn mt-8 w-full py-3 text-sm", featured ? "btn-primary" : "btn-secondary")}
                       >
                         Start with the live demo
@@ -268,9 +275,9 @@ export default function LandingPage() {
               {CONTACT_EMAIL ? (
                 <>
                   Prices in US dollars. Online payment is not open yet: to subscribe, email{" "}
-                  <a href={salesMailto()} className="font-medium text-violet-200 underline underline-offset-2">
+                  <SalesEmailLink className="font-medium text-violet-200 underline underline-offset-2">
                     {CONTACT_EMAIL}
-                  </a>{" "}
+                  </SalesEmailLink>{" "}
                   with the plan you want and we will reply with the next steps. NEXORA is in early access and currently
                   runs on sample data.
                 </>
@@ -309,7 +316,7 @@ export default function LandingPage() {
             <p className="mx-auto mt-3 max-w-xl text-slate-300">
               Open the live demo — no account needed — and install it on your phone in one tap.
             </p>
-            <Link href={APP_HOME} className="btn btn-primary mt-7 px-5 py-3 text-sm">
+            <Link href={DEMO_HOME} className="btn btn-primary mt-7 px-5 py-3 text-sm">
               Open the live demo <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>

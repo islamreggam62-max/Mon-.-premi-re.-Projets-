@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n/core";
 import { Eye, FlaskConical, OctagonAlert, ShieldCheck, type LucideIcon } from "lucide-react";
 import {
   APPROVAL_STATUS_LABEL,
@@ -62,7 +63,7 @@ export function DemoBadge({ label = "Static demo preview" }: { label?: string })
   return (
     <Badge tone="violet">
       <FlaskConical className="h-3 w-3" aria-hidden="true" />
-      {label}
+      {t(label)}
     </Badge>
   );
 }

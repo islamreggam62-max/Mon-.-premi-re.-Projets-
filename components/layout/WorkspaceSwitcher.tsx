@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n/core";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Popover } from "@/components/ui/Popover";
 import type { Workspace } from "@/lib/types";
@@ -27,11 +28,11 @@ export function WorkspaceSwitcher({
   return (
     <Popover
       align="left"
-      panelLabel="Workspaces"
+      panelLabel={t("Workspaces")}
       panelClassName="w-72"
-      triggerLabel={collapsed ? `Workspace: ${current.name} (${current.plan})` : undefined}
+      triggerLabel={collapsed ? `${t("Workspace:")} ${current.name} (${current.plan})` : undefined}
       triggerClassName={cn(
-        "block w-full border border-hairline bg-white/[0.03] text-left hover:border-white/20 hover:bg-white/[0.05]",
+        "block w-full border border-hairline bg-white/[0.03] text-start hover:border-white/20 hover:bg-white/[0.05]",
         collapsed && "p-0",
       )}
       trigger={() =>
@@ -45,7 +46,7 @@ export function WorkspaceSwitcher({
               {initials(current.name)}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="sr-only">Workspace: </span>
+              <span className="sr-only">{t("Workspace:")} </span>
               <span className="block truncate text-sm font-semibold text-slate-50">{current.name}</span>
               <span className="mt-0.5 inline-flex items-center rounded-md bg-violet/15 px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-violet-200 ring-1 ring-inset ring-violet/30">
                 {current.plan}
@@ -57,7 +58,7 @@ export function WorkspaceSwitcher({
       }
     >
       <div className="border-b border-hairline px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Workspaces</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">{t("Workspaces")}</p>
       </div>
       <ul className="p-2">
         {workspaces.map((ws) => (
@@ -76,9 +77,9 @@ export function WorkspaceSwitcher({
                 </p>
               </div>
               {ws.current ? (
-                <Check className="h-4 w-4 text-violet-300" aria-label="Current workspace" />
+                <Check className="h-4 w-4 text-violet-300" aria-label={t("Current workspace")} />
               ) : (
-                <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">Phase 2</span>
+                <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{t("Phase 2")}</span>
               )}
             </div>
           </li>

@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n/core";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +31,10 @@ export function MiniStat({
     <div className="glass p-4">
       <p className="flex items-center gap-1.5 text-xs text-slate-300">
         {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
-        {label}
+        {t(label)}
       </p>
       <p className={cn("mt-1 text-xl font-semibold tabular-nums", VALUE_TONE[tone])}>{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-slate-400">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-slate-400">{t(hint)}</p>}
       {children}
     </div>
   );

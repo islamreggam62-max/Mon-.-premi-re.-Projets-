@@ -13,6 +13,9 @@ const TRAILING_SLASH = process.env.NEXT_PUBLIC_TRAILING_SLASH === "1";
  */
 export const APP_HOME = "/dashboard";
 
+/** The website's demo links: open the sample company when the device has no NEXORA data yet. */
+export const DEMO_HOME = `${APP_HOME}?demo=1`;
+
 /** A file URL under the base path, e.g. withBase("/icons/icon-192.png"). */
 export function withBase(path: string): string {
   return `${BASE_PATH}${path}`;
