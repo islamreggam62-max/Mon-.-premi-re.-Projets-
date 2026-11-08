@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CircleHelp,
   BadgeCheck,
   ClipboardList,
   FlaskConical,
@@ -167,6 +168,7 @@ export function Sidebar({
             );
           })}
         </ul>
+        <HelpLink pathname={pathname} collapsed={collapsed} onClose={onClose} />
       </nav>
 
       <div className="shrink-0 space-y-2 border-t border-hairline p-3">
@@ -230,5 +232,26 @@ function DataModeNote() {
         </Link>
       </p>
     </div>
+  );
+}
+
+/** The user guide, under the modules. */
+function HelpLink({ pathname, collapsed, onClose }: { pathname: string; collapsed: boolean; onClose?: () => void }) {
+  const active = isActivePath(pathname, "/help");
+  return (
+    <Link
+      href="/help"
+      onClick={onClose}
+      aria-current={active ? "page" : undefined}
+      title={collapsed ? "How NEXORA works" : undefined}
+      className={cn(
+        "focus-ring mt-4 flex items-center gap-3 rounded-xl border-t border-hairline py-2.5 pt-3 text-sm transition-colors",
+        collapsed ? "justify-center px-0" : "px-3",
+        active ? "text-slate-50" : "text-slate-300 hover:bg-white/5 hover:text-slate-100",
+      )}
+    >
+      <CircleHelp className={cn("h-[18px] w-[18px] shrink-0", active ? "text-violet-300" : "text-slate-400")} aria-hidden="true" />
+      {collapsed ? <span className="sr-only">How NEXORA works</span> : <span className="flex-1 truncate font-medium">How NEXORA works</span>}
+    </Link>
   );
 }

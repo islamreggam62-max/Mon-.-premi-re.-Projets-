@@ -21,7 +21,7 @@ const CACHE = `nexora-${VERSION}`;
 const page = (path) => (path === "/" ? `${BASE}/` : `${BASE}${path}${TRAILING_SLASH ? "/" : ""}`);
 const OFFLINE = page("/offline");
 // "/" is the public landing page; "/dashboard" and the modules are the product.
-const PAGES = ["/", "/dashboard", "/team", "/projects", "/tasks", "/daily-reports", "/approvals", "/ai-intelligence", "/settings", "/offline"].map(page);
+const PAGES = ["/", "/dashboard", "/team", "/projects", "/tasks", "/daily-reports", "/approvals", "/ai-intelligence", "/settings", "/help", "/offline"].map(page);
 const STATIC = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", "/icons/icon.svg"].map(
   (p) => `${BASE}${p}`,
 );

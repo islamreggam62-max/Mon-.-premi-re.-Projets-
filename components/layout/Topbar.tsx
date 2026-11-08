@@ -44,7 +44,7 @@ export function Topbar({
 }) {
   const pathname = usePathname();
   const page = findNavItem(pathname) ?? {
-    label: normalizePath(pathname) === "/offline" ? "Offline" : "Page not found",
+    label: normalizePath(pathname) === "/offline" ? "Offline" : normalizePath(pathname) === "/help" ? "How NEXORA works" : "Page not found",
     description: "",
   };
   const workspace = workspaces.find((w) => w.current) ?? workspaces[0];

@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ArrowLeft, TriangleAlert } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LogoMark } from "@/components/layout/Sidebar";
+import { APP_HOME } from "@/lib/basePath";
+import { normalizePath } from "@/lib/nav";
 import { currentUser, notificationsFor, openApprovalCount, workspacesFor } from "@/lib/store/derived";
 import { useStore } from "@/lib/store/StoreProvider";
 import { setDisplayCurrency } from "@/lib/utils";
@@ -18,6 +22,7 @@ import { Welcome } from "./Welcome";
  */
 export function ConnectedShell({ children }: { children: React.ReactNode }) {
   const { status, data, actions, saveFailed } = useStore();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (status !== "empty") return;
@@ -26,6 +31,8 @@ export function ConnectedShell({ children }: { children: React.ReactNode }) {
 
   if (status === "loading") return <Loading />;
   if (status === "unreadable") return <Unreadable />;
+  // The guide is readable before any company exists (linked from the welcome screen).
+  if ((status === "empty" || !data) && normalizePath(pathname) === "/help") return <StandaloneGuide>{children}</StandaloneGuide>;
   if (status === "empty" || !data) return <Welcome />;
 
   setDisplayCurrency(data.mode === "sample" ? "USD" : data.company.currency);
@@ -44,6 +51,18 @@ export function ConnectedShell({ children }: { children: React.ReactNode }) {
       )}
       {children}
     </AppShell>
+  );
+}
+
+function StandaloneGuide({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
+      <Link href={APP_HOME} className="focus-ring mb-6 inline-flex items-center gap-2 rounded text-sm font-semibold text-violet-300 hover:text-violet-200">
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Back to the start screen
+      </Link>
+      <main id="main">{children}</main>
+    </div>
   );
 }
 

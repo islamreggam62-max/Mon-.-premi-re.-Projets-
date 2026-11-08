@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, FlaskConical, History, ShieldCheck, Smartphone } from "lucide-react";
+import Link from "next/link";
+import { Building2, CircleHelp, FlaskConical, History, ShieldCheck, Smartphone } from "lucide-react";
 import { LogoMark } from "@/components/layout/Sidebar";
 import { FormActions, FormGrid, SelectField, TextField } from "@/components/ui/Form";
 import type { Department } from "@/lib/types";
@@ -61,14 +62,23 @@ export function Welcome() {
               </span>
             </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setStep("restore")}
-            className="focus-ring mt-4 inline-flex items-center gap-2 self-start rounded text-sm font-semibold text-violet-300 hover:text-violet-200"
-          >
-            <History className="h-4 w-4" aria-hidden="true" />
-            Restore from a backup
-          </button>
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+            <button
+              type="button"
+              onClick={() => setStep("restore")}
+              className="focus-ring inline-flex items-center gap-2 rounded text-sm font-semibold text-violet-300 hover:text-violet-200"
+            >
+              <History className="h-4 w-4" aria-hidden="true" />
+              Restore from a backup
+            </button>
+            <Link
+              href="/help"
+              className="focus-ring inline-flex items-center gap-2 rounded text-sm font-semibold text-violet-300 hover:text-violet-200"
+            >
+              <CircleHelp className="h-4 w-4" aria-hidden="true" />
+              How NEXORA works
+            </Link>
+          </div>
         </>
       )}
       {step === "setup" && <CompanySetupForm onCancel={() => setStep("choose")} />}

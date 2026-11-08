@@ -70,6 +70,7 @@ export const PUBLIC_PAGES = [
   "/approvals",
   "/ai-intelligence",
   "/settings",
+  "/help",
   "/privacy",
   "/terms",
 ] as const;

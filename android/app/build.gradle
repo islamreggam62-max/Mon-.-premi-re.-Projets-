@@ -16,10 +16,26 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Google Play upload key. CI passes it from repository secrets (see
+    // .github/workflows/android.yml); without them the release bundle is unsigned.
+    def uploadKeystore = System.getenv("NEXORA_UPLOAD_KEYSTORE")
+    signingConfigs {
+        if (uploadKeystore) {
+            upload {
+                storeFile file(uploadKeystore)
+                storePassword System.getenv("NEXORA_UPLOAD_STORE_PASSWORD")
+                keyAlias System.getenv("NEXORA_UPLOAD_KEY_ALIAS")
+                keyPassword System.getenv("NEXORA_UPLOAD_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (uploadKeystore) {
+                signingConfig signingConfigs.upload
+            }
         }
     }
 }
