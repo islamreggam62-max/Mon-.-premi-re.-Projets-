@@ -59,9 +59,18 @@ jobs:
           done
           exit 1
 
+      # Dependencies come from Maven hosts that sometimes redirect to github.com
+      # release downloads, which can time out. Downloads already finished stay in
+      # ~/.gradle, so a retry only fetches what is missing.
       - name: Build the debug APK and the release bundle
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug bundleRelease
+        run: |
+          for attempt in 1 2 3; do
+            ./gradlew --no-daemon assembleDebug bundleRelease && exit 0
+            echo "Build failed (attempt $attempt of 3)"
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 60)); fi
+          done
+          exit 1
 
       - uses: actions/upload-artifact@v4
         with:
