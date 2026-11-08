@@ -1,5 +1,12 @@
 {
   "root": true,
   "extends": "next/core-web-vitals",
-  "ignorePatterns": ["orchestrator/", "tests/", ".next/", "node_modules/"]
+  "ignorePatterns": [
+    "orchestrator/",
+    "tests/",
+    ".next/",
+    "node_modules/",
+    "out/",
+    "android/"
+  ]
 }

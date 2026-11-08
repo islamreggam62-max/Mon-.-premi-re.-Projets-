@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
+import { NativeRouteGuard } from "@/components/native/NativeAppSetup";
 import { APP_HOME } from "@/lib/basePath";
 import { CURRENCY, PLANS, PLAN_FEATURES } from "@/lib/data/pricing";
 import { SalesEmailLink } from "@/components/marketing/SalesEmailLink";
@@ -103,6 +104,7 @@ export default function LandingPage() {
         // JSON.stringify output with "<" escaped cannot close the script tag.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      <NativeRouteGuard />
       <LandingHeader onLanding />
 
       <main>

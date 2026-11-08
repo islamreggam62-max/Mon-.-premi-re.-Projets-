@@ -1,0 +1,60 @@
+# Builds the NEXORA Android app (Capacitor) to prove the native project
+# compiles, and keeps the result for testing on a phone:
+# - app-debug.apk: install it directly on an Android phone;
+# - app-release.aab: the Google Play bundle, unsigned (sign it with your upload
+#   key before sending it to the Play Console).
+name: Android build
+
+on:
+  pull_request:
+    paths-ignore: ["supabase/**", "docs/**", "orchestrator/**", "**/*.md"]
+  push:
+    branches: ["main", "claude/orchestrater-cyber-offensive-4do8x6"]
+    paths-ignore: ["supabase/**", "docs/**", "orchestrator/**", "**/*.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the web app (static export in out/)
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Copy it into the Android project
+        run: npx cap sync android
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Build the debug APK and the release bundle
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug bundleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nexora-android
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14

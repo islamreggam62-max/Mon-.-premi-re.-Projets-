@@ -46,15 +46,18 @@ export default function PrivacyPage() {
             subject of an email you choose to send us. It is never sent anywhere on its own.
           </li>
           <li>
-            Copies of the site&apos;s pages and files, stored by your browser (a service worker) so NEXORA opens faster
-            and works offline. This cache contains no personal data.
+            On the website, copies of the site&apos;s pages and files, stored by your browser (a service worker) so
+            NEXORA opens faster and works offline. This cache contains no personal data.
           </li>
           <li>
             Actions in the demo, such as approving a request, change only what you see in that browser tab and reset
             when you reload. Nothing is sent or stored.
           </li>
         </ul>
-        <p>To remove all of it, uninstall the app or clear this site&apos;s data in your browser settings.</p>
+        <p>
+          To remove all of it, uninstall the app or clear this site&apos;s data in your browser settings (in the Android
+          app: Settings, Apps, NEXORA, Storage, Clear storage).
+        </p>
       </LegalSection>
 
       <LegalSection title="3. Sample data">
@@ -79,7 +82,15 @@ export default function PrivacyPage() {
         )}
       </LegalSection>
 
-      <LegalSection title="5. Changes">
+      <LegalSection title="5. The Android app">
+        <p>
+          The NEXORA Android app contains these same pages and files and opens them from your device. It has no
+          account, no analytics, and no advertising, and it sends nothing on its own. Links to our website, and the
+          email you may choose to send us, open in your browser or email app.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="6. Changes">
         <p>
           Accounts, payments, and your own company data will arrive in a later release. This policy will be updated
           before NEXORA collects any personal data, and the date above will change.
@@ -87,7 +98,7 @@ export default function PrivacyPage() {
       </LegalSection>
 
       {CONTACT_EMAIL && (
-        <LegalSection title="6. Contact">
+        <LegalSection title="7. Contact">
           <p>
             Questions about this policy: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
           </p>

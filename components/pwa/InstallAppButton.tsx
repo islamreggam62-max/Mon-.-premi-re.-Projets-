@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Download, Share, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isNativeApp } from "@/lib/native";
 
 /** Chromium's install prompt event (not yet in TypeScript's DOM lib). */
 interface BeforeInstallPromptEvent extends Event {
@@ -15,7 +16,8 @@ type Mode = "hidden" | "prompt" | "ios";
 /**
  * "Install app" control. Chromium browsers (Chrome, Edge, Android) get the native
  * install prompt; iPhone/iPad Safari gets Add-to-Home-Screen instructions, since
- * iOS has no install API. Hidden when already running as an installed app.
+ * iOS has no install API. Hidden when already running as an installed app or
+ * inside the Android app.
  */
 export function InstallAppButton({ collapsed = false }: { collapsed?: boolean }) {
   const [mode, setMode] = useState<Mode>("hidden");
@@ -26,7 +28,7 @@ export function InstallAppButton({ collapsed = false }: { collapsed?: boolean })
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    if (standalone) return;
+    if (standalone || isNativeApp()) return;
 
     const ua = navigator.userAgent;
     const isIos = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);

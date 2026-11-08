@@ -18,7 +18,7 @@ export function absoluteUrl(path: string): string {
 }
 
 /** Date shown on the privacy policy and terms (ISO). Change it with their text. */
-export const LEGAL_UPDATED = "2026-11-03";
+export const LEGAL_UPDATED = "2026-11-08";
 
 /**
  * Public sales and contact address. Empty until the owner chooses one: while
