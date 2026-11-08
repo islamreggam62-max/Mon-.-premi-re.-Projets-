@@ -21,3 +21,9 @@ npm-debug.log*
 # Local environment files — never commit secrets or API keys
 .env
 .env*.local
+
+# LinkedIn working files: the repository is public. Voice samples, career
+# stories, analytics exports and the post log stay local unless the owner
+# asks to commit them (git add -f).
+/marketing/linkedin/private/*
+!/marketing/linkedin/private/README.md
