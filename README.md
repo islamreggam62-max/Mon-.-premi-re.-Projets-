@@ -127,16 +127,16 @@ contrats d'application (NAFTAL Branche Carburants, Dépt Contrats et Conseils) :
 
 | Rôle | Fichier | Champ |
 |------|---------|-------|
-| Directeur | `.claude/skills/juriste-contrats/SKILL.md` | Qualifie la demande, répartit, relit en contradicteur, livre |
+| Directeur | `.claude/skills/equipe-contrats/SKILL.md` | Qualifie la demande, répartit, relit en contradicteur, livre |
 | 1. Qualification et forme | `.claude/agents/jur-qualification-forme.md` | Parties, pouvoirs, numérotation, renvois, chiffres/lettres |
 | 2. Droit et sources | `.claude/agents/jur-droit-sources.md` | Droit applicable, vérification JORADP |
 | 3. Revue des clauses | `.claude/agents/jur-revue-clauses.md` | Risques clause par clause, rédaction proposée, comparaison |
 | 4. Finances et calculs | `.claude/agents/jur-finances-calculs.md` | Exposition financière, pénalités, garanties, délais |
 | 5. Rédaction | `.claude/agents/jur-redaction.md` | Corrections Word suivies, avenants, lettres |
 
-Utilisation : `/juriste-contrats examen avant visa du contrat joint`.
+Utilisation : `/equipe-contrats examen avant visa du contrat joint`.
 Corrections Word en suivi des modifications :
-`python3 .claude/skills/juriste-contrats/scripts/revision.py original.docx corrections.json sortie.docx`.
+`python3 .claude/skills/equipe-contrats/scripts/revision.py original.docx corrections.json sortie.docx`.
 Les pièces et livrables vont dans `dossiers-juridiques/`, ignoré par git : ce dépôt est public.
 
 <div dir="rtl">

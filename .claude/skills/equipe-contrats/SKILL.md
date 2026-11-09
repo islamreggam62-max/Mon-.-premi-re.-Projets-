@@ -1,5 +1,5 @@
 ---
-name: juriste-contrats
+name: equipe-contrats
 description: >-
   Directeur de l'équipe de cinq juristes contrats (NAFTAL Branche Carburants,
   Direction Juridique, Dépt Contrats et Conseils). À utiliser pour toute revue,

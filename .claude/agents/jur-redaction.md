@@ -43,11 +43,11 @@ et arrête-toi là pour la lettre — aucun modèle de remplacement.
 
 - Pièce en PDF ou en photo seulement : le dire — le suivi des modifications exige un Word.
   À défaut du Word, retranscrire en .docx et le signaler comme retranscription.
-- Outil : `.claude/skills/juriste-contrats/scripts/revision.py` (insertions et suppressions
+- Outil : `.claude/skills/equipe-contrats/scripts/revision.py` (insertions et suppressions
   Word réelles, au mot près, mise en forme conservée, révisions existantes intactes) :
 
   ```bash
-  python3 .claude/skills/juriste-contrats/scripts/revision.py \
+  python3 .claude/skills/equipe-contrats/scripts/revision.py \
     "original.docx" corrections.json "dossiers-juridiques/<affaire>/<nom>_corrigé_DJ.docx" \
     --auteur "Direction Juridique"
   ```
