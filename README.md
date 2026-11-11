@@ -122,7 +122,7 @@ python -m pytest -q
 
 ## Équipe de juristes contrats (Claude Code)
 
-Un directeur et cinq juristes sous-agents pour les contrats, avenants, conventions et
+Un directeur et six juristes sous-agents pour les contrats, avenants, conventions et
 contrats d'application (NAFTAL Branche Carburants, Dépt Contrats et Conseils) :
 
 | Rôle | Fichier | Champ |
@@ -133,8 +133,15 @@ contrats d'application (NAFTAL Branche Carburants, Dépt Contrats et Conseils) :
 | 3. Revue des clauses | `.claude/agents/jur-revue-clauses.md` | Risques clause par clause, rédaction proposée, comparaison |
 | 4. Finances et calculs | `.claude/agents/jur-finances-calculs.md` | Exposition financière, pénalités, garanties, délais |
 | 5. Rédaction | `.claude/agents/jur-redaction.md` | Corrections Word suivies, avenants, lettres |
+| 6. Procédure, garanties, fiche de suivi | `.claude/agents/jur-procedure-garanties.md` | Pièces du dossier, procédure interne (sur pièce), cautions et échéances, avenants, échéancier |
 
-Utilisation : `/equipe-contrats examen avant visa du contrat joint`.
+Les rôles sont aussi décrits dans `.claude/skills/equipe-contrats/juristes/`, et les repères de
+pratique (familles de contrats NAFTAL, grille de relecture, cadre juridique, tous « à vérifier »)
+dans `.claude/skills/equipe-contrats/references/`. Le même dossier, compressé, s'importe tel quel
+comme skill dans claude.ai.
+
+Utilisation : `/equipe-contrats examen avant visa du contrat joint` ou
+`/equipe-contrats audit du dossier joint`.
 Corrections Word en suivi des modifications :
 `python3 .claude/skills/equipe-contrats/scripts/revision.py original.docx corrections.json sortie.docx`.
 Les pièces et livrables vont dans `dossiers-juridiques/`, ignoré par git : ce dépôt est public.

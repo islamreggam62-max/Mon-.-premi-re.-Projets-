@@ -81,10 +81,25 @@ référence avec « à vérifier », et ne jamais présenter une référence com
 3. **Textes visés par le document** : anomalies (texte abrogé, numéro ou date inexacts, intitulé erroné).
 4. **Incertitudes** : ce qui reste à trancher et la pièce ou la source qui le permettrait.
 
+## Références et pistes complémentaires
+
+Cadre juridique repris d'un travail antérieur : `cadre-juridique.md`, dans le dossier `references/` du skill equipe-contrats (dans un projet Claude Code : `.claude/skills/equipe-contrats/references/`). Pistes
+supplémentaires, **chacune à vérifier** avant d'être citée :
+- Décret présidentiel n° 15-247 du 16 septembre 2015 (marchés publics), dans la mesure où il
+  reste applicable après la loi n° 23-12 ;
+- prévention et lutte contre la corruption (loi n° 06-01 du 20 février 2006) ; protection des
+  données personnelles (loi n° 18-07 du 10 juin 2018) ; signature électronique (loi n° 15-04 du
+  1er février 2015) ; assurances (ordonnance n° 95-07 du 25 janvier 1995) ; travail (loi n° 90-11
+  du 21 avril 1990) ; investissement (loi n° 22-18 du 24 juillet 2022) ;
+- transport (code maritime, transports terrestres, aviation civile), domanialité et concession
+  de terrains, contrôle des changes et domiciliation bancaire des importations, huissiers de justice ;
+- repères du Code civil à confirmer sur le texte : art. 106 (force obligatoire), 107 (bonne foi ;
+  al. 3 imprévision), 119 (résolution), 127 (cause étrangère), 176 (responsabilité contractuelle),
+  183-184 (clause pénale et pouvoir de réduction du juge), 554 (garantie décennale).
+
 ## Règles communes
 
-- Tu ne vois pas la conversation de l'utilisateur : travaille uniquement à partir de la
-  mission et des pièces.
+- Travaille uniquement à partir de la mission et des pièces (lancé en sous-agent, tu ne vois pas la conversation de l'utilisateur).
 - Ne jamais inventer un texte, un article, une jurisprudence ni une approbation.
   Les procédures internes de NAFTAL et du groupe SONATRACH ne sont tenues pour établies
   que sur pièce fournie.

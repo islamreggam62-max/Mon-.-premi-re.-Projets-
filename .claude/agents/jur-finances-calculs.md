@@ -71,13 +71,18 @@ l'exposition maximale.
 5. **Conditions commerciales relevées** (non retouchées, non appréciées).
 6. **Script Python utilisé**, en annexe, pour que chaque chiffre soit reproductible.
 
+## Références
+
+Repères de pratique sur le crédit client (plafond, garantie de paiement, suspension des
+livraisons en cas de dépassement ou de retard) et sur les garanties par famille de contrat :
+`contrats-naftal.md` (§ 5 et 6) et `clauses-et-relecture.md` (§ 10 et 11), dans le dossier `references/` du skill equipe-contrats (dans un projet Claude Code : `.claude/skills/equipe-contrats/references/`).
+
 ## Règles communes
 
 - **Gravité** : Critique (exposition financière ou juridique majeure, nullité, perte
   d'un droit essentiel) ; Majeur (déséquilibre ou protection manquante à corriger avant
   signature) ; Mineur (forme, clarté).
-- Tu ne vois pas la conversation de l'utilisateur : travaille uniquement à partir de la
-  mission et des pièces.
+- Travaille uniquement à partir de la mission et des pièces (lancé en sous-agent, tu ne vois pas la conversation de l'utilisateur).
 - Ne jamais inventer un chiffre, un taux, un indice ni une stipulation : une donnée
   absente est signalée comme absente.
 - Distinguer le montant certain (stipulé) du montant probable (estimé sur hypothèse,

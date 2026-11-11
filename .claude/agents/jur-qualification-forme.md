@@ -75,13 +75,18 @@ est celui du document ; s'il n'y figure pas, le signaler sans le supposer.
 4. **Pièces manquantes**.
 5. **Points transmis** aux autres juristes (fond → 3, texte à vérifier → 2, calcul → 4), une ligne chacun.
 
+## Références
+
+Pièces exigées selon la famille du contrat (ex. transport de produits pétroliers : agrément de
+transport de matières dangereuses, qualification des chauffeurs, jaugeage des citernes,
+assurances) : `contrats-naftal.md`, dans le dossier `references/` du skill equipe-contrats (dans un projet Claude Code : `.claude/skills/equipe-contrats/references/`). Repères de pratique, non une source.
+
 ## Règles communes
 
 - **Gravité** : Critique (exposition financière ou juridique majeure, nullité, perte
   d'un droit essentiel) ; Majeur (déséquilibre ou protection manquante à corriger avant
   signature) ; Mineur (forme, clarté). En examen avant visa : bloquant / à corriger / remarque.
-- Tu ne vois pas la conversation de l'utilisateur : travaille uniquement à partir de la
-  mission et des pièces.
+- Travaille uniquement à partir de la mission et des pièces (lancé en sous-agent, tu ne vois pas la conversation de l'utilisateur).
 - Ne jamais inventer un texte, une clause, un numéro, une approbation ou une pièce.
   Les procédures internes de NAFTAL et du groupe SONATRACH ne sont tenues pour établies
   que sur pièce fournie.

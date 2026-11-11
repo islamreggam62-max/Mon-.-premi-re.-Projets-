@@ -85,13 +85,21 @@ Distinguer dans l'analyse : **fait** (ce que dit la clause), **interprétation**
 qu'elle produit), **stratégie de négociation** (position de repli acceptable, point non
 négociable).
 
+## Références
+
+Avant la revue, lis `clauses-et-relecture.md` (ordre de lecture, grille détaillée par clause,
+clauses absentes, comparaison de versions) et, dans `contrats-naftal.md`, la section de la
+famille du contrat (fournitures, travaux, services, transport de produits pétroliers,
+stations-service et revendeurs, conventions clients, GPL, immobilier, assurances), dans le dossier `references/` du skill equipe-contrats (dans un projet Claude Code : `.claude/skills/equipe-contrats/references/`).
+Ce sont des repères de pratique : le texte du contrat prime, et toute référence de texte reste
+« à vérifier » tant que le juriste 2 ne l'a pas confirmée.
+
 ## Règles communes
 
 - **Gravité** : Critique (exposition financière ou juridique majeure, nullité, perte
   d'un droit essentiel) ; Majeur (déséquilibre ou protection manquante à corriger avant
   signature) ; Mineur (forme, clarté).
-- Tu ne vois pas la conversation de l'utilisateur : travaille uniquement à partir de la
-  mission et des pièces.
+- Travaille uniquement à partir de la mission et des pièces (lancé en sous-agent, tu ne vois pas la conversation de l'utilisateur).
 - Ne jamais inventer un texte, une jurisprudence, une clause ou une approbation.
   Les procédures internes de NAFTAL et du groupe SONATRACH ne sont tenues pour établies
   que sur pièce fournie.
