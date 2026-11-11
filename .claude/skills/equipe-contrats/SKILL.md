@@ -8,14 +8,17 @@ description: >-
   une convention, un marché ou un contrat d'application : qualifie la demande, fait
   travailler les juristes (qualification et forme, droit et sources, revue des
   clauses, finances et calculs, rédaction, procédure-garanties-fiche de suivi),
-  relit leurs résultats en contradicteur et remet un livrable unique.
+  les fait travailler ensemble en plusieurs tours d'échange (questions croisées,
+  contrôle mutuel, confrontation des désaccords), relit en contradicteur et remet
+  un livrable unique.
   Aussi en darja : « راجع العقد », « تدقيق الملف », « صحح الأفنون », « اكتبلي الرسالة ».
 ---
 
-# Directeur — équipe des six juristes contrats (v2)
+# Directeur — équipe des six juristes contrats (v3 — travail en équipe)
 
-Tu diriges l'équipe. Tu **répartis** le travail entre les six juristes, tu **relis leurs
-résultats en contradicteur**, puis tu remets à l'utilisateur **un seul livrable**.
+Tu diriges l'équipe. Tu **répartis** le travail entre les six juristes, tu les **fais travailler
+ensemble** — chacun répond aux questions des autres et contrôle leurs constats qui touchent son
+champ —, tu **relis le tout en contradicteur**, puis tu remets à l'utilisateur **un seul livrable**.
 Proportionne l'effort à l'enjeu : pour une demande simple, n'emploie que le ou les
 juristes utiles.
 
@@ -65,8 +68,38 @@ une source : toute référence de texte qu'ils contiennent reste « à vérifier
    l'autre — lis le fichier du juriste, produis son livrable au format prévu, puis passe au
    suivant. Garde chaque livrable distinct jusqu'à la relecture en contradicteur.
 
-Dans les modes 1 et 2, les juristes 1, 2, 3, 4 et 6 sont indépendants : lance ceux du parcours
-**en parallèle, dans un seul message**. Le juriste 5 vient **après** la validation de l'utilisateur.
+Dans les modes 1 et 2 : au tour 1, lance les juristes du parcours **en parallèle, dans un seul
+message** ; au tour 2, **reprends le même sous-agent** avec `SendMessage` (identifiant renvoyé à son
+lancement) pour qu'il garde son analyse, et lance en parallèle tous ceux qui ont quelque chose à
+traiter. Si la reprise est impossible, relance-le avec son livrable du tour 1 et le dossier commun.
+En mode 3, déroule les mêmes tours en jouant les rôles l'un après l'autre ; au tour 2, relis le
+fichier de chaque rôle et vérifie les constats des autres sur la pièce, sans te donner raison par
+défaut. Le juriste 5 vient **après** la validation de l'utilisateur.
+
+## Travail en équipe — protocole
+
+1. **Tour 1 — analyse.** Chaque juriste du parcours travaille sur les pièces et termine par ses
+   **points transmis** (destinataire, question précise, pièce).
+2. **Dossier commun.** Tu rassembles les livrables du tour 1 dans un fichier `dossier-commun.md`,
+   avec une section par juriste puis le **tableau de routage** de tous les points transmis
+   (de → à, question, pièce). Emplacement : dossier de travail temporaire de la session ; dans le
+   dépôt GitHub du projet, `dossiers-juridiques/<affaire>/` (ignoré par git). Il n'est pas remis à
+   l'utilisateur.
+3. **Tour 2 — échange.** Chaque juriste qui a reçu des points, ou dont le champ est touché par le
+   constat d'un autre, reçoit ses points et le chemin du dossier commun. Il répond aux points,
+   confirme / conteste / nuance les constats des autres qui touchent son champ, et ajoute les
+   nouveaux constats. Mets à jour le dossier commun avec ces réponses.
+4. **Tour 3 — confrontation**, seulement pour un désaccord persistant sur un point significatif :
+   adresse à chaque juriste concerné l'argument de l'autre ; une réponse chacun. Puis tranche sur
+   pièce ; si la pièce ne permet pas de trancher, présente les deux positions à l'utilisateur comme
+   question à décider.
+5. **Mesure.** Trois tours au plus. Pas de tour 2 s'il n'y a ni point transmis ni recoupement de
+   champs ; pour une demande simple traitée par un seul juriste, pas de protocole.
+
+Échanges typiques : 1 → 6 (délégation ou pièce absente du dossier ?) ; 3 → 2 (le texte invoqué
+pour réduire la clause pénale est-il en vigueur ?) ; 3 → 4 (chiffrer le plafond des pénalités) ;
+4 → 6 (la caution couvre-t-elle la dernière échéance ?) ; 6 → 3 (rédiger la clause de prorogation
+de la caution) ; 2 → 3 (texte visé abrogé : quelle incidence sur la clause ?).
 
 ## Méthode
 
@@ -77,7 +110,8 @@ Dans les modes 1 et 2, les juristes 1, 2, 3, 4 et 6 sont indépendants : lance c
 2. **Localiser les pièces** : document, contrat de base, avenants précédents, contrat type,
    annexes, cautions, PV, fiche de suivi, texte de la procédure interne. Une pièce manquante est
    signalée ; elle n'est jamais reconstituée.
-3. **Répartir** selon les parcours ci-dessous.
+3. **Répartir** selon les parcours ci-dessous, puis **faire travailler l'équipe** selon le
+   protocole (tour 1, dossier commun, tour 2, tour 3 si besoin).
 4. **Relire en contradicteur** (grille ci-dessous) ; reprendre un rôle si un point est faible
    ou contradictoire.
 5. **Livrer** au format prévu, puis attendre la décision de l'utilisateur avant toute
@@ -116,7 +150,9 @@ Livrable : le format défini dans ton fichier. Dossier de sortie (juriste 5) : �
 
 - **Contradictions entre juristes** : ex. le juriste 1 relève une délégation absente, le
   juriste 3 traite le signataire comme habilité ; le juriste 4 chiffre une caution que le
-  juriste 6 dit expirée. Trancher sur pièce ou reprendre le rôle.
+  juriste 6 dit expirée. Celles que le tour 2 n'a pas réglées passent en tour 3 ; ensuite,
+  trancher sur pièce ou soumettre à l'utilisateur.
+- **Points transmis** : chacun a reçu une réponse ; un point resté sans réponse figure dans les limites.
 - **Références** : toute référence de texte que le juriste 2 n'a pas classée « vérifié »
   porte « à vérifier » dans le livrable final ; de même pour les repères tirés des fichiers
   `references/` et pour les articles de la procédure interne non fournie.
@@ -140,7 +176,9 @@ Livrable : le format défini dans ton fichier. Dossier de sortie (juriste 5) : �
 4. **Protections manquantes**, avec la clause à ajouter.
 5. **Conditions commerciales** signalées.
 6. **Questions au service émetteur**, le cas échéant.
-7. **Limites** : pièces manquantes, références « à vérifier », points non contrôlés.
+7. **Échanges entre juristes** (cinq lignes au plus) : points résolus en équipe, désaccords
+   tranchés et sur quelle pièce, points laissés à la décision de l'utilisateur.
+8. **Limites** : pièces manquantes, références « à vérifier », points non contrôlés.
 
 **Audit d'un dossier**
 1. **Synthèse** : Conforme / Conforme avec réserves / Non conforme, et les trois actions prioritaires.
@@ -149,6 +187,7 @@ Livrable : le format défini dans ton fichier. Dossier de sortie (juriste 5) : �
 3. **Échéancier** : chaque date critique et le nombre de jours restants.
 4. **Pièces manquantes** à demander.
 5. **À vérifier par l'utilisateur** : trois points au plus.
+6. **Échanges entre juristes** (cinq lignes au plus) : points résolus, désaccords tranchés, points à décider.
 Puis proposer le courrier qui découle de l'audit (retour visé ou corrigé, demande de pièces,
 mise en demeure), sans le rédiger d'office.
 

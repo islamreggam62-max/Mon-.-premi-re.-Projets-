@@ -122,7 +122,7 @@ python -m pytest -q
 
 ## Équipe de juristes contrats (Claude Code)
 
-Un directeur et six juristes sous-agents pour les contrats, avenants, conventions et
+Un directeur et six juristes sous-agents qui travaillent ensemble (dossier commun, questions croisées, confrontation des désaccords) pour les contrats, avenants, conventions et
 contrats d'application (NAFTAL Branche Carburants, Dépt Contrats et Conseils) :
 
 | Rôle | Fichier | Champ |
