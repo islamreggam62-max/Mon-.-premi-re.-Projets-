@@ -22,7 +22,7 @@ and does not count toward the risk score.
 | Tenant isolation in the database (row-level security) | Built, 116 automated checks |
 | Contract records, PDF/DOCX upload, private file storage | Built |
 | Text extraction with page numbers (PDF exact, DOCX approximate) | Built, unit-tested |
-| AI analysis with evidence check (Claude API) | Built, logic unit-tested; **not yet run against the live API** |
+| AI analysis with evidence check (Claude API) | Built; pipeline tested end to end with a scripted model; **not yet run against the live API** |
 | Risks and obligations: triage, manual entries, assignees | Built |
 | Deterministic risk score per contract | Built (in the database) |
 | Deadlines: expiry, notice window, dated obligations | Built |
@@ -63,7 +63,7 @@ Requirements: Node 20.19+ (22 recommended), a Supabase project, a Claude API key
 ```bash
 npm run typecheck      # TypeScript
 npm run lint           # ESLint
-npm test               # unit tests: extraction, evidence check, payload, formatting
+npm test               # unit tests: extraction, evidence check, payload, pipeline, formatting
 npm run test:db        # runs the real migrations on a throwaway local Postgres and
                        # tries to break tenant isolation and the workflow rules
 npm run build
