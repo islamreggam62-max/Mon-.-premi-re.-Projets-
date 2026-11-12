@@ -1,0 +1,41 @@
+{
+  "name": "trust",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TRUST — enterprise contract risk & intelligence platform",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:db": "bash scripts/test-db.sh",
+    "test:smoke": "node tests/smoke/render-smoke.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.8.0",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.119.0",
+    "fflate": "0.8.3",
+    "next": "15.5.28",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1",
+    "unpdf": "2.1.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "autoprefixer": "10.4.21",
+    "eslint": "8.57.1",
+    "eslint-config-next": "15.5.28",
+    "pdf-lib": "1.17.1",
+    "postcss": "8.5.32",
+    "tailwindcss": "3.4.13",
+    "typescript": "5.6.3",
+    "vitest": "5.1.0"
+  }
+}
