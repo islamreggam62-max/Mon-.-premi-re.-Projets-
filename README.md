@@ -133,6 +133,9 @@ python -m pytest -q
 - البنية والأمان وخارطة الطريق: `trust/docs/`
 - فريق الوكلاء (20 وكيلاً + المنسّق): `.claude/agents/trust-*.md` و `.claude/skills/trust/SKILL.md`
   — الاستعمال في Claude Code: `/trust <المهمّة>`
+- مهارات العمل المتكرّر: `/trust-check` (كل الفحوصات)، `/trust-migration` (تعديل قاعدة البيانات)،
+  `/trust-security-review` (مراجعة أمنية)، `/trust-prompt-change` (تعديل برومبت التحليل)،
+  `/trust-release-gate` (تقرير نهاية المرحلة)
 
 </div>
 

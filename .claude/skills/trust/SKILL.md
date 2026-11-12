@@ -64,6 +64,16 @@ Read `trust/README.md`, `trust/docs/ARCHITECTURE.md`, `trust/docs/SECURITY.md` a
 6. **Report to the owner.** What was done, the evidence, what is not done, the
    open risks, and the decision you need.
 
+## Skills for recurring work
+
+| Skill | Use it for |
+|---|---|
+| `trust-check` | Running every automated check and reporting what they do and do not cover |
+| `trust-migration` | Any change to the database: test first, then migration, then a deliberate break |
+| `trust-security-review` | A defensive review with independent reviewers, ending in fixes with tests |
+| `trust-prompt-change` | Changing the analysis prompt or schema with before/after measurements |
+| `trust-release-gate` | The one-page report that ends a phase |
+
 ## Usual routes
 
 - **New feature:** product manager → architect (if structure changes) → database
