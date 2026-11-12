@@ -109,6 +109,19 @@ describe("DOCX extraction", () => {
     expect(() => extractDocx(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3]))).toThrowError(expect.objectContaining({ code: "corrupt_file" }));
   });
 
+  it("stays fast on a body made of unclosed tags (no quadratic scan)", () => {
+    const hostile = makeDocx("<w:t ".repeat(200_000)); // about 1 MB of XML
+    const started = performance.now();
+    expect(() => extractDocx(hostile)).toThrowError(expect.objectContaining({ code: "no_text_layer" }));
+    expect(performance.now() - started).toBeLessThan(2000);
+  });
+
+  it("reads only the entry named word/document.xml", () => {
+    const xml = strToU8("<w:document><w:body><w:p><w:r><w:t>a</w:t></w:r></w:p></w:body></w:document>");
+    const withOtherParts = zipSync({ "word/document.xml": xml, "word/footnotes.xml": strToU8("<w:t>ignored</w:t>"), "word/document.xml.bak": xml });
+    expect(extractDocx(withOtherParts).pages[0]!.text).toBe("a");
+  });
+
   it("refuses a document with no text", () => {
     expect(() => extractDocx(makeDocx("<w:p/>"))).toThrowError(expect.objectContaining({ code: "no_text_layer" }));
   });

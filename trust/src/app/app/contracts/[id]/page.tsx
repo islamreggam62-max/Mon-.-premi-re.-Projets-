@@ -6,7 +6,7 @@ import { AnalyzeButton } from "@/components/AnalyzeButton";
 import { ContractFields } from "@/components/ContractFields";
 import { Banner, Empty, EvidenceBlock, LEGAL_NOTICE, Pill, RiskLevelBadge, Section, SeverityBadge, StatusBadge, SubmitRow } from "@/components/ui";
 import {
-  addObligation, addRisk, applyExtractedTerms, decideReview, requestReview, setContractStatus,
+  addObligation, addRisk, applyExtractedTerms, cancelReview, decideReview, requestReview, setContractStatus,
   updateContract, updateObligation, updateRiskStatus, uploadDocument,
 } from "@/lib/actions";
 import { RISK_CATEGORIES, OBLIGATION_CATEGORIES } from "@/lib/ai/schema";
@@ -75,6 +75,12 @@ export default async function ContractPage({
   const canTriage = context.canManage || context.role === "reviewer";
   const today = todayIso();
   const path = `/app/contracts/${contract.id}`;
+  // Under review, approved or in force: the record, documents and (during review) findings are locked.
+  const locked = ["in_review", "approved", "active"].includes(contract.status);
+  const canEditRecord = context.canManage && !locked;
+  const lockedNote = contract.status === "in_review"
+    ? "Locked while the review is pending."
+    : "Locked because the contract is approved. Reopen it as a draft to change it; it will then need a new review.";
   const aiFindings = [...partyRows, ...factRows, ...riskRows.filter((risk) => risk.source === "ai" && risk.evidence_kind === "quote"), ...obligationRows.filter((obligation) => obligation.source === "ai")];
   const unverified = aiFindings.filter((finding) => !finding.evidence_verified).length;
   const hasVerifiedTerms = factRows.some((fact) => fact.evidence_verified && fact.field !== "other");
@@ -126,7 +132,8 @@ export default async function ContractPage({
             ))}
           </ul>
         )}
-        {context.canManage ? (
+        {context.canManage && locked ? <p className="mb-4 text-sm text-ink-muted">Documents: {lockedNote}</p> : null}
+        {canEditRecord ? (
           <form action={uploadDocument} className="mb-4 flex flex-wrap items-end gap-3">
             <input type="hidden" name="contract_id" value={contract.id} />
             <div className="min-w-[14rem] flex-1">
@@ -137,7 +144,7 @@ export default async function ContractPage({
           </form>
         ) : null}
 
-        {latestDocument && context.canManage ? (
+        {latestDocument && context.canManage && contract.status !== "in_review" ? (
           analysisConfigured() ? (
             <AnalyzeButton contractId={contract.id} documentId={latestDocument.id} running={running}
               label={lastCompleted ? "Analyse the latest document again" : "Analyse with AI"} />
@@ -317,7 +324,7 @@ export default async function ContractPage({
       </Section>
 
       <Section id="terms" title="Parties and key terms found in the document"
-        aside={context.canManage && hasVerifiedTerms ? (
+        aside={canEditRecord && hasVerifiedTerms ? (
           <form action={applyExtractedTerms}><input type="hidden" name="contract_id" value={contract.id} />
             <button type="submit" className="btn-secondary min-h-0 px-3 py-1">Copy verified terms to the record</button></form>
         ) : undefined}>
@@ -368,6 +375,13 @@ export default async function ContractPage({
                 </div>
               </form>
             ) : null}
+            {pendingReview.requested_by === context.user.id || context.canAdmin ? (
+              <form action={cancelReview} className="mt-3">
+                <input type="hidden" name="review_id" value={pendingReview.id} />
+                <input type="hidden" name="back" value={path} />
+                <button type="submit" className="btn-secondary">Withdraw the review request</button>
+              </form>
+            ) : null}
           </div>
         ) : null}
         {context.canManage && contract.status === "draft" ? (
@@ -396,7 +410,7 @@ export default async function ContractPage({
                 <button type="submit" name="status" value="terminated" className="btn-secondary">Mark as terminated</button>
               </>
             ) : null}
-            {["expired", "terminated"].includes(contract.status) ? <button type="submit" name="status" value="draft" className="btn-secondary">Reopen as draft</button> : null}
+            <button type="submit" name="status" value="draft" className="btn-secondary">Reopen as draft{["approved", "active"].includes(contract.status) ? " (removes the approval)" : ""}</button>
           </form>
         ) : null}
         {reviewRows.length === 0 ? <Empty>No review has been requested for this contract.</Empty> : (
@@ -415,8 +429,8 @@ export default async function ContractPage({
       <Section id="record" title="Contract record">
         <form action={updateContract}>
           <input type="hidden" name="contract_id" value={contract.id} />
-          <ContractFields contract={contract} members={members} disabled={!context.canManage} />
-          {context.canManage ? <SubmitRow label="Save record" /> : <p className="mt-3 text-xs text-ink-muted">Your role can read this record but not change it.</p>}
+          <ContractFields contract={contract} members={members} disabled={!canEditRecord} />
+          {canEditRecord ? <SubmitRow label="Save record" /> : <p className="mt-3 text-xs text-ink-muted">{context.canManage ? lockedNote : "Your role can read this record but not change it."}</p>}
         </form>
       </Section>
     </>

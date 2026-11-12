@@ -35,7 +35,7 @@ export const MIME_BY_KIND: Record<DocumentKind, string> = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
 
-const DOCX_MAX_XML_BYTES = 60 * 1024 * 1024;
+const DOCX_MAX_XML_BYTES = 20 * 1024 * 1024;
 const DOCX_SECTION_CHARS = 3000;
 /** Below this many characters per page on average, a PDF is treated as scanned. */
 const MIN_CHARS_PER_PAGE = 40;
@@ -97,9 +97,14 @@ export async function extractPdf(bytes: Uint8Array): Promise<ExtractedDocument> 
 export function extractDocx(bytes: Uint8Array): ExtractedDocument {
   let xml: string;
   try {
+    let bodies = 0;
     const files = unzipSync(bytes, {
       filter: (file) => {
         if (file.name !== "word/document.xml") return false;
+        // A real document has exactly one body. Several entries with that name would each
+        // be inflated, which is a way to make a small file expand without limit.
+        bodies += 1;
+        if (bodies > 1) throw new ExtractionError("corrupt_file", "The Word document could not be read. It may be damaged.");
         if (file.originalSize > DOCX_MAX_XML_BYTES) {
           throw new ExtractionError("too_large", "The document is too large to process.");
         }
@@ -137,7 +142,10 @@ function readDocxBody(xml: string): { chunks: string[]; sawPageBreak: boolean } 
   const chunks: string[] = [];
   let current = "";
   let sawPageBreak = false;
-  const token = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>|<w:(tab|cr|lastRenderedPageBreak)\b[^>]*\/>|<w:br\b([^>]*)\/>|<\/w:(p|tc)>/g;
+  // Every attribute run is [^<>]*, so a match attempt can never scan past the next "<".
+  // That keeps the work proportional to the size of the file whatever it contains;
+  // with [^>]* a body made of unclosed tags took time quadratic in its length.
+  const token = /<w:t(?:\s[^<>]*)?>([^<]*)<\/w:t>|<w:(tab|cr|lastRenderedPageBreak)\b[^<>]*\/>|<w:br\b([^<>]*)\/>|<\/w:(p|tc)>/g;
   let match: RegExpExecArray | null;
   while ((match = token.exec(xml)) !== null) {
     const [, text, simple, brAttributes, closing] = match;

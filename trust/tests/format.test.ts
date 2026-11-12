@@ -33,6 +33,10 @@ describe("safeNextPath", () => {
     expect(safeNextPath("https://evil.example")).toBe("/app");
     expect(safeNextPath("//evil.example")).toBe("/app");
     expect(safeNextPath("/\\evil.example")).toBe("/app");
+    expect(safeNextPath("/\t/evil.example")).toBe("/app");   // browsers drop the tab: "//evil.example"
+    expect(safeNextPath("/\r/evil.example")).toBe("/app");
+    expect(safeNextPath("/ /evil.example")).toBe("/app");
+    expect(safeNextPath("/app/contracts?error=x#risks")).toBe("/app/contracts?error=x#risks");
     expect(safeNextPath(undefined)).toBe("/app");
   });
 });

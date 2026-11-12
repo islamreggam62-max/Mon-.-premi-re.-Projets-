@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { AnalysisError, type AnalysisModel } from "@/lib/ai/model";
-import { runAnalysis } from "@/lib/ai/pipeline";
+import { runAnalysis, storagePathFor } from "@/lib/ai/pipeline";
 import type { AnalysisOutput } from "@/lib/ai/schema";
 
 /**
@@ -51,7 +51,9 @@ class Query implements PromiseLike<{ data: unknown; error: { message: string } |
   }
 }
 
-const ORG = "org-1";
+const ORG = "11111111-1111-4111-8111-111111111111";
+const CONTRACT = "22222222-2222-4222-8222-222222222222";
+const DOCUMENT = "33333333-3333-4333-8333-333333333333";
 
 async function makePdf(lines: string[]): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
@@ -64,12 +66,14 @@ async function makePdf(lines: string[]): Promise<Uint8Array> {
 async function setup(options: { file?: Uint8Array; recordedHash?: string; rpcError?: string } = {}) {
   const file = options.file ?? (await makePdf(["SUPPLY AGREEMENT between ACME Ltd and Globex SA.", "The Supplier's liability under this Agreement shall be unlimited."]));
   const tables: Record<string, Row[]> = {
-    analyses: [{ id: "an-1", org_id: ORG, contract_id: "c-1", document_id: "d-1", status: "queued" }],
-    documents: [{ id: "d-1", org_id: ORG, storage_path: `${ORG}/c-1/d-1.pdf`, filename: "supply.pdf", sha256: options.recordedHash ?? createHash("sha256").update(file).digest("hex") }],
-    contracts: [{ id: "c-1", our_party: "the Buyer" }],
+    analyses: [{ id: "an-1", org_id: ORG, contract_id: CONTRACT, document_id: DOCUMENT, status: "queued" }],
+    // storage_path is deliberately hostile: the pipeline must ignore it and build the path from the ids.
+    documents: [{ id: DOCUMENT, org_id: ORG, contract_id: CONTRACT, mime_type: "application/pdf", storage_path: "../../other-org/secret.pdf?x=1", filename: "supply.pdf", sha256: options.recordedHash ?? createHash("sha256").update(file).digest("hex") }],
+    contracts: [{ id: CONTRACT, our_party: "the Buyer" }],
     document_pages: [],
   };
   const rpcCalls: { name: string; args: { _analysis: string; _payload: Record<string, unknown> } }[] = [];
+  const downloads: string[] = [];
   const admin = {
     from: (table: string) => new Query(tables[table]!),
     rpc: async (name: string, args: { _analysis: string; _payload: Record<string, unknown> }) => {
@@ -78,9 +82,9 @@ async function setup(options: { file?: Uint8Array; recordedHash?: string; rpcErr
       Object.assign(tables.analyses![0]!, { status: "completed" });
       return { error: null };
     },
-    storage: { from: () => ({ download: async () => ({ data: new Blob([file as BlobPart]), error: null }) }) },
+    storage: { from: () => ({ download: async (path: string) => { downloads.push(path); return { data: new Blob([file as BlobPart]), error: null }; } }) },
   } as unknown as SupabaseClient;
-  return { admin, tables, rpcCalls, analysis: () => tables.analyses![0]! };
+  return { admin, tables, rpcCalls, downloads, analysis: () => tables.analyses![0]! };
 }
 
 const goodOutput: AnalysisOutput = {
@@ -113,7 +117,8 @@ describe("runAnalysis", () => {
 
     expect(seen).toEqual({ perspective: "the Buyer", pages: 1 });
     expect(context.tables.document_pages).toHaveLength(1);
-    expect(context.tables.document_pages![0]).toMatchObject({ document_id: "d-1", org_id: ORG, page_number: 1 });
+    expect(context.tables.document_pages![0]).toMatchObject({ document_id: DOCUMENT, org_id: ORG, page_number: 1 });
+    expect(context.downloads).toEqual([`${ORG}/${CONTRACT}/${DOCUMENT}.pdf`]);
     expect(context.tables.documents![0]!.page_count).toBe(1);
 
     expect(context.rpcCalls).toHaveLength(1);
@@ -171,9 +176,32 @@ describe("runAnalysis", () => {
 
   it("refuses a document of another organisation even if the job points at it", async () => {
     const context = await setup();
-    context.tables.documents![0]!.org_id = "org-2";
+    context.tables.documents![0]!.org_id = "99999999-9999-4999-8999-999999999999";
     await runAnalysis(context.admin, "an-1", model(goodOutput));
     expect(context.analysis()).toMatchObject({ status: "failed", error: "The document could not be found." });
     expect(context.rpcCalls).toHaveLength(0);
+    expect(context.downloads).toHaveLength(0);
+  });
+
+  it("refuses a document that belongs to another contract", async () => {
+    const context = await setup();
+    context.tables.documents![0]!.contract_id = "44444444-4444-4444-8444-444444444444";
+    await runAnalysis(context.admin, "an-1", model(goodOutput));
+    expect(context.analysis().status).toBe("failed");
+    expect(context.downloads).toHaveLength(0);
+  });
+});
+
+describe("storagePathFor", () => {
+  it("builds the path from the ids", () => {
+    expect(storagePathFor(ORG, CONTRACT, DOCUMENT, "application/pdf")).toBe(`${ORG}/${CONTRACT}/${DOCUMENT}.pdf`);
+    expect(storagePathFor(ORG, CONTRACT, DOCUMENT, "application/vnd.openxmlformats-officedocument.wordprocessingml.document")).toMatch(/\.docx$/);
+  });
+  it("refuses anything that is not three ids and a known type", () => {
+    for (const bad of ["../..", `${ORG}/..`, "", null, 7, `${ORG}?select=id`]) {
+      expect(() => storagePathFor(bad, CONTRACT, DOCUMENT, "application/pdf")).toThrow();
+      expect(() => storagePathFor(ORG, CONTRACT, bad, "application/pdf")).toThrow();
+    }
+    expect(() => storagePathFor(ORG, CONTRACT, DOCUMENT, "text/html")).toThrow();
   });
 });

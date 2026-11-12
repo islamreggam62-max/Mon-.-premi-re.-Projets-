@@ -95,7 +95,9 @@ declare
   erin  uuid := '00000000-0000-0000-0000-00000000000e';  -- manager in org 1
   frank uuid := '00000000-0000-0000-0000-00000000000f';  -- admin in org 1
   org1 uuid; org2 uuid; c1 uuid; c2 uuid; d1 uuid := gen_random_uuid(); a1 uuid; a2 uuid;
-  tok text; rev uuid; r_crit uuid; r_manual uuid; ob uuid;
+  gina  uuid := '00000000-0000-0000-0000-000000000010';  -- signed up, email never confirmed
+  tok text; rev uuid; rev2 uuid; r_crit uuid; r_manual uuid; ob uuid;
+  c3 uuid; c4 uuid; dx uuid := gen_random_uuid(); d2 uuid := gen_random_uuid(); d4 uuid := gen_random_uuid();
 begin
   insert into auth.users (id, email, raw_user_meta_data) values
     (alice, 'alice@one.test', '{"full_name":"Alice"}'), (bob, 'bob@two.test', '{}'),
@@ -224,16 +226,14 @@ begin
     format('update public.contracts set title=''pwned'' where id=%L', c1), 0);
   perform test.denied('a document cannot point at another organisation''s contract',
     format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
-              values (gen_random_uuid(), %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
-           org2, c1, org2 || '/' || c1 || '/x.pdf', bob), 'foreign key');
+              values (%L, %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
+           dx, org2, c1, org2 || '/' || c1 || '/' || dx || '.pdf', bob), 'foreign key');
   perform test.denied('outsider cannot attach a document to org 1',
     format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
               values (gen_random_uuid(), %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
            org1, c1, org1 || '/' || c1 || '/x.pdf', bob), 'row-level security');
   perform test.denied('outsider cannot request a review in org 1',
     format('select public.request_review(%L, %L)', c1, dave), 'forbidden');
-  perform test.denied('outsider cannot write audit events for org 1',
-    format($q$select public.log_audit_event(%L, 'document.downloaded', 'document', null, '{}')$q$, org1), 'forbidden');
 
   -- -------------------------------------------------- documents & analyses
   perform test.as_user(erin, 'erin@one.test');
@@ -243,6 +243,18 @@ begin
     format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
               values (gen_random_uuid(), %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
            org1, c1, org2 || '/' || c1 || '/x.pdf', erin), 'check constraint');
+  perform test.denied('a storage path cannot climb out of its folder',
+    format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+              values (%L, %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
+           dx, org1, c1, org1 || '/' || c1 || '/../../' || org2 || '/' || c2 || '/' || dx || '.pdf', erin), 'check constraint');
+  perform test.denied('a storage path cannot carry a query string',
+    format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+              values (%L, %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
+           dx, org1, c1, org1 || '/' || c1 || '/' || dx || '.pdf?select=id', erin), 'check constraint');
+  perform test.denied('the file extension must match the declared type',
+    format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+              values (%L, %L, %L, %L, 'x.pdf', 'application/pdf', 10, repeat('a', 64), %L)$q$,
+           dx, org1, c1, org1 || '/' || c1 || '/' || dx || '.docx', erin), 'check constraint');
   perform test.denied('only PDF and DOCX are accepted',
     format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
               values (gen_random_uuid(), %L, %L, %L, 'x.exe', 'application/x-msdownload', 10, repeat('a', 64), %L)$q$,
@@ -250,6 +262,15 @@ begin
   perform test.denied('users cannot write extracted page text',
     format('insert into public.document_pages (document_id, org_id, page_number, content) values (%L, %L, 1, ''fake'')', d1, org1), 'permission denied');
   insert into public.analyses (org_id, contract_id, document_id, requested_by) values (org1, c1, d1, erin) returning id into a1;
+  perform test.denied('only one analysis of a contract can run at a time',
+    format('insert into public.analyses (org_id, contract_id, document_id, requested_by) values (%L, %L, %L, %L)', org1, c1, d1, erin), 'analyses_one_running_idx');
+  insert into public.contracts (org_id, title, created_by) values (org1, 'Other contract', erin) returning id into c3;
+  perform test.denied('an analysis cannot pair a contract with another contract''s document',
+    format('insert into public.analyses (org_id, contract_id, document_id, requested_by) values (%L, %L, %L, %L)', org1, c3, d1, erin), 'foreign key');
+  perform test.denied('an obligation cannot be assigned to someone outside the organisation',
+    format($q$insert into public.obligations (org_id, contract_id, description, assignee_id, created_by) values (%L, %L, 'x', %L, %L)$q$, org1, c3, bob, erin), 'foreign key');
+  perform test.denied('a contract owner must be a member of the organisation',
+    format('update public.contracts set owner_id = %L where id = %L', bob, c3), 'foreign key');
   perform test.denied('users cannot mark an analysis completed',
     format('update public.analyses set status = ''completed'' where id=%L', a1), 'permission denied');
   perform test.denied('users cannot call the server-only results function',
@@ -332,11 +353,11 @@ begin
   perform test.denied('only one pending review per contract',
     format('select public.request_review(%L, %L)', c1, frank), 'contract_not_in_draft');
   perform test.denied('the record is frozen while a review is pending',
-    format('update public.contracts set expiration_date = date ''2035-01-01'' where id=%L', c1), 'contract_under_review');
+    format('update public.contracts set expiration_date = date ''2035-01-01'' where id=%L', c1), 'contract_locked');
   perform test.denied('documents cannot be swapped while a review is pending',
     format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
               values (gen_random_uuid(), %L, %L, %L, 'swap.pdf', 'application/pdf', 10, repeat('c', 64), %L)$q$,
-           org1, c1, org1 || '/' || c1 || '/swap.pdf', erin), 'contract_under_review');
+           org1, c1, org1 || '/' || c1 || '/swap.pdf', erin), 'contract_locked');
   update public.risks set resolution_note = 'Cap negotiated (confirmed)' where id = r_crit;
   perform test.pass('findings can still be triaged while a review is pending');
   perform test.as_service();
@@ -359,9 +380,23 @@ begin
   perform test.is_true('approval moves the contract to approved', format('(select status = ''approved'' from public.contracts where id=%L)', c1));
   perform test.denied('a review cannot be decided twice',
     format('select public.decide_review(%L, ''rejected'', ''changed my mind'')', rev), 'review_already_decided');
+  perform test.as_user(erin, 'erin@one.test');
+  perform test.denied('an approved record cannot be rewritten',
+    format('update public.contracts set total_value = 99999999, counterparty = ''Someone Else'' where id=%L', c1), 'contract_locked');
+  perform test.denied('documents cannot be added to an approved contract',
+    format($q$insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+              values (%L, %L, %L, %L, 'new-terms.pdf', 'application/pdf', 10, repeat('d', 64), %L)$q$,
+           dx, org1, c1, org1 || '/' || c1 || '/' || dx || '.pdf', erin), 'contract_locked');
+  perform test.affects('the person following an approved contract can still be reassigned',
+    format('update public.contracts set owner_id = %L where id=%L', alice, c1), 1);
+  perform test.as_user(alice, 'alice@one.test');
+  perform test.denied('the approved document cannot be deleted, even by the owner',
+    format('delete from public.documents where id=%L', d1), 'contract_locked');
 
   perform test.as_user(erin, 'erin@one.test');
   perform public.set_contract_status(c1, 'active');
+  perform test.denied('a contract in force stays locked',
+    format('update public.contracts set expiration_date = date ''2040-01-01'' where id=%L', c1), 'contract_locked');
   perform test.denied('lifecycle cannot jump back to approved',
     format('select public.set_contract_status(%L, ''approved'')', c1), 'invalid_status_transition');
   perform test.as_user(carol, 'carol@one.test');
@@ -402,11 +437,12 @@ begin
   perform test.count_is('manager cannot read the audit log', 'select 1 from public.audit_log', 0);
   perform test.denied('users cannot write audit rows directly',
     format('insert into public.audit_log (org_id, action, entity_type) values (%L, ''x.y'', ''x'')', org1), 'permission denied');
-  perform public.log_audit_event(org1, 'document.downloaded', 'document', d1, '{}');
-  perform test.denied('users cannot imitate system audit entries',
-    format($q$select public.log_audit_event(%L, 'contract.created', 'contract', %L, '{}')$q$, org1, c1), 'invalid_audit_event');
-  perform test.denied('a download event must name a document of the same organisation',
-    format($q$select public.log_audit_event(%L, 'document.downloaded', 'document', %L, '{}')$q$, org1, c2), 'invalid_audit_event');
+  perform test.denied('users cannot write download events themselves',
+    format('select public.record_document_download(%L, %L)', d1, erin), 'permission denied');
+  perform test.as_service();
+  perform public.record_document_download(d1, erin);
+  perform test.denied('a download cannot be attributed to someone outside the organisation',
+    format('select public.record_document_download(%L, %L)', d1, bob), 'forbidden');
   perform test.as_user(alice, 'alice@one.test');
   perform test.count_is('contract creation is audited with its actor',
     format('select 1 from public.audit_log where action=''contract.created'' and entity_id=%L and actor_id=%L', c1, erin), 1);
@@ -417,7 +453,8 @@ begin
   perform test.count_is('membership changes are audited', format('select 1 from public.audit_log where action=''membership.created'' and org_id=%L', org1), 5);
   perform test.count_is('server-side writes are audited as system (no actor)',
     format('select 1 from public.audit_log where action=''analysis.updated'' and actor_id is null and org_id=%L', org1), 2);
-  perform test.count_is('explicit events are recorded', 'select 1 from public.audit_log where action=''document.downloaded''', 1);
+  perform test.count_is('downloads are recorded with the member who asked',
+    format('select 1 from public.audit_log where action=''document.downloaded'' and actor_id=%L', erin), 1);
   perform test.count_is('owner sees only their organisation''s audit log', format('select 1 from public.audit_log where org_id <> %L', org1), 0);
   perform test.denied('owner cannot delete audit rows', 'delete from public.audit_log', 'permission denied');
   perform test.as_service();
@@ -425,21 +462,102 @@ begin
   perform test.denied('even the server cannot delete audit rows', 'delete from public.audit_log', 'append-only');
   perform test.denied('even the server cannot truncate the audit log', 'truncate public.audit_log', 'append-only');
 
+  -- ------------------------------------------------- reopening and cancelling
+  perform test.as_user(erin, 'erin@one.test');
+  perform public.set_contract_status(c1, 'draft');
+  perform test.affects('a reopened contract can be edited again',
+    format('update public.contracts set description = ''amended'' where id=%L', c1), 1);
+  perform test.is_true('reopening removes the approval', format('(select status = ''draft'' from public.contracts where id=%L)', c1));
+  perform test.as_user(alice, 'alice@one.test');
+  perform test.denied('an analysed document cannot be deleted on its own (its findings would go with it)',
+    format('delete from public.documents where id=%L', d1), 'document_has_analyses');
+  perform test.as_user(erin, 'erin@one.test');
+  rev2 := public.request_review(c1, dave);
+  perform test.denied('findings cannot be regenerated while a review is pending',
+    format('insert into public.analyses (org_id, contract_id, document_id, requested_by) values (%L, %L, %L, %L)', org1, c1, d1, erin), 'contract_locked');
+  perform test.as_user(bob, 'bob@two.test');
+  perform test.denied('an outsider cannot cancel a review', format('select public.cancel_review(%L)', rev2), 'forbidden');
+  perform test.as_user(carol, 'carol@one.test');
+  perform test.denied('a member who did not request the review cannot cancel it', format('select public.cancel_review(%L)', rev2), 'forbidden');
+  perform test.as_user(erin, 'erin@one.test');
+  perform public.cancel_review(rev2);
+  perform test.is_true('cancelling a review returns the contract to draft',
+    format('(select c.status = ''draft'' and r.status = ''cancelled'' from public.contracts c, public.reviews r where c.id=%L and r.id=%L)', c1, rev2));
+  perform test.denied('a cancelled review cannot be decided', format('select public.cancel_review(%L)', rev2), 'review_already_decided');
+
+  -- ----------------------------------------------------- quota cannot be reset
+  perform test.as_service();
+  update public.subscriptions set monthly_analysis_limit = 1 where org_id = org2;
+  perform test.as_user(bob, 'bob@two.test');
+  insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+    values (d2, org2, c2, org2 || '/' || c2 || '/' || d2 || '.pdf', 'lease.pdf', 'application/pdf', 99, repeat('e', 64), bob);
+  insert into public.analyses (org_id, contract_id, document_id, requested_by) values (org2, c2, d2, bob);
+  perform test.affects('an owner can delete a whole contract with its documents and analyses',
+    format('delete from public.contracts where id=%L', c2), 1);
+  perform test.count_is('the analyses went with the contract', format('select 1 from public.analyses where org_id=%L', org2), 0);
+  insert into public.contracts (org_id, title, created_by) values (org2, 'Second lease', bob) returning id into c4;
+  insert into public.documents (id, org_id, contract_id, storage_path, filename, mime_type, size_bytes, sha256, uploaded_by)
+    values (d4, org2, c4, org2 || '/' || c4 || '/' || d4 || '.pdf', 'lease2.pdf', 'application/pdf', 99, repeat('f', 64), bob);
+  perform test.denied('deleting analysed contracts does not give the monthly quota back',
+    format('insert into public.analyses (org_id, contract_id, document_id, requested_by) values (%L, %L, %L, %L)', org2, c4, d4, bob), 'plan_limit_analyses');
+  perform test.denied('users cannot erase usage records', 'delete from public.usage_events', 'permission denied');
+  perform test.count_is('an organisation sees only its own usage', format('select 1 from public.usage_events where org_id <> %L', org2), 0);
+  perform test.as_service();
+  perform test.denied('even the server cannot erase usage records', 'delete from public.usage_events', 'append-only');
+  update public.subscriptions set status = 'canceled' where org_id = org2;
+  perform test.as_user(bob, 'bob@two.test');
+  perform test.denied('a cancelled subscription cannot add contracts',
+    format('insert into public.contracts (org_id, title, created_by) values (%L, ''Late'', %L)', org2, bob), 'subscription_inactive');
+
+  -- ------------------------------------------------ accounts and memberships
+  perform public.create_organization('Bob Three');
+  perform public.create_organization('Bob Four');
+  perform public.create_organization('Bob Five');
+  perform public.create_organization('Bob Six');
+  perform test.denied('one account cannot create organisations without limit',
+    $q$select public.create_organization('Bob Seven')$q$, 'too_many_organizations');
+  perform test.denied('an outsider learns nothing about who belongs to an organisation (member)',
+    format('select public.remove_member(%L, %L)', org1, alice), 'forbidden');
+  perform test.denied('an outsider learns nothing about who belongs to an organisation (non-member)',
+    format('select public.remove_member(%L, %L)', org1, bob), 'forbidden');
+  perform test.as_admin();
+  insert into auth.users (id, email, email_confirmed_at) values (gina, 'gina@one.test', null);
+  perform test.as_user(alice, 'alice@one.test');
+  tok := public.create_invitation(org1, 'gina@one.test', 'viewer');
+  perform test.as_user(gina, 'gina@one.test');
+  perform test.denied('an unconfirmed email address cannot accept an invitation',
+    format('select public.accept_invitation(%L)', tok), 'invitation_email_mismatch');
+
   -- ---------------------------------------------------------------- storage
   perform test.as_user(erin, 'erin@one.test');
   insert into storage.objects (bucket_id, name) values ('contracts', org1 || '/' || c1 || '/' || d1 || '.pdf');
   perform test.denied('a file cannot be uploaded into another organisation''s folder',
-    format('insert into storage.objects (bucket_id, name) values (''contracts'', %L)', org2 || '/' || c2 || '/evil.pdf'), 'row-level security');
+    format('insert into storage.objects (bucket_id, name) values (''contracts'', %L)', org2 || '/' || c4 || '/' || dx || '.pdf'), 'row-level security');
   perform test.denied('a file path without an organisation folder is rejected',
     'insert into storage.objects (bucket_id, name) values (''contracts'', ''loose.pdf'')', 'row-level security');
+  perform test.denied('a file path with extra segments is rejected',
+    format('insert into storage.objects (bucket_id, name) values (''contracts'', %L)', org1 || '/' || c1 || '/../' || c1 || '/' || dx || '.pdf'), 'row-level security');
+  perform test.count_is('files cannot be listed or read directly, even by the uploader', 'select 1 from storage.objects', 0);
+  perform test.affects('a stored file cannot be renamed or replaced by a user', 'update storage.objects set name = name', 0);
+  perform test.as_user(alice, 'alice@one.test');
+  perform test.affects('a stored file cannot be removed by a user, even the owner', 'delete from storage.objects', 0);
   perform test.as_user(carol, 'carol@one.test');
-  perform test.count_is('members can read their organisation''s files', 'select 1 from storage.objects', 1);
   perform test.denied('viewer cannot upload files',
-    format('insert into storage.objects (bucket_id, name) values (''contracts'', %L)', org1 || '/' || c1 || '/v.pdf'), 'row-level security');
+    format('insert into storage.objects (bucket_id, name) values (''contracts'', %L)', org1 || '/' || c1 || '/' || dx || '.pdf'), 'row-level security');
   perform test.as_user(bob, 'bob@two.test');
   perform test.count_is('outsider cannot read org 1 files', 'select 1 from storage.objects', 0);
   perform test.as_anon();
   perform test.count_is('anon cannot read any file', 'select 1 from storage.objects', 0);
+  perform test.as_service();
+  perform test.count_is('the server can read stored files', 'select 1 from storage.objects', 1);
+
+  -- ------------------------------------------------------- a member leaves
+  perform test.as_user(carol, 'carol@one.test');
+  perform public.remove_member(org1, carol);
+  perform test.as_user(alice, 'alice@one.test');
+  perform test.is_true('when a member leaves, their assignments are cleared',
+    format('(select assignee_id is null from public.obligations where id=%L)', ob));
+  perform test.count_is('the obligation itself is kept', format('select 1 from public.obligations where id=%L', ob), 1);
 
   perform test.as_admin();
 end $$;

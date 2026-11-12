@@ -14,7 +14,7 @@ export default async function BillingPage() {
     context.supabase.from("subscriptions").select("*").eq("org_id", context.org.id).maybeSingle(),
     context.supabase.from("contracts").select("id", { count: "exact", head: true }).eq("org_id", context.org.id),
     context.supabase.from("memberships").select("user_id", { count: "exact", head: true }).eq("org_id", context.org.id),
-    context.supabase.from("analyses").select("id", { count: "exact", head: true }).eq("org_id", context.org.id).gte("created_at", monthStart),
+    context.supabase.from("usage_events").select("id", { count: "exact", head: true }).eq("org_id", context.org.id).eq("kind", "analysis").gte("created_at", monthStart),
   ]);
   const plan = subscription.data as { plan: string; status: string; seat_limit: number; contract_limit: number; monthly_analysis_limit: number; current_period_end: string } | null;
   const usage = plan

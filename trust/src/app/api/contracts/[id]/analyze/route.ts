@@ -13,6 +13,13 @@ export const maxDuration = 300;
 /** A job that has not finished after this long is considered dead and may be started again. */
 const STALE_AFTER_MS = 15 * 60 * 1000;
 
+/**
+ * Ceiling on analyses started per day across ALL organisations. Each organisation
+ * has its own monthly limit, but sign-up is open, so this bounds the total AI spend
+ * if many accounts are created to abuse the free allowance. Set it to your budget.
+ */
+const DAILY_CEILING = Number(process.env.TRUST_MAX_ANALYSES_PER_DAY ?? 200);
+
 function originHost(origin: string): string | null {
   try {
     return new URL(origin).host;
@@ -61,6 +68,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .limit(1);
   if (running && running.length > 0) return refuse("already_running", 409);
 
+  const admin = createAdminClient();
+  const dayStart = new Date(new Date().toISOString().slice(0, 10)).toISOString();
+  const { count: startedToday, error: countError } = await admin
+    .from("usage_events")
+    .select("id", { count: "exact", head: true })
+    .eq("kind", "analysis")
+    .gte("created_at", dayStart);
+  if (countError || (startedToday ?? 0) >= DAILY_CEILING) return refuse("service_busy", 429);
+
   const { data: analysis, error } = await supabase
     .from("analyses")
     .insert({ org_id: document.org_id, contract_id: contractId.data, document_id: document.id, requested_by: auth.user.id })
@@ -68,13 +84,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .single();
   if (error || !analysis) {
     const code = errorCode(error);
-    return refuse(code, code === "forbidden" ? 403 : code === "plan_limit_analyses" ? 402 : 500);
+    const status: Record<string, number> = { forbidden: 403, plan_limit_analyses: 402, already_running: 409, contract_locked: 409, subscription_inactive: 402 };
+    return refuse(code, status[code] ?? 500);
   }
 
   const analysisId = analysis.id as string;
   after(async () => {
     try {
-      await runAnalysis(createAdminClient(), analysisId, new ClaudeAnalysisModel());
+      await runAnalysis(admin, analysisId, new ClaudeAnalysisModel());
     } catch (failure) {
       console.error("analysis could not run", { analysisId, failure });
     }

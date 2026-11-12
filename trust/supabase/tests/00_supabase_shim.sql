@@ -11,6 +11,7 @@ create schema auth;
 create table auth.users (
   id uuid primary key default gen_random_uuid(),
   email text unique,
+  email_confirmed_at timestamptz default now(),
   raw_user_meta_data jsonb not null default '{}'::jsonb
 );
 create function auth.jwt() returns jsonb language sql stable as $$

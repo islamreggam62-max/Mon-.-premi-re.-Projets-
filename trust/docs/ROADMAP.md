@@ -16,7 +16,9 @@ review and approval; audit trail; plan limits; dashboard.
 2. **Run the database tests against the real project's schema** (in a transaction
    that is rolled back) to confirm the policies behave the same under Supabase's
    own roles and storage schema as under the local stand-in.
-3. **Independent security review** (see `SECURITY.md`).
+3. **Second independent security review.** The first one found a critical flaw and
+   several serious ones; they are fixed and tested (see `SECURITY.md`), but the fixes
+   have not been re-tested by an independent reviewer.
 4. **Owner decisions:** plan names, prices and limits; output language policy;
    hosting provider; data region.
 

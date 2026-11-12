@@ -33,14 +33,19 @@ export async function runAnalysis(admin: SupabaseClient, analysisId: string, mod
 
   try {
     const [{ data: document, error: documentError }, { data: contract, error: contractError }] = await Promise.all([
-      admin.from("documents").select("id, org_id, storage_path, filename, sha256").eq("id", claimed.document_id).single(),
+      admin.from("documents").select("id, org_id, contract_id, mime_type, filename, sha256").eq("id", claimed.document_id).single(),
       admin.from("contracts").select("id, our_party").eq("id", claimed.contract_id).single(),
     ]);
-    if (documentError || contractError || !document || !contract || document.org_id !== claimed.org_id) {
+    if (
+      documentError || contractError || !document || !contract ||
+      document.org_id !== claimed.org_id || document.contract_id !== claimed.contract_id
+    ) {
       throw new AnalysisError("The document could not be found.");
     }
 
-    const { data: file, error: downloadError } = await admin.storage.from("contracts").download(document.storage_path);
+    const { data: file, error: downloadError } = await admin.storage
+      .from("contracts")
+      .download(storagePathFor(document.org_id, document.contract_id, document.id, document.mime_type));
     if (downloadError || !file) throw new AnalysisError("The document file could not be read from storage.");
     const bytes = new Uint8Array(await file.arrayBuffer());
     if (createHash("sha256").update(bytes).digest("hex") !== document.sha256) {
@@ -88,6 +93,26 @@ export async function runAnalysis(admin: SupabaseClient, analysisId: string, mod
       .eq("id", analysisId)
       .in("status", ["extracting", "analyzing"]);
   }
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/**
+ * Where a document's file lives. This client can read every tenant's files, so the
+ * path is built here from validated ids and never taken from a stored or supplied
+ * string: a path containing "..", "?" or another folder cannot be formed.
+ */
+export function storagePathFor(orgId: unknown, contractId: unknown, documentId: unknown, mimeType: unknown): string {
+  const ids = [orgId, contractId, documentId];
+  if (!ids.every((id): id is string => typeof id === "string" && UUID.test(id))) {
+    throw new AnalysisError("The document could not be found.");
+  }
+  const extension =
+    mimeType === "application/pdf" ? "pdf"
+    : mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "docx"
+    : null;
+  if (!extension) throw new AnalysisError("The document could not be found.");
+  return `${ids.join("/")}.${extension}`;
 }
 
 async function storePages(admin: SupabaseClient, orgId: string, documentId: string, extracted: ExtractedDocument) {

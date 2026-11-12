@@ -19,14 +19,14 @@ and does not count toward the risk score.
 | Area | State |
 |---|---|
 | Accounts, organisations, five roles, invitations | Built |
-| Tenant isolation in the database (row-level security) | Built, 116 automated checks |
+| Tenant isolation in the database (row-level security) | Built, 152 automated checks |
 | Contract records, PDF/DOCX upload, private file storage | Built |
 | Text extraction with page numbers (PDF exact, DOCX approximate) | Built, unit-tested |
 | AI analysis with evidence check (Claude API) | Built; pipeline tested end to end with a scripted model; **not yet run against the live API** |
 | Risks and obligations: triage, manual entries, assignees | Built |
 | Deterministic risk score per contract | Built (in the database) |
 | Deadlines: expiry, notice window, dated obligations | Built |
-| Review and approval with separation of duties | Built |
+| Review and approval with separation of duties; approved contracts locked | Built |
 | Append-only audit trail | Built |
 | Plan limits (seats, contracts, analyses per month) | Built; **values are placeholders** |
 | Dashboard | Built |
@@ -50,7 +50,9 @@ Requirements: Node 20.19+ (22 recommended), a Supabase project, a Claude API key
      address, which is only meaningful if addresses are confirmed.
    - Add `https://YOUR-DOMAIN/auth/confirm` to the allowed redirect URLs.
 3. **Environment.** Copy `.env.example` to `.env.local` and fill it in.
-   `SUPABASE_SECRET_KEY` and `ANTHROPIC_API_KEY` are server-only secrets.
+   `SUPABASE_SECRET_KEY` and `ANTHROPIC_API_KEY` are server-only secrets. Without
+   `SUPABASE_SECRET_KEY` neither analysis nor document download works: files are only
+   handed out by the server.
 4. **Run.**
    ```bash
    npm install

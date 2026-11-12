@@ -3,7 +3,7 @@
 ## What the database guarantees
 
 Each line below is checked by `npm run test:db`, which runs the real migrations and
-then tries to break them (116 checks). The checks were also run against deliberately
+then tries to break them (152 checks). The checks were also run against deliberately
 broken policies to confirm that they fail when they should.
 
 - A signed-out caller can read nothing and call nothing.
@@ -14,12 +14,29 @@ broken policies to confirm that they fail when they should.
   "quotation found" mark. They can change status and add a note.
 - Contract status and risk score cannot be edited directly. Approval comes only
   from the named reviewer, who cannot be the requester and must still hold a
-  reviewing role. The record and documents are frozen during review.
+  reviewing role.
+- While a contract is under review, approved or in force, its record and documents
+  are locked. Changing them means reopening it as a draft, which removes the
+  approval. Findings cannot be regenerated during a review. A pending review can be
+  withdrawn by its requester or an administrator.
+- A document's storage path is fully determined by its ids. It cannot contain a
+  parent-folder segment, a query string or another organisation's folder.
+- An analysed document cannot be deleted on its own (its findings would go with it).
+- Users can add a file to their organisation's folder and nothing else: they cannot
+  read, replace or delete stored files directly. Downloads go through the server,
+  which records each one; users cannot write audit entries at all.
+- Contract owners and obligation assignees must be members of the organisation;
+  the assignment is cleared when the member leaves.
 - Roles change only through functions: an admin cannot create admins or touch
   owners; the last owner cannot be removed or demoted.
 - Invitation tokens are stored only as a hash, work once, expire after 7 days and
   are bound to the invited email address.
-- Plan limits (seats, contracts, monthly analyses) are enforced by triggers.
+- Plan limits (seats, contracts, monthly analyses) are enforced by triggers. AI usage
+  is counted in an append-only ledger, so deleting contracts does not reset the quota.
+  One account can create at most five organisations. Only one analysis of a contract
+  runs at a time.
+- An invitation is accepted only by the invited address, and only once that address
+  has been confirmed.
 - The audit log cannot be updated, deleted or truncated, even by the server role,
   and users cannot imitate system entries.
 
@@ -61,13 +78,42 @@ broken policies to confirm that they fail when they should.
 
 ## Not done yet
 
-- **Independent review.** An independent security review was started and did not
-  complete. It must be run before real customer data is loaded.
+- **Second independent review.** One independent review was run (see below). The
+  reviewer was stopped before it could re-test the fixes, so a second pass by someone
+  who did not write them is still required before real customer data is loaded.
+- **Concurrency.** Two fixes rely on row locks (last-owner check, document lock during
+  a review request). They were reasoned about, not tested with parallel sessions.
+- **Hostile PDFs.** The Word parser is bounded and tested against a pathological file.
+  PDF parsing relies on pdf.js and runs in the web process without a time limit; a
+  worker with a timeout is on the roadmap.
+- **Trial expiry** is not enforced (only a cancelled subscription blocks new work):
+  what happens at the end of a trial is a commercial decision.
 - No multi-factor authentication, SSO or session management screen.
 - No rate limiting beyond what Supabase applies.
 - No malware scanning of uploaded files.
 - No data export, retention schedule or organisation deletion.
 - No penetration test.
+
+## Independent review, November 2026
+
+An independent reviewer read the migrations, server code and routes and proved most
+findings by running statements against the real migrations. All were fixed in the
+same change, each with a regression test in `supabase/tests/` or `tests/`.
+
+| Severity | Finding | Fix |
+|---|---|---|
+| Critical | The stored file path only had to *start* with the organisation's folder. A crafted path made the server-side analysis fetch another organisation's file, or another address on the same host, with the server's key. | The path is now fixed by a database constraint to `<org>/<contract>/<document>.<ext>`, and the server builds it from validated ids instead of reading it. |
+| High | A tiny crafted Word file made text extraction take minutes (quadratic pattern matching). | Linear tokenizer, smaller size cap, timing test. |
+| High | The monthly AI quota counted rows the user could delete. | Append-only usage ledger; organisation creation counted per account; daily ceiling across all organisations. |
+| High | An approved contract could be rewritten and its documents replaced while staying approved. | Record and documents locked while under review, approved or in force; reopening removes the approval. |
+| Medium | Deleting a document silently deleted its AI findings. | Analysed documents cannot be deleted on their own. |
+| Medium | Stored files could be swapped under a document row; downloads could bypass the audit log. | Users can only add files; downloads are issued and recorded by the server. |
+| Medium | A pending review could not be withdrawn if the reviewer left. | `cancel_review`. |
+| Medium | A redirect parameter accepted tab and carriage-return characters; the email link could sign a visitor into someone else's account. | Strict path check; only the browser-bound confirmation flow is accepted. |
+| Low | Races on the last-owner check and on adding a document during a review request; forged download entries; analysis not tied to its contract's document; membership probing; assignees outside the organisation; unconfirmed email on invitations. | Fixed (locks, constraints, server-only functions). |
+
+The reviewer's report was cut off before its "informational" notes and its list of
+what it found sound, so those are not reflected here.
 
 ## Data protection: assumptions to verify
 

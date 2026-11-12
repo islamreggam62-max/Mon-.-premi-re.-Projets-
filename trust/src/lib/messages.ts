@@ -7,7 +7,7 @@ export const MESSAGES: Record<string, { tone: "error" | "success"; text: string 
   not_configured: { tone: "error", text: "This installation is not connected to its database yet. See the README for setup." },
   invalid_credentials: { tone: "error", text: "Wrong email or password." },
   signup_failed: { tone: "error", text: "The account could not be created. Check the email address and use a password of at least 10 characters." },
-  confirm_failed: { tone: "error", text: "The confirmation link is invalid or has expired." },
+  confirm_failed: { tone: "error", text: "This link could not sign you in here. If you have just confirmed your email address, sign in below; otherwise the link has expired." },
   invalid_input: { tone: "error", text: "Some fields are missing or invalid. Please check the form." },
   forbidden: { tone: "error", text: "Your role does not allow this action." },
   not_found: { tone: "error", text: "The item could not be found." },
@@ -25,7 +25,10 @@ export const MESSAGES: Record<string, { tone: "error" | "success"; text: string 
   reviewer_not_eligible: { tone: "error", text: "The chosen person cannot act as reviewer." },
   review_already_decided: { tone: "error", text: "This review has already been decided." },
   comment_required: { tone: "error", text: "A written reason is required to reject or request changes." },
-  contract_under_review: { tone: "error", text: "This contract is under review. Its record and documents cannot change until the reviewer decides." },
+  contract_locked: { tone: "error", text: "This contract is under review, approved or in force, so its record, documents and findings are locked. Reopen it as a draft to change it; it will then need a new review." },
+  document_has_analyses: { tone: "error", text: "A document that has been analysed is kept with its findings and cannot be deleted on its own." },
+  subscription_inactive: { tone: "error", text: "This organisation's subscription is not active." },
+  already_running: { tone: "error", text: "An analysis of this contract is already running." },
   invalid_status_transition: { tone: "error", text: "The contract cannot move to that status from its current one." },
   last_owner: { tone: "error", text: "An organisation must keep at least one owner." },
   invitation_invalid_or_expired: { tone: "error", text: "This invitation is invalid, already used or expired." },
@@ -39,6 +42,8 @@ export const MESSAGES: Record<string, { tone: "error" | "success"; text: string 
   terms_applied: { tone: "success", text: "Verified extracted terms were copied to the contract record." },
   review_requested: { tone: "success", text: "Review requested." },
   review_decided: { tone: "success", text: "Decision recorded." },
+  review_cancelled: { tone: "success", text: "Review request withdrawn. The contract is a draft again." },
+  reopened: { tone: "success", text: "Contract reopened as a draft. It needs a new review before it can be approved again." },
   member_updated: { tone: "success", text: "Member updated." },
   member_removed: { tone: "success", text: "Member removed." },
   invitation_revoked: { tone: "success", text: "Invitation revoked." },
@@ -48,7 +53,7 @@ export const MESSAGES: Record<string, { tone: "error" | "success"; text: string 
 const KNOWN_DB_ERRORS = [
   "plan_limit_contracts", "plan_limit_analyses", "plan_limit_seats", "contract_not_in_draft",
   "reviewer_must_differ_from_requester", "reviewer_not_eligible", "review_already_decided",
-  "comment_required", "invalid_status_transition", "contract_under_review", "last_owner", "invitation_invalid_or_expired",
+  "comment_required", "invalid_status_transition", "contract_locked", "document_has_analyses", "subscription_inactive", "last_owner", "invitation_invalid_or_expired",
   "invitation_email_mismatch", "too_many_organizations", "forbidden",
 ];
 
@@ -57,7 +62,9 @@ export function errorCode(error: { message?: string; code?: string } | null | un
   const message = error?.message ?? "";
   const known = KNOWN_DB_ERRORS.find((code) => message.includes(code));
   if (known) return known;
+  if (message.includes("analyses_one_running_idx")) return "already_running";
   if (error?.code === "42501" || /row-level security|permission denied/i.test(message)) return "forbidden";
+  if (/foreign key/i.test(message)) return "invalid_input";
   if (/contracts_check|expiration_date/i.test(message)) return "dates_inconsistent";
   return "unexpected";
 }

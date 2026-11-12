@@ -19,7 +19,7 @@ create type public.contract_status as enum ('draft', 'in_review', 'approved', 'a
 create type public.risk_severity as enum ('low', 'medium', 'high', 'critical');
 create type public.risk_status as enum ('open', 'accepted', 'mitigated', 'dismissed');
 create type public.obligation_status as enum ('open', 'in_progress', 'done', 'waived');
-create type public.review_status as enum ('pending', 'approved', 'rejected', 'changes_requested');
+create type public.review_status as enum ('pending', 'approved', 'rejected', 'changes_requested', 'cancelled');
 create type public.analysis_status as enum ('queued', 'extracting', 'analyzing', 'completed', 'failed');
 create type public.finding_source as enum ('ai', 'manual');
 -- 'quote'   : backed by a verbatim quotation located in the document.
@@ -99,13 +99,15 @@ create table public.contracts (
   total_value numeric(18, 2) check (total_value is null or total_value >= 0),
   currency text check (currency is null or currency ~ '^[A-Z]{3}$'),
   governing_law text,
-  owner_id uuid references auth.users (id) on delete set null,
+  owner_id uuid,                             -- a member of this organisation (constraint below)
   risk_score int check (risk_score is null or risk_score between 0 and 100),
   risk_level public.risk_severity,
   created_by uuid not null references auth.users (id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (id, org_id),
+  -- when the member leaves, only owner_id is cleared
+  foreign key (org_id, owner_id) references public.memberships (org_id, user_id) on delete set null (owner_id),
   check (expiration_date is null or effective_date is null or expiration_date >= effective_date)
 );
 create index contracts_org_idx on public.contracts (org_id, status);
@@ -126,9 +128,12 @@ create table public.documents (
   uploaded_by uuid not null references auth.users (id),
   created_at timestamptz not null default now(),
   unique (id, org_id),
+  unique (id, contract_id),
   foreign key (contract_id, org_id) references public.contracts (id, org_id) on delete cascade,
-  -- files live under "<org_id>/<contract_id>/..." so storage policies can scope by folder
-  check (storage_path like org_id::text || '/' || contract_id::text || '/%')
+  -- The path is exactly "<org_id>/<contract_id>/<id>.<pdf|docx>": nothing in it is chosen by
+  -- the caller, so it can never contain "..", a query string or another tenant's folder.
+  check (storage_path = org_id::text || '/' || contract_id::text || '/' || id::text
+         || case mime_type when 'application/pdf' then '.pdf' else '.docx' end)
 );
 create index documents_contract_idx on public.documents (contract_id);
 
@@ -160,10 +165,24 @@ create table public.analyses (
   finished_at timestamptz,
   unique (id, org_id),
   foreign key (contract_id, org_id) references public.contracts (id, org_id) on delete cascade,
-  foreign key (document_id, org_id) references public.documents (id, org_id) on delete cascade
+  foreign key (document_id, org_id) references public.documents (id, org_id) on delete cascade,
+  foreign key (document_id, contract_id) references public.documents (id, contract_id) on delete cascade
 );
 create index analyses_contract_idx on public.analyses (contract_id, created_at desc);
-create index analyses_org_month_idx on public.analyses (org_id, created_at);
+create unique index analyses_one_running_idx on public.analyses (contract_id)
+  where status in ('queued', 'extracting', 'analyzing');
+
+-- What was consumed, kept apart from the rows that consumed it: deleting a contract
+-- or a document does not give the quota back.
+create table public.usage_events (
+  id bigint generated always as identity primary key,
+  org_id uuid not null references public.organizations (id) on delete restrict,
+  kind text not null check (kind in ('analysis')),
+  actor_id uuid,
+  created_at timestamptz not null default now()
+);
+create index usage_events_org_idx on public.usage_events (org_id, kind, created_at);
+create index usage_events_day_idx on public.usage_events (kind, created_at);
 
 create table public.contract_parties (
   id uuid primary key default gen_random_uuid(),
@@ -257,12 +276,13 @@ create table public.obligations (
   evidence_verified boolean not null default false,
   superseded boolean not null default false,
   status public.obligation_status not null default 'open',
-  assignee_id uuid references auth.users (id) on delete set null,
+  assignee_id uuid,                          -- a member of this organisation (constraint below)
   completed_at timestamptz,
   created_by uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
   foreign key (contract_id, org_id) references public.contracts (id, org_id) on delete cascade,
   foreign key (analysis_id, org_id) references public.analyses (id, org_id) on delete cascade,
+  foreign key (org_id, assignee_id) references public.memberships (org_id, user_id) on delete set null (assignee_id),
   check ((source = 'ai') = (analysis_id is not null)),
   check (source = 'ai' or evidence_verified = false)
 );
@@ -366,11 +386,14 @@ create trigger subscriptions_touch before update on public.subscriptions
 -- Plan limits.
 create function private.enforce_contract_limit() returns trigger
 language plpgsql security definer set search_path = '' as $$
-declare _limit int; _count int;
+declare _sub public.subscriptions; _count int;
 begin
-  select contract_limit into _limit from public.subscriptions where org_id = new.org_id for update;
+  select * into _sub from public.subscriptions where org_id = new.org_id for update;
+  if _sub.status = 'canceled' then
+    raise exception 'subscription_inactive' using errcode = 'P0001';
+  end if;
   select count(*) into _count from public.contracts where org_id = new.org_id;
-  if _limit is not null and _count >= _limit then
+  if _sub.contract_limit is not null and _count >= _sub.contract_limit then
     raise exception 'plan_limit_contracts' using errcode = 'P0001',
       hint = 'The organisation has reached the contract limit of its plan.';
   end if;
@@ -379,17 +402,33 @@ end $$;
 create trigger contracts_plan_limit before insert on public.contracts
   for each row execute function private.enforce_contract_limit();
 
+-- Gate for starting an AI analysis. Usage is counted in usage_events, which nobody
+-- can delete, so removing contracts or documents does not reset the monthly quota.
 create function private.enforce_analysis_limit() returns trigger
 language plpgsql security definer set search_path = '' as $$
-declare _limit int; _count int;
+declare _sub public.subscriptions; _count int;
 begin
-  select monthly_analysis_limit into _limit from public.subscriptions where org_id = new.org_id for update;
-  select count(*) into _count from public.analyses
-    where org_id = new.org_id and created_at >= date_trunc('month', now());
-  if _limit is not null and _count >= _limit then
+  select * into _sub from public.subscriptions where org_id = new.org_id for update;
+  if _sub.status = 'canceled' then
+    raise exception 'subscription_inactive' using errcode = 'P0001';
+  end if;
+  if exists (select 1 from public.contracts where id = new.contract_id and status = 'in_review') then
+    raise exception 'contract_locked' using errcode = 'P0001',
+      hint = 'Findings cannot be regenerated while a review is pending.';
+  end if;
+  -- A job that never finished must not block the contract for ever.
+  update public.analyses
+    set status = 'failed', error = 'The analysis did not finish.', finished_at = now()
+    where contract_id = new.contract_id
+      and status in ('queued', 'extracting', 'analyzing')
+      and created_at < now() - interval '15 minutes';
+  select count(*) into _count from public.usage_events
+    where org_id = new.org_id and kind = 'analysis' and created_at >= date_trunc('month', now());
+  if _sub.monthly_analysis_limit is not null and _count >= _sub.monthly_analysis_limit then
     raise exception 'plan_limit_analyses' using errcode = 'P0001',
       hint = 'The organisation has used all AI analyses included in its plan this month.';
   end if;
+  insert into public.usage_events (org_id, kind, actor_id) values (new.org_id, 'analysis', auth.uid());
   return new;
 end $$;
 create trigger analyses_plan_limit before insert on public.analyses
@@ -461,36 +500,51 @@ end $$;
 create trigger obligations_stamp before update on public.obligations
   for each row execute function private.stamp_obligation_completion();
 
--- What a reviewer approves must be what was submitted: while a review is pending,
--- the contract record and its documents are frozen. Status and the computed risk
--- fields still move (the review decision and the risk trigger need them).
-create function private.freeze_contract_under_review() returns trigger
+-- What is under review, approved or in force must stay what was submitted. In those
+-- states the contract record and its documents are locked; to change them the contract
+-- is reopened as a draft (set_contract_status) and goes through review again.
+-- Still allowed: status moves (made only by the workflow functions), the computed risk
+-- fields, and owner_id (reassigning who follows the contract, or a member leaving).
+create function private.lock_contract_record() returns trigger
 language plpgsql set search_path = '' as $$
+declare
+  -- notice_deadline is generated: it is not yet computed on NEW in a BEFORE trigger
+  _skip text[] := array['status', 'risk_score', 'risk_level', 'updated_at', 'notice_deadline', 'owner_id'];
 begin
-  if old.status = 'in_review' and new.status = 'in_review'
-     -- notice_deadline is generated: it is not yet computed on NEW in a BEFORE trigger
-     and (to_jsonb(new) - array['risk_score', 'risk_level', 'updated_at', 'notice_deadline'])
-         is distinct from (to_jsonb(old) - array['risk_score', 'risk_level', 'updated_at', 'notice_deadline']) then
-    raise exception 'contract_under_review' using errcode = 'P0001',
-      hint = 'The contract record cannot change while a review is pending.';
+  if old.status in ('in_review', 'approved', 'active')
+     and (to_jsonb(new) - _skip) is distinct from (to_jsonb(old) - _skip) then
+    raise exception 'contract_locked' using errcode = 'P0001',
+      hint = 'Reopen the contract as a draft to change its record.';
   end if;
   return new;
 end $$;
-create trigger contracts_freeze before update on public.contracts
-  for each row execute function private.freeze_contract_under_review();
+create trigger contracts_lock before update on public.contracts
+  for each row execute function private.lock_contract_record();
 
-create function private.freeze_documents_under_review() returns trigger
+create function private.lock_contract_documents() returns trigger
 language plpgsql security definer set search_path = '' as $$
-declare _contract uuid := coalesce(new.contract_id, old.contract_id);
+declare
+  _contract uuid := case when tg_op = 'DELETE' then old.contract_id else new.contract_id end;
+  _status public.contract_status;
 begin
-  if exists (select 1 from public.contracts where id = _contract and status = 'in_review') then
-    raise exception 'contract_under_review' using errcode = 'P0001',
-      hint = 'Documents cannot be added or removed while a review is pending.';
+  -- FOR SHARE waits for a review request that is being recorded on this contract.
+  select status into _status from public.contracts where id = _contract for share;
+  if not found then
+    return coalesce(new, old);                -- the contract itself is being deleted
+  end if;
+  if _status in ('in_review', 'approved', 'active') then
+    raise exception 'contract_locked' using errcode = 'P0001',
+      hint = 'Reopen the contract as a draft to add or remove documents.';
+  end if;
+  -- Deleting an analysed document would silently delete its findings with it.
+  if tg_op = 'DELETE' and exists (select 1 from public.analyses where document_id = old.id) then
+    raise exception 'document_has_analyses' using errcode = 'P0001',
+      hint = 'A document that has been analysed is kept with its findings.';
   end if;
   return coalesce(new, old);
 end $$;
-create trigger documents_freeze before insert or delete on public.documents
-  for each row execute function private.freeze_documents_under_review();
+create trigger documents_lock before insert or delete on public.documents
+  for each row execute function private.lock_contract_documents();
 
 -- An assignee who is not a manager may move the status of their obligation, nothing else.
 create function private.guard_obligation_update() returns trigger
@@ -498,7 +552,8 @@ language plpgsql set search_path = '' as $$
 begin
   if auth.uid() is not null
      and not private.has_role(new.org_id, array['owner', 'admin', 'manager']::public.org_role[])
-     and (new.assignee_id is distinct from old.assignee_id or new.due_date is distinct from old.due_date) then
+     and ((new.assignee_id is not null and new.assignee_id is distinct from old.assignee_id)
+          or new.due_date is distinct from old.due_date) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
   return new;
@@ -564,11 +619,15 @@ create trigger audit_subscriptions after update on public.subscriptions
 create function private.audit_is_append_only() returns trigger
 language plpgsql set search_path = '' as $$
 begin
-  raise exception 'audit_log is append-only' using errcode = '42501';
+  raise exception '% is append-only', tg_table_name using errcode = '42501';
 end $$;
 create trigger audit_log_no_change before update or delete on public.audit_log
   for each row execute function private.audit_is_append_only();
 create trigger audit_log_no_truncate before truncate on public.audit_log
+  for each statement execute function private.audit_is_append_only();
+create trigger usage_events_no_change before update or delete on public.usage_events
+  for each row execute function private.audit_is_append_only();
+create trigger usage_events_no_truncate before truncate on public.usage_events
   for each statement execute function private.audit_is_append_only();
 
 -- ------------------------------------------------------------------ RPC ----
@@ -576,7 +635,7 @@ create function public.create_organization(_name text) returns uuid
 language plpgsql security definer set search_path = '' as $$
 declare _uid uuid := private.require_user(); _org uuid;
 begin
-  if (select count(*) from public.memberships where user_id = _uid and role = 'owner') >= 5 then
+  if (select count(*) from public.organizations where created_by = _uid) >= 5 then
     raise exception 'too_many_organizations' using errcode = 'P0001';
   end if;
   insert into public.organizations (name, created_by) values (btrim(_name), _uid) returning id into _org;
@@ -622,7 +681,11 @@ begin
   if not found or _inv.accepted_at is not null or _inv.expires_at < now() then
     raise exception 'invitation_invalid_or_expired' using errcode = 'P0001';
   end if;
-  if _inv.email <> _email then
+  -- The address must match AND be confirmed: the claim alone proves nothing if the
+  -- project ever allows sign-in before email confirmation.
+  if _inv.email <> _email or not exists (
+       select 1 from auth.users u
+       where u.id = _uid and lower(u.email) = _inv.email and u.email_confirmed_at is not null) then
     raise exception 'invitation_email_mismatch' using errcode = '42501';
   end if;
   if exists (select 1 from public.memberships where org_id = _inv.org_id and user_id = _uid) then
@@ -643,6 +706,7 @@ create function public.set_member_role(_org uuid, _user uuid, _role public.org_r
 language plpgsql security definer set search_path = '' as $$
 declare _uid uuid := private.require_user(); _current public.org_role; _is_owner boolean;
 begin
+  perform 1 from public.organizations where id = _org for update;
   _is_owner := private.has_role(_org, array['owner']::public.org_role[]);
   if not private.has_role(_org, array['owner', 'admin']::public.org_role[]) then
     raise exception 'forbidden' using errcode = '42501';
@@ -666,6 +730,11 @@ create function public.remove_member(_org uuid, _user uuid) returns void
 language plpgsql security definer set search_path = '' as $$
 declare _uid uuid := private.require_user(); _current public.org_role;
 begin
+  -- Outsiders learn nothing about who belongs to an organisation.
+  if not private.is_member(_org) then
+    raise exception 'forbidden' using errcode = '42501';
+  end if;
+  perform 1 from public.organizations where id = _org for update;
   select role into _current from public.memberships where org_id = _org and user_id = _user for update;
   if not found then
     raise exception 'member_not_found' using errcode = 'P0001';
@@ -723,7 +792,7 @@ begin
   if _r.status <> 'pending' then
     raise exception 'review_already_decided' using errcode = 'P0001';
   end if;
-  if _decision not in ('approved', 'rejected', 'changes_requested') then
+  if _decision is null or _decision not in ('approved', 'rejected', 'changes_requested') then
     raise exception 'invalid_decision' using errcode = 'P0001';
   end if;
   if _decision <> 'approved' and nullif(btrim(coalesce(_comment, '')), '') is null then
@@ -735,6 +804,23 @@ begin
   update public.contracts
     set status = case when _decision = 'approved' then 'approved' else 'draft' end::public.contract_status
     where id = _r.contract_id and status = 'in_review';
+end $$;
+
+-- Withdraws a pending review: by the person who asked for it, or an owner or admin.
+create function public.cancel_review(_review uuid) returns void
+language plpgsql security definer set search_path = '' as $$
+declare _uid uuid := private.require_user(); _r public.reviews;
+begin
+  select * into _r from public.reviews where id = _review for update;
+  if not found or not private.is_member(_r.org_id)
+     or not (_r.requested_by = _uid or private.has_role(_r.org_id, array['owner', 'admin']::public.org_role[])) then
+    raise exception 'forbidden' using errcode = '42501';
+  end if;
+  if _r.status <> 'pending' then
+    raise exception 'review_already_decided' using errcode = 'P0001';
+  end if;
+  update public.reviews set status = 'cancelled', decided_at = now() where id = _review;
+  update public.contracts set status = 'draft' where id = _r.contract_id and status = 'in_review';
 end $$;
 
 -- Lifecycle moves that do not need a review. Approval itself only comes from decide_review.
@@ -749,34 +835,26 @@ begin
   if not (
        (_c.status = 'approved' and _status = 'active')
     or (_c.status in ('approved', 'active') and _status in ('expired', 'terminated'))
-    or (_c.status in ('expired', 'terminated') and _status = 'draft')
+    or (_c.status in ('approved', 'active', 'expired', 'terminated') and _status = 'draft')
   ) then
     raise exception 'invalid_status_transition' using errcode = 'P0001';
   end if;
   update public.contracts set status = _status where id = _contract;
 end $$;
 
--- App-level events that have no row change (for example "document downloaded").
-create function public.log_audit_event(_org uuid, _action text, _entity_type text, _entity_id uuid, _metadata jsonb)
-returns void
+-- Server-only: records that a member was given a download link. It is not callable by
+-- users, so the audit log cannot be flooded or given misleading entries from the API.
+create function public.record_document_download(_document uuid, _actor uuid) returns void
 language plpgsql security definer set search_path = '' as $$
-declare _uid uuid := private.require_user();
+declare _org uuid;
 begin
-  if not private.is_member(_org) then
+  select org_id into _org from public.documents where id = _document;
+  if not found or not exists (
+       select 1 from public.memberships where org_id = _org and user_id = _actor) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
-  -- A fixed list: callers must not be able to imitate the entries the triggers write
-  -- (for example "contract.created" or "review.updated").
-  if (_action, _entity_type) not in (('document.downloaded', 'document'))
-     or pg_column_size(coalesce(_metadata, '{}'::jsonb)) > 1024 then
-    raise exception 'invalid_audit_event' using errcode = 'P0001';
-  end if;
-  if _entity_id is null or not exists (
-       select 1 from public.documents where id = _entity_id and org_id = _org) then
-    raise exception 'invalid_audit_event' using errcode = 'P0001';
-  end if;
-  insert into public.audit_log (org_id, actor_id, action, entity_type, entity_id, metadata)
-  values (_org, _uid, _action, _entity_type, _entity_id, coalesce(_metadata, '{}'::jsonb));
+  insert into public.audit_log (org_id, actor_id, action, entity_type, entity_id)
+  values (_org, _actor, 'document.downloaded', 'document', _document);
 end $$;
 
 -- Server-only: stores one finished analysis atomically. Earlier AI findings of the
@@ -887,6 +965,7 @@ alter table public.risks enable row level security;
 alter table public.obligations enable row level security;
 alter table public.reviews enable row level security;
 alter table public.audit_log enable row level security;
+alter table public.usage_events enable row level security;
 
 create policy profiles_select on public.profiles for select to authenticated
   using (id = (select auth.uid()) or private.shares_org_with(id));
@@ -969,6 +1048,9 @@ create policy obligations_delete on public.obligations for delete to authenticat
 create policy reviews_select on public.reviews for select to authenticated
   using (private.is_member(org_id));
 
+create policy usage_events_select on public.usage_events for select to authenticated
+  using (private.is_member(org_id));
+
 create policy audit_log_select on public.audit_log for select to authenticated
   using (private.has_role(org_id, array['owner', 'admin']::public.org_role[]));
 
@@ -985,7 +1067,7 @@ grant execute on function private.is_member(uuid), private.has_role(uuid, public
 grant select on public.profiles, public.organizations, public.memberships, public.invitations,
   public.subscriptions, public.contracts, public.documents, public.document_pages, public.analyses,
   public.contract_parties, public.contract_facts, public.risks, public.obligations, public.reviews,
-  public.audit_log, public.deadlines to authenticated;
+  public.audit_log, public.usage_events, public.deadlines to authenticated;
 
 grant update (full_name) on public.profiles to authenticated;
 grant update (name) on public.organizations to authenticated;
@@ -1025,8 +1107,8 @@ grant execute on function
   public.remove_member(uuid, uuid),
   public.request_review(uuid, uuid),
   public.decide_review(uuid, public.review_status, text),
-  public.set_contract_status(uuid, public.contract_status),
-  public.log_audit_event(uuid, text, text, uuid, jsonb)
+  public.cancel_review(uuid),
+  public.set_contract_status(uuid, public.contract_status)
   to authenticated;
 
 grant all on all tables in schema public to service_role;

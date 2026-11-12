@@ -61,6 +61,7 @@ const TABLES = {
   ],
   invitations: [{ id: "88888888-8888-4888-8888-888888888888", email: "new.colleague@example.test", role: "reviewer", expires_at: new Date(Date.now() + 5 * 86_400_000).toISOString(), created_at: new Date().toISOString() }],
   subscriptions: [{ org_id: ORG, plan: "trial", status: "trialing", seat_limit: 3, contract_limit: 10, monthly_analysis_limit: 20, current_period_end: new Date(Date.now() + 9 * 86_400_000).toISOString() }],
+  usage_events: [{ id: 1 }, { id: 2 }, { id: 3 }],
   audit_log: [
     { id: 3, actor_id: ME, action: "risk.updated", entity_type: "risk", metadata: { changed: ["status"], status_from: "open", status_to: "accepted" }, created_at: "2026-11-11T09:30:00Z" },
     { id: 2, actor_id: null, action: "analysis.updated", entity_type: "analysis", metadata: { changed: ["status"], status_from: "analyzing", status_to: "completed" }, created_at: "2026-11-01T10:02:10Z" },

@@ -3,7 +3,7 @@ export type ContractStatus = "draft" | "in_review" | "approved" | "active" | "ex
 export type Severity = "low" | "medium" | "high" | "critical";
 export type RiskStatus = "open" | "accepted" | "mitigated" | "dismissed";
 export type ObligationStatus = "open" | "in_progress" | "done" | "waived";
-export type ReviewStatus = "pending" | "approved" | "rejected" | "changes_requested";
+export type ReviewStatus = "pending" | "approved" | "rejected" | "changes_requested" | "cancelled";
 export type AnalysisStatus = "queued" | "extracting" | "analyzing" | "completed" | "failed";
 
 export interface Contract {

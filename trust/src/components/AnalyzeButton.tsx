@@ -9,6 +9,9 @@ const ERRORS: Record<string, string> = {
   already_running: "An analysis of this contract is already running.",
   plan_limit_analyses: "All AI analyses included in your plan this month have been used.",
   not_found: "The document could not be found.",
+  contract_locked: "Findings cannot be regenerated while a review is pending.",
+  subscription_inactive: "This organisation's subscription is not active.",
+  service_busy: "The analysis service has reached its daily capacity. Please try again tomorrow.",
 };
 
 /** Starts an analysis, then refreshes the page until it has finished. */

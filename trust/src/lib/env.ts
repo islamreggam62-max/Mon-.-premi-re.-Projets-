@@ -23,6 +23,8 @@ export function analysisConfigured(): boolean {
 /** Only same-site relative paths are accepted as redirect targets. */
 export function safeNextPath(value: unknown, fallback = "/app"): string {
   if (typeof value !== "string") return fallback;
-  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\") || value.includes("\n")) return fallback;
+  // One leading slash, then visible ASCII only. Browsers drop tabs and line breaks inside
+  // a URL, so "/\t/host" would otherwise be read as "//host", which is another site.
+  if (!/^\/(?!\/)[\x21-\x7e]*$/.test(value) || value.includes("\\")) return fallback;
   return value;
 }

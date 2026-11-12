@@ -51,15 +51,21 @@ These weights are a starting point and should be reviewed with users.
 
 **6. Workflow through functions.** Membership, review and contract status change
 only through `SECURITY DEFINER` functions that check the caller's role. Approval
-needs a named reviewer who is not the requester; the record and its documents are
-frozen while the review is pending.
+needs a named reviewer who is not the requester. While a contract is under review,
+approved or in force, its record and documents are locked; changing them means
+reopening it as a draft, which removes the approval.
 
 **7. Extracted terms never overwrite the record.** The analysis stores what it
 found. A person copies verified terms into the contract record with one action.
 
 **8. The audit trail is written by triggers** and is append-only, including for the
-service role. The one event that has no row change (a download) goes through a
-function that accepts only that event.
+service role. The one event that has no row change (a download) is recorded by a
+server-only function; users cannot write audit entries.
+
+**8b. The server never follows a stored path.** A file's location is derived from
+the organisation, contract and document ids, both in a database constraint and in
+the code that reads it with the server's key. Users may add files but cannot read,
+replace or delete them directly; downloads are short-lived links issued by the server.
 
 **9. No queue yet.** The analysis runs after the HTTP response (`after()`), claimed
 with a conditional update so two workers cannot process the same job. This is the
@@ -68,8 +74,10 @@ serverless time limits will bite on long documents.
 
 ## Analysis pipeline
 
-1. The user asks for an analysis. The route inserts an `analyses` row **as the
-   user** (the database checks role and monthly limit) and answers `202`.
+1. The user asks for an analysis. The route checks a daily ceiling across all
+   organisations, then inserts an `analyses` row **as the user** (the database checks
+   role, monthly limit, that no other analysis of the contract is running, and that
+   the contract is not under review) and answers `202`.
 2. The pipeline claims the row, downloads the file, and checks its SHA-256 against
    the value recorded at upload.
 3. Text is extracted per page and stored in `document_pages`.

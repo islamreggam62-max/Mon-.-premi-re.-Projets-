@@ -276,7 +276,7 @@ export async function setContractStatus(formData: FormData) {
   const { error } = await context.supabase.rpc("set_contract_status", { _contract: id, _status: status.data });
   if (error) finish(`/app/contracts/${id}`, "error", errorCode(error));
   revalidatePath("/app", "layout");
-  finish(`/app/contracts/${id}`, "notice", "saved");
+  finish(`/app/contracts/${id}`, "notice", status.data === "draft" ? "reopened" : "saved");
 }
 
 // ----------------------------------------------------------- documents ----
@@ -334,11 +334,9 @@ async function storeDocument(
     sha256: createHash("sha256").update(bytes).digest("hex"),
     uploaded_by: context.user.id,
   });
-  if (error) {
-    // Best effort: only owners and admins may delete files, so this can leave an unreferenced file behind.
-    await context.supabase.storage.from("contracts").remove([storagePath]);
-    return errorCode(error);
-  }
+  // Users cannot delete stored files (by design), so a failed insert leaves an
+  // unreferenced file behind. It is unreachable; cleaning those up is an operations task.
+  if (error) return errorCode(error);
   return null;
 }
 
@@ -511,6 +509,17 @@ export async function requestReview(formData: FormData) {
   if (error) finish(path, "error", errorCode(error), "#review");
   revalidatePath("/app", "layout");
   finish(path, "notice", "review_requested", "#review");
+}
+
+export async function cancelReview(formData: FormData) {
+  const context = await getContext();
+  const reviewId = parseId(formData.get("review_id"));
+  const back = backPath(formData, "/app/reviews");
+  if (!reviewId) finish(back, "error", "invalid_input");
+  const { error } = await context.supabase.rpc("cancel_review", { _review: reviewId });
+  if (error) finish(back, "error", errorCode(error));
+  revalidatePath("/app", "layout");
+  finish(back, "notice", "review_cancelled");
 }
 
 export async function decideReview(formData: FormData) {
