@@ -33,3 +33,4 @@ for migration in supabase/migrations/*.sql; do
   run_sql "$migration"
 done
 psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/10_security.test.sql
+DB_URL="$DB_URL" bash supabase/tests/20_concurrency.sh

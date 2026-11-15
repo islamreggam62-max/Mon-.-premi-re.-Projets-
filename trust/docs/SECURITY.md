@@ -81,8 +81,10 @@ broken policies to confirm that they fail when they should.
 - **Second independent review.** One independent review was run (see below). The
   reviewer was stopped before it could re-test the fixes, so a second pass by someone
   who did not write them is still required before real customer data is loaded.
-- **Concurrency.** Two fixes rely on row locks (last-owner check, document lock during
-  a review request). They were reasoned about, not tested with parallel sessions.
+- **Concurrency.** The two fixes that rely on row locks (last-owner check, document
+  lock during a review request) are covered by two-session tests in
+  `supabase/tests/20_concurrency.sh`, which fail when either lock is removed. Other
+  functions were not tested under concurrency.
 - **Hostile PDFs.** The Word parser is bounded and tested against a pathological file.
   PDF parsing relies on pdf.js and runs in the web process without a time limit; a
   worker with a timeout is on the roadmap.
