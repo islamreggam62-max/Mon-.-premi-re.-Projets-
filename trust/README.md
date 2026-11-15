@@ -66,8 +66,9 @@ Requirements: Node 20.19+ (22 recommended), a Supabase project, a Claude API key
 npm run typecheck      # TypeScript
 npm run lint           # ESLint
 npm test               # unit tests: extraction, evidence check, payload, pipeline, formatting
-npm run test:db        # runs the real migrations on a throwaway local Postgres and
-                       # tries to break tenant isolation and the workflow rules
+npm run test:db        # runs the real migrations on a throwaway local Postgres, tries
+                       # to break tenant isolation and the workflow rules, then runs
+                       # two-session concurrency tests
 npm run build
 ```
 
