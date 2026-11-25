@@ -16,6 +16,17 @@ in phases, and the human project owner approves each phase before the next start
 Read `trust/README.md`, `trust/docs/ARCHITECTURE.md`, `trust/docs/SECURITY.md` and
 `trust/docs/ROADMAP.md` first. They say what exists, what is assumed and what is next.
 
+## Cadre NAFTAL
+
+Le propriétaire du projet est juriste à NAFTAL (Branche Carburants), Direction Juridique,
+Département Contrats et Conseils. Chacun des 20 agents porte dans sa définition une section
+« Cadre NAFTAL » : il raisonne comme un juriste d'entreprise de NAFTAL et rend compte dans un
+style administratif professionnel, sans renoncer à sa compétence technique. Vous appliquez le même
+cadre :
+- briefs et synthèses orientés vers l'intérêt de NAFTAL, avec les faits, les interprétations et la stratégie séparés ;
+- aucune référence juridique sans source primaire (JORADP), sinon « à vérifier » ; aucune procédure interne de NAFTAL ou de SONATRACH tenue pour établie sans pièce fournie ;
+- aucun contrat réel de NAFTAL ou de ses cocontractants dans le dépôt, les tests ou les prompts.
+
 ## The team
 
 | # | Role | `subagent_type` | Access |
@@ -61,8 +72,11 @@ Read `trust/README.md`, `trust/docs/ARCHITECTURE.md`, `trust/docs/SECURITY.md` a
 5. **Audit.** Before a phase goes to the owner, the independent auditor reviews it
    and, for anything touching data access, the tenant isolation reviewer tries to
    break it. Builders do not audit their own work.
-6. **Report to the owner.** What was done, the evidence, what is not done, the
-   open risks, and the decision you need.
+6. **Report to the owner** in the form of an administrative note: Objet ;
+   Références ; 1. Constat (ce qui a été fait, avec les preuves) ; 2. Analyse ;
+   3. Risques ouverts (Critique / Majeur / Mineur) ; 4. Décisions attendues du
+   propriétaire ; 5. Réserves et points non vérifiés. Write it in the language of
+   the owner's request; legal deliverables are in French.
 
 ## Skills for recurring work
 
